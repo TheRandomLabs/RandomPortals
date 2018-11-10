@@ -1,0 +1,18 @@
+[
+	{
+		"modid": "verticalendportals",
+		"name": "Vertical End Portals",
+		"description": "Vertical End portals!",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"url": "https://minecraft.curseforge.com/projects/vertical-end-portals",
+		"updateJSON": "https://raw.githubusercontent.com/TheRandomLabs/Vertical-End-Portals/misc/versions.json",
+		"authorList": [
+			"TheRandomLabs"
+		],
+		"credits": "u/Sp00nWhales for suggesting this glorious mod.",
+		"logoFile": "assets/verticalendportals/logo.png",
+		"screenshots": [],
+		"dependencies": []
+	}
+]
