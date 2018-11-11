@@ -12,6 +12,19 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public final class ClientProxy extends CommonProxy {
 	@Override
+	public void construct() {
+		super.construct();
+
+		if(!Loader.isModLoaded("randompatches")) {
+			VerticalEndPortals.crashReport(
+					"RandomPatches " + VerticalEndPortals.MINIMUM_RANDOMPATCHES_VERSION +
+							" or higher must be installed on the client",
+					new IllegalStateException()
+			);
+		}
+	}
+
+	@Override
 	public void preInit() {
 		super.preInit();
 
@@ -19,14 +32,12 @@ public final class ClientProxy extends CommonProxy {
 			ClientCommandHandler.instance.registerCommand(new CommandVEPReload(Side.CLIENT));
 		}
 
-		if(Loader.isModLoaded("randompatches")) {
-			ClientRegistry.bindTileEntitySpecialRenderer(
-					TileEntityVerticalEndPortal.class, new TileEntityEndPortalRenderer()
-			);
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityVerticalEndPortal.class, new TileEntityEndPortalRenderer()
+		);
 
-			ClientRegistry.bindTileEntitySpecialRenderer(
-					TileEntityUpsideDownEndPortal.class, new TileEntityUpsideDownEndPortalRenderer()
-			);
-		}
+		ClientRegistry.bindTileEntitySpecialRenderer(
+				TileEntityUpsideDownEndPortal.class, new TileEntityUpsideDownEndPortalRenderer()
+		);
 	}
 }

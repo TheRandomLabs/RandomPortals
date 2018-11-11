@@ -6,6 +6,7 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ReportedException;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,7 +23,9 @@ public final class VerticalEndPortals {
 	public static final String MOD_ID = "verticalendportals";
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
-	public static final String DEPENDENCIES = "after:randompatches@[1.12.2-1.7.0.0,)";
+	public static final String MINIMUM_RANDOMPATCHES_VERSION = "1.12.2-1.7.0.0";
+	public static final String DEPENDENCIES =
+			"after:randompatches@[" + MINIMUM_RANDOMPATCHES_VERSION + ",)";
 	public static final String UPDATE_JSON = "https://raw.githubusercontent.com/TheRandomLabs/" +
 			"Vertical-End-Portals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
@@ -37,6 +40,11 @@ public final class VerticalEndPortals {
 			serverSide = "com.therandomlabs.verticalendportals.CommonProxy"
 	)
 	public static CommonProxy proxy;
+
+	@Mod.EventHandler
+	public static void construct(FMLConstructionEvent event) {
+		proxy.construct();
+	}
 
 	@Mod.EventHandler
 	public static void preInit(FMLPreInitializationEvent event) {
