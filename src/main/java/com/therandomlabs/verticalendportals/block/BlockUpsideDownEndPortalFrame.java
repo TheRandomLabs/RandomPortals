@@ -158,7 +158,6 @@ public class BlockUpsideDownEndPortalFrame extends BlockEndPortalFrame {
 									where(FACING, facing -> facing == EnumFacing.EAST)
 					)).
 					build();
-
 		}
 
 		return portalShape;

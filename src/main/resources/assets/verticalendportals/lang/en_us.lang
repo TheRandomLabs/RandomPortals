@@ -4,7 +4,6 @@ verticalendportals.config.client.vepreloadclientCommand=/vepreloadclient
 
 verticalendportals.config.misc=Miscellaneous
 verticalendportals.config.misc.tooltip=Options that don't fit into any other categories.
-verticalendportals.config.misc.allowHorizontalPortals=Allow horizontal portals
 verticalendportals.config.misc.vepreloadCommand=/vepreload
 
 tile.endPortalFrameVertical.name=Vertical End Portal Frame

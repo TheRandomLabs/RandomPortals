@@ -4,7 +4,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.util.BlockPattern;
 import com.therandomlabs.verticalendportals.util.BlockPatternFactory;
 import net.minecraft.block.BlockEndPortalFrame;
@@ -33,8 +33,9 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 	private static final Map<EnumFacing, AxisAlignedBB> AABB_EYE = new EnumMap<>(EnumFacing.class);
 
 	private static final Map<EnumFacing, BlockPattern> portalShape = new EnumMap<>(EnumFacing.class);
-
-	private static BlockPattern horizontalPortalShape;
+	private static BlockPattern inwardsFacingPortalShapeNorthSouth;
+	private static BlockPattern inwardsFacingPortalShapeEastWest;
+	private static BlockPattern lateralPortalShape;
 
 	private final Random random = new Random();
 
@@ -147,25 +148,36 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 				null, pos, SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F
 		);
 
-		BlockPattern.PatternHelper patternHelper =
-				getPortalShape(state.getValue(FACING)).match(world, pos);
-		boolean horizontal = false;
+		EnumFacing frameFacing = state.getValue(FACING);
+
+		BlockPattern.PatternHelper patternHelper = getPortalShape(frameFacing).match(world, pos);
+		boolean lateral = false;
 
 		if(patternHelper == null) {
-			if(!VEPConfig.misc.allowHorizontalPortals) {
-				return false;
-			}
-
-			patternHelper = getPortalShape(null).match(world, pos);
+			patternHelper = getInwardsFacingPortalShape(frameFacing).match(world, pos);
 
 			if(patternHelper == null) {
-				return false;
-			}
+				patternHelper = getLateralPortalShape().match(world, pos);
 
-			horizontal = true;
+				if(patternHelper == null) {
+					return false;
+				}
+
+				lateral = true;
+			} else {
+				if(frameFacing == EnumFacing.NORTH) {
+					frameFacing = EnumFacing.WEST;
+				} else if(frameFacing == EnumFacing.WEST) {
+					frameFacing = EnumFacing.SOUTH;
+				} else if(frameFacing == EnumFacing.SOUTH) {
+					frameFacing = EnumFacing.EAST;
+				} else {
+					frameFacing = EnumFacing.NORTH;
+				}
+			}
 		}
 
-		if(horizontal) {
+		if(lateral) {
 			final BlockPos portalPos = patternHelper.getFrontTopLeft().add(-3, 0, -3);
 
 			for(int i = 0; i < 3; i++) {
@@ -181,7 +193,6 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 			return true;
 		}
 
-		final EnumFacing portalFacing = state.getValue(FACING);
 		final List<BlockPos> positions = patternHelper.getPositions();
 		final BlockPos first = positions.get(0);
 
@@ -189,7 +200,7 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 		int x = first.getX();
 		int y = first.getY();
 
-		if(portalFacing == EnumFacing.NORTH || portalFacing == EnumFacing.SOUTH) {
+		if(frameFacing == EnumFacing.NORTH || frameFacing == EnumFacing.SOUTH) {
 			for(BlockPos position : patternHelper.getPositions()) {
 				final int newX = position.getX();
 				final int newY = position.getY();
@@ -215,7 +226,7 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 							topLeft.add(i, -j, 0),
 							VEPBlocks.vertical_end_portal.getDefaultState().withProperty(
 									BlockVerticalEndPortal.FACING,
-									portalFacing
+									frameFacing
 							),
 							2
 					);
@@ -227,7 +238,7 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 			return true;
 		}
 
-		if(portalFacing != EnumFacing.WEST && portalFacing != EnumFacing.EAST) {
+		if(frameFacing != EnumFacing.WEST && frameFacing != EnumFacing.EAST) {
 			return false;
 		}
 
@@ -256,7 +267,7 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 						topLeft.add(0, -i, j),
 						VEPBlocks.vertical_end_portal.getDefaultState().withProperty(
 								BlockVerticalEndPortal.FACING,
-								portalFacing
+								frameFacing
 						),
 						2
 				);
@@ -268,93 +279,171 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 		return true;
 	}
 
-	public static BlockPattern getPortalShape(EnumFacing portalFacing) {
-		if(horizontalPortalShape == null) {
-			horizontalPortalShape = BlockPatternFactory.start().
-					aisle("?vvv?", ">???<", ">???<", ">???<", "?^^^?").
-					where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
-					where('^', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.SOUTH)
-					)).
-					where('>', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.WEST)
-					)).
-					where('v', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.NORTH)
-					)).
-					where('<', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.EAST)
-					)).
-					build();
+	public static BlockPattern getPortalShape(EnumFacing frameFacing) {
+		initializePortalShapes();
+		return portalShape.get(frameFacing);
+	}
 
-			portalShape.put(
-					EnumFacing.NORTH,
-					BlockPatternFactory.start().
-							aisle("?vvv?").
-							aisle("v???v").
-							aisle("v???v").
-							aisle("v???v").
-							aisle("?vvv?").
-							where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
-							where('v', BlockWorldState.hasState(
-									BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-											where(EYE, eye -> eye).
-											where(FACING, facing -> facing == EnumFacing.NORTH)
-							)).
-							build()
-			);
+	public static BlockPattern getInwardsFacingPortalShape(EnumFacing frameFacing) {
+		initializePortalShapes();
 
-			portalShape.put(EnumFacing.SOUTH, BlockPatternFactory.start().
-					aisle("?vvv?").
-					aisle("v???v").
-					aisle("v???v").
-					aisle("v???v").
-					aisle("?vvv?").
-					where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
-					where('v', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.SOUTH)
-					)).
-					build());
-
-			portalShape.put(EnumFacing.WEST, BlockPatternFactory.start().
-					aisle("?vvv?").
-					aisle("v???v").
-					aisle("v???v").
-					aisle("v???v").
-					aisle("?vvv?").
-					where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
-					where('v', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.WEST)
-					)).
-					build());
-
-			portalShape.put(EnumFacing.EAST, BlockPatternFactory.start().
-					aisle("?vvv?").
-					aisle("v???v").
-					aisle("v???v").
-					aisle("v???v").
-					aisle("?vvv?").
-					where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
-					where('v', BlockWorldState.hasState(
-							BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-									where(EYE, eye -> eye).
-									where(FACING, facing -> facing == EnumFacing.EAST)
-					)).
-					build());
+		if(frameFacing == EnumFacing.NORTH || frameFacing == EnumFacing.SOUTH) {
+			return inwardsFacingPortalShapeNorthSouth;
 		}
 
-		return portalFacing == null ? horizontalPortalShape : portalShape.get(portalFacing);
+		return inwardsFacingPortalShapeEastWest;
+	}
+
+	public static BlockPattern getLateralPortalShape() {
+		initializePortalShapes();
+		return lateralPortalShape;
+	}
+
+	@SuppressWarnings("Duplicates")
+	private static void initializePortalShapes() {
+		if(lateralPortalShape != null) {
+			return;
+		}
+
+		inwardsFacingPortalShapeNorthSouth = BlockPatternFactory.start().
+				aisle("?vvv?").
+				aisle(">???<").
+				aisle(">???<").
+				aisle(">???<").
+				aisle("?^^^?").
+				where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+				where('^', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
+								where(EYE, eye -> eye)
+				)).
+				where('>', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.SOUTH)
+				)).
+				where('v', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
+								where(EYE, eye -> eye)
+				)).
+				where('<', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.NORTH)
+				)).
+				build();
+
+		inwardsFacingPortalShapeEastWest = BlockPatternFactory.start().
+				aisle("?vvv?").
+				aisle(">???<").
+				aisle(">???<").
+				aisle(">???<").
+				aisle("?^^^?").
+				where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+				where('^', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
+								where(EYE, eye -> eye)
+				)).
+				where('>', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.EAST)
+				)).
+				where('v', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
+								where(EYE, eye -> eye)
+				)).
+				where('<', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.WEST)
+				)).
+				build();
+
+		lateralPortalShape = BlockPatternFactory.start().
+				aisle("?vvv?", ">???<", ">???<", ">???<", "?^^^?").
+				where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+				where('^', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.SOUTH)
+				)).
+				where('>', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.WEST)
+				)).
+				where('v', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.NORTH)
+				)).
+				where('<', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.EAST)
+				)).
+				build();
+
+		portalShape.put(
+				EnumFacing.NORTH,
+				BlockPatternFactory.start().
+						aisle("?vvv?").
+						aisle("v???v").
+						aisle("v???v").
+						aisle("v???v").
+						aisle("?vvv?").
+						where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+						where('v', BlockWorldState.hasState(
+								BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+										where(EYE, eye -> eye).
+										where(FACING, facing -> facing == EnumFacing.NORTH)
+						)).
+						build()
+		);
+
+		portalShape.put(EnumFacing.SOUTH, BlockPatternFactory.start().
+				aisle("?vvv?").
+				aisle("v???v").
+				aisle("v???v").
+				aisle("v???v").
+				aisle("?vvv?").
+				where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+				where('v', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.SOUTH)
+				)).
+				build()
+		);
+
+		portalShape.put(EnumFacing.WEST, BlockPatternFactory.start().
+				aisle("?vvv?").
+				aisle("v???v").
+				aisle("v???v").
+				aisle("v???v").
+				aisle("?vvv?").
+				where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+				where('v', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.WEST)
+				)).
+				build()
+		);
+
+		portalShape.put(EnumFacing.EAST, BlockPatternFactory.start().
+				aisle("?vvv?").
+				aisle("v???v").
+				aisle("v???v").
+				aisle("v???v").
+				aisle("?vvv?").
+				where('?', BlockWorldState.hasState(BlockStateMatcher.ANY)).
+				where('v', BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing -> facing == EnumFacing.EAST)
+				)).
+				build()
+		);
 	}
 }

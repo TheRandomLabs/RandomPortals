@@ -28,10 +28,6 @@ public class VEPConfig {
 	}
 
 	public static class Misc {
-		@Config.LangKey("verticalendportals.config.misc.allowHorizontalPortals")
-		@Config.Comment("Allow horizontal End portals to be made out of vertical End portal frames.")
-		public boolean allowHorizontalPortals = VerticalEndPortals.IS_DEOBFUSCATED;
-
 		@Config.RequiresWorldRestart
 		@Config.LangKey("verticalendportals.config.misc.vepreloadCommand")
 		@Config.Comment("Enables the /vepreload command.")
