@@ -9,6 +9,8 @@ verticalendportals.config.misc.vepreloadCommand=/vepreload
 
 tile.endPortalFrameVertical.name=Vertical End Portal Frame
 tile.endPortalVertical.name=Vertical End Portal
+tile.endPortalFrameUpsideDown.name=Upside Down End Portal Frame
+tile.endPortalUpsideDown.name=Upside Down End Portal
 tile.endPortalFrame.name=End Portal Frame
 tile.endPortal.name=End Portal
 

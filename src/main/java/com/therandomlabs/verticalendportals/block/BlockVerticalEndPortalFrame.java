@@ -108,14 +108,14 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 		}
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
 			EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
 			float hitZ) {
 		final ItemStack stack = player.getHeldItem(hand);
 
-		if(stack.getItem() != Items.ENDER_EYE ||
-				state.getBlock() != VEPBlocks.vertical_end_portal_frame ||
+		if(stack.getItem() != Items.ENDER_EYE || state.getBlock() != this ||
 				!player.canPlayerEdit(pos.offset(facing), facing, stack) || state.getValue(EYE)) {
 			return false;
 		}
