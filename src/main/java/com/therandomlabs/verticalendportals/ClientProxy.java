@@ -5,6 +5,7 @@ import com.therandomlabs.verticalendportals.command.CommandVEPReload;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 
 public final class ClientProxy extends CommonProxy {
@@ -16,8 +17,10 @@ public final class ClientProxy extends CommonProxy {
 			ClientCommandHandler.instance.registerCommand(new CommandVEPReload(Side.CLIENT));
 		}
 
-		ClientRegistry.bindTileEntitySpecialRenderer(
-				TileEntityVerticalEndPortal.class, new TileEntityEndPortalRenderer()
-		);
+		if(Loader.isModLoaded("randompatches")) {
+			ClientRegistry.bindTileEntitySpecialRenderer(
+					TileEntityVerticalEndPortal.class, new TileEntityEndPortalRenderer()
+			);
+		}
 	}
 }

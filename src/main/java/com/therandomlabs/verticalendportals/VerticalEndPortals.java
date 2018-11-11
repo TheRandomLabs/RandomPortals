@@ -22,7 +22,7 @@ public final class VerticalEndPortals {
 	public static final String MOD_ID = "verticalendportals";
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
-	public static final String DEPENDENCIES = "required-after:randompatches@[1.12.2-1.7.0.0,)";
+	public static final String DEPENDENCIES = "after:randompatches@[1.12.2-1.7.0.0,)";
 	public static final String UPDATE_JSON = "https://raw.githubusercontent.com/TheRandomLabs/" +
 			"Vertical-End-Portals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
