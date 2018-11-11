@@ -7,8 +7,9 @@ verticalendportals.config.misc.tooltip=Options that don't fit into any other cat
 verticalendportals.config.misc.allowHorizontalPortals=Allow horizontal portals
 verticalendportals.config.misc.vepreloadCommand=/vepreload
 
-tile.endPortalFrameVertical.name=Vertical End Portal
+tile.endPortalFrameVertical.name=Vertical End Portal Frame
 tile.endPortalVertical.name=Vertical End Portal
+tile.endPortalFrame.name=End Portal Frame
 tile.endPortal.name=End Portal
 
 commands.vepreloadclient.usage=/vepreloadclient

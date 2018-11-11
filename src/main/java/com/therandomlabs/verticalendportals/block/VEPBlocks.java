@@ -72,7 +72,7 @@ public final class VEPBlocks {
 		));
 
 		Blocks.END_PORTAL.setCreativeTab(CreativeTabs.DECORATIONS);
-		Blocks.END_PORTAL.setTranslationKey("endPortalVertical");
+		Blocks.END_PORTAL.setTranslationKey("endPortal");
 	}
 
 	@SubscribeEvent
