@@ -6,6 +6,7 @@ import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -46,6 +47,15 @@ public final class VEPBlocks {
 							"inventory"
 					)
 			);
+
+			ModelLoader.setCustomModelResourceLocation(
+					Item.getItemFromBlock(Blocks.END_PORTAL),
+					0,
+					new ModelResourceLocation(
+							Blocks.END_PORTAL.getRegistryName(),
+							"inventory"
+					)
+			);
 		}
 	}
 
@@ -60,6 +70,9 @@ public final class VEPBlocks {
 				VerticalEndPortals.MOD_ID,
 				"vertical_end_portal"
 		));
+
+		Blocks.END_PORTAL.setCreativeTab(CreativeTabs.DECORATIONS);
+		Blocks.END_PORTAL.setTranslationKey("endPortalVertical");
 	}
 
 	@SubscribeEvent
