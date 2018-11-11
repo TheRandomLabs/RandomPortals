@@ -1,9 +1,8 @@
 package com.therandomlabs.verticalendportals;
 
+import com.therandomlabs.randompatches.TileEntityEndPortalRenderer;
 import com.therandomlabs.verticalendportals.command.CommandVEPReload;
-import com.therandomlabs.verticalendportals.tileentity.TileEntityBetterEndPortal;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
-import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortalRenderer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,11 +17,7 @@ public final class ClientProxy extends CommonProxy {
 		}
 
 		ClientRegistry.bindTileEntitySpecialRenderer(
-				TileEntityVerticalEndPortal.class, new TileEntityVerticalEndPortalRenderer()
-		);
-
-		ClientRegistry.bindTileEntitySpecialRenderer(
-				TileEntityBetterEndPortal.class, new TileEntityVerticalEndPortalRenderer()
+				TileEntityVerticalEndPortal.class, new TileEntityEndPortalRenderer()
 		);
 	}
 }

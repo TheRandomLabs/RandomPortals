@@ -2,7 +2,6 @@ package com.therandomlabs.verticalendportals.block;
 
 import java.util.EnumMap;
 import java.util.Map;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.block.BlockEndPortal;
 import net.minecraft.block.BlockHorizontal;
@@ -72,8 +71,41 @@ public class BlockVerticalEndPortal extends BlockEndPortal {
 	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
 			EnumFacing side) {
 		final EnumFacing facing = state.getValue(FACING);
-		return (side == facing || side == facing.getOpposite()) &&
-				VerticalEndPortals.shouldSideBeRendered(state, world, pos, side);
+
+		if(side != facing && side != facing.getOpposite()) {
+			return false;
+		}
+
+		final AxisAlignedBB axisAlignedBB = state.getBoundingBox(world, pos);
+
+		switch(side) {
+		case NORTH:
+			if(axisAlignedBB.minZ > 0.0D) {
+				return true;
+			}
+
+			break;
+		case SOUTH:
+			if(axisAlignedBB.maxZ < 1.0D) {
+				return true;
+			}
+
+			break;
+		case WEST:
+			if(axisAlignedBB.minX > 0.0D) {
+				return true;
+			}
+
+			break;
+		case EAST:
+			if(axisAlignedBB.maxX < 1.0D) {
+				return true;
+			}
+		}
+
+		return !world.getBlockState(pos.offset(side)).doesSideBlockRendering(
+				world, pos.offset(side), side.getOpposite()
+		);
 	}
 
 	@SuppressWarnings("deprecation")

@@ -3,10 +3,10 @@ package com.therandomlabs.verticalendportals.block;
 import java.util.Arrays;
 import java.util.List;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
-import com.therandomlabs.verticalendportals.tileentity.TileEntityBetterEndPortal;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
@@ -24,9 +24,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 public final class VEPBlocks {
 	public static final BlockVerticalEndPortalFrame vertical_end_portal_frame = null;
 	public static final BlockVerticalEndPortal vertical_end_portal = null;
-
-	@GameRegistry.ObjectHolder("minecraft:end_portal")
-	public static final BlockBetterEndPortal end_portal = null;
 
 	@Mod.EventBusSubscriber(value = Side.CLIENT, modid = VerticalEndPortals.MOD_ID)
 	public static class ModelRegistrar {
@@ -49,15 +46,6 @@ public final class VEPBlocks {
 							"inventory"
 					)
 			);
-
-			ModelLoader.setCustomModelResourceLocation(
-					Item.getItemFromBlock(end_portal),
-					0,
-					new ModelResourceLocation(
-							end_portal.getRegistryName(),
-							"inventory"
-					)
-			);
 		}
 	}
 
@@ -67,16 +55,10 @@ public final class VEPBlocks {
 
 		registry.register(new BlockVerticalEndPortalFrame());
 		registry.register(new BlockVerticalEndPortal());
-		registry.register(new BlockBetterEndPortal());
 
 		GameRegistry.registerTileEntity(TileEntityVerticalEndPortal.class, new ResourceLocation(
 				VerticalEndPortals.MOD_ID,
 				"vertical_end_portal"
-		));
-
-		GameRegistry.registerTileEntity(TileEntityBetterEndPortal.class, new ResourceLocation(
-				"minecraft",
-				"end_portal"
 		));
 	}
 
@@ -85,7 +67,7 @@ public final class VEPBlocks {
 		final List<Block> blocks = Arrays.asList(
 				vertical_end_portal_frame,
 				vertical_end_portal,
-				end_portal
+				Blocks.END_PORTAL
 		);
 
 		blocks.stream().

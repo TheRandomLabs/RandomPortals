@@ -20,6 +20,16 @@ archivesBaseName = "verticalendportals"
 
 sourceCompatibility = targetCompatibility = "1.8"
 
+repositories {
+	maven {
+		url "https://jitpack.io"
+	}
+}
+
+//dependencies {
+//	deobfCompile "com.github.TheRandomLabs:RandomPatches:1.12-SNAPSHOT"
+//}
+
 minecraft {
 	version = "1.12.2-latest"
 	runDir = "run"
