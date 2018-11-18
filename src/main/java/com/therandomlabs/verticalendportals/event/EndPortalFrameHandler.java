@@ -1,5 +1,7 @@
 package com.therandomlabs.verticalendportals.event;
 
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Random;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
@@ -29,9 +31,8 @@ import static net.minecraft.block.BlockHorizontal.FACING;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public final class EndPortalFrameHandler {
-	public static final FrameDetector LATERAL_FRAMES = new FrameDetector(
+	private static final FrameDetector LATERAL_FRAMES = new FrameDetector(
 			FrameDetector.Type.LATERAL,
-			3, 6, 3, 6,
 			BlockWorldState.hasState(
 					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
 							where(EYE, eye -> eye).
@@ -56,9 +57,8 @@ public final class EndPortalFrameHandler {
 			potentialFrame -> true
 	);
 
-	public static final FrameDetector LATERAL_VERTICAL_FRAMES = new FrameDetector(
+	private static final FrameDetector LATERAL_VERTICAL_FRAMES = new FrameDetector(
 			FrameDetector.Type.LATERAL,
-			3, 6, 3, 6,
 			BlockWorldState.hasState(
 					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
 							where(EYE, eye -> eye).
@@ -83,9 +83,8 @@ public final class EndPortalFrameHandler {
 			potentialFrame -> true
 	);
 
-	public static final FrameDetector UPSIDE_DOWN_FRAMES = new FrameDetector(
+	private static final FrameDetector UPSIDE_DOWN_FRAMES = new FrameDetector(
 			FrameDetector.Type.LATERAL,
-			3, 6, 3, 6,
 			BlockWorldState.hasState(
 					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
 							where(EYE, eye -> eye).
@@ -109,6 +108,57 @@ public final class EndPortalFrameHandler {
 			BlockWorldState.hasState(BlockStateMatcher.ANY),
 			potentialFrame -> true
 	);
+
+	private static final FrameDetector VERTICAL_INWARDS_FACING_FRAMES_X = new FrameDetector(
+			FrameDetector.Type.VERTICAL_X,
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
+							where(EYE, eye -> eye)
+			),
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+							where(EYE, eye -> eye).
+							where(FACING, facing1 -> facing1 == EnumFacing.WEST)
+			),
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
+							where(EYE, eye -> eye)
+			),
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+							where(EYE, eye -> eye).
+							where(FACING, facing1 -> facing1 == EnumFacing.EAST)
+			),
+			BlockWorldState.hasState(BlockStateMatcher.ANY),
+			potentialFrame -> true
+	);
+
+	private static final FrameDetector VERTICAL_INWARDS_FACING_FRAMES_Z = new FrameDetector(
+			FrameDetector.Type.VERTICAL_Z,
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
+							where(EYE, eye -> eye)
+			),
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+							where(EYE, eye -> eye).
+							where(FACING, facing1 -> facing1 == EnumFacing.EAST)
+			),
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
+							where(EYE, eye -> eye)
+			),
+			BlockWorldState.hasState(
+					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+							where(EYE, eye -> eye).
+							where(FACING, facing1 -> facing1 == EnumFacing.WEST)
+			),
+			BlockWorldState.hasState(BlockStateMatcher.ANY),
+			potentialFrame -> true
+	);
+
+	private static final EnumMap<EnumFacing, FrameDetector> VERTICAL_FRAMES =
+			new EnumMap<>(EnumFacing.class);
 
 	private static final Block[] frames = {
 			Blocks.END_PORTAL_FRAME,
@@ -117,6 +167,52 @@ public final class EndPortalFrameHandler {
 	};
 
 	private static final Random random = new Random();
+
+	static {
+		VERTICAL_FRAMES.put(EnumFacing.NORTH, new FrameDetector(
+				FrameDetector.Type.VERTICAL_X,
+				BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing1 -> facing1 == EnumFacing.NORTH)
+				),
+				BlockWorldState.hasState(BlockStateMatcher.ANY),
+				potentialFrame -> true
+		));
+
+		VERTICAL_FRAMES.put(EnumFacing.SOUTH, new FrameDetector(
+				FrameDetector.Type.VERTICAL_X,
+				BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing1 -> facing1 == EnumFacing.NORTH)
+				),
+				BlockWorldState.hasState(BlockStateMatcher.ANY),
+				potentialFrame -> true
+		));
+
+		VERTICAL_FRAMES.put(EnumFacing.WEST, new FrameDetector(
+				FrameDetector.Type.VERTICAL_Z,
+				BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing1 -> facing1 == EnumFacing.WEST)
+				),
+				BlockWorldState.hasState(BlockStateMatcher.ANY),
+				potentialFrame -> true
+		));
+
+		VERTICAL_FRAMES.put(EnumFacing.EAST, new FrameDetector(
+				FrameDetector.Type.VERTICAL_Z,
+				BlockWorldState.hasState(
+						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
+								where(EYE, eye -> eye).
+								where(FACING, facing1 -> facing1 == EnumFacing.EAST)
+				),
+				BlockWorldState.hasState(BlockStateMatcher.ANY),
+				potentialFrame -> true
+		));
+	}
 
 	@SubscribeEvent
 	public static void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
@@ -166,22 +262,28 @@ public final class EndPortalFrameHandler {
 		FrameDetector.Frame frame = null;
 
 		if(block == Blocks.END_PORTAL_FRAME) {
-			frame = LATERAL_FRAMES.detect(world, pos);
+			frame = LATERAL_FRAMES.detect(world, pos, 3, 11, 3, 11);
 		} else if(block == VEPBlocks.vertical_end_portal_frame) {
-			frame = LATERAL_VERTICAL_FRAMES.detect(world, pos);
+			frame = LATERAL_VERTICAL_FRAMES.detect(world, pos, 3, 11, 3, 11);
 		} else if(block == VEPBlocks.upside_down_end_portal_frame) {
-			frame = UPSIDE_DOWN_FRAMES.detect(world, pos);
+			frame = UPSIDE_DOWN_FRAMES.detect(world, pos, 3, 11, 3, 11);
 		}
 
 		if(frame != null && !frame.isCorner(pos)) {
+			final List<BlockPos> innerBlocks = frame.getInnerBlocks();
+
 			if(block == VEPBlocks.upside_down_end_portal_frame) {
-				frame.getInnerBlocks().forEach(innerPos -> world.setBlockState(
-						innerPos, VEPBlocks.upside_down_end_portal.getDefaultState(), 2
-				));
+				for(BlockPos innerPos : innerBlocks) {
+					world.setBlockState(
+							innerPos, VEPBlocks.upside_down_end_portal.getDefaultState(), 2
+					);
+				}
 			} else {
-				frame.getInnerBlocks().forEach(innerPos -> world.setBlockState(
-						innerPos, Blocks.END_PORTAL.getDefaultState(), 2
-				));
+				for(BlockPos innerPos : innerBlocks) {
+					world.setBlockState(
+							innerPos, Blocks.END_PORTAL.getDefaultState(), 2
+					);
+				}
 			}
 
 			world.playBroadcastSound(1038, frame.getTopLeft().add(1, 0, 1), 0);
@@ -190,8 +292,42 @@ public final class EndPortalFrameHandler {
 			return;
 		}
 
-		if(block == VEPBlocks.vertical_end_portal_frame) {
+		final EnumFacing facing = state.getValue(FACING);
+		EnumFacing portalFacing = null;
 
+		if(block == VEPBlocks.vertical_end_portal_frame) {
+			frame = VERTICAL_FRAMES.get(facing).detect(world, pos, 3, 11, 3, 11);
+			portalFacing = facing;
 		}
+
+		if(frame == null) {
+			frame = VERTICAL_INWARDS_FACING_FRAMES_X.detect(world, pos, 3, 11, 3, 11);
+			portalFacing = EnumFacing.NORTH;
+		}
+
+		if(frame == null) {
+			frame = VERTICAL_INWARDS_FACING_FRAMES_Z.detect(world, pos, 3, 11, 3, 11);
+			portalFacing = EnumFacing.WEST;
+		}
+
+		if(frame == null || frame.isCorner(pos)) {
+			event.setCancellationResult(EnumActionResult.FAIL);
+			return;
+		}
+
+		final EnumFacing portalFacing2 = portalFacing;
+		final List<BlockPos> innerBlocks = frame.getInnerBlocks();
+
+		for(BlockPos innerPos : innerBlocks) {
+			world.setBlockState(
+					innerPos, VEPBlocks.vertical_end_portal.getDefaultState().withProperty(
+							FACING, portalFacing2
+					), 2
+			);
+		}
+
+		world.playBroadcastSound(1038, innerBlocks.get(0), 0);
+
+		event.setCancellationResult(EnumActionResult.SUCCESS);
 	}
 }

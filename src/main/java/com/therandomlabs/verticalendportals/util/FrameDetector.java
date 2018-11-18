@@ -234,12 +234,6 @@ public class FrameDetector {
 
 	private final Type type;
 
-	private final int minWidth;
-	private final int maxWidth;
-
-	private final int minHeight;
-	private final int maxHeight;
-
 	private final List<Predicate<BlockWorldState>> sidePredicates;
 	private final Predicate<BlockWorldState> cornerPredicate;
 
@@ -247,23 +241,19 @@ public class FrameDetector {
 
 	private final Map<BlockPos, BlockWorldState> posCache = new HashMap<>();
 
-	public FrameDetector(Type type, int minWidth, int maxWidth, int minHeight, int maxHeight,
-			Predicate<BlockWorldState> topPredicate, Predicate<BlockWorldState> rightPredicate,
-			Predicate<BlockWorldState> bottomPredicate, Predicate<BlockWorldState> leftPredicate,
+	public FrameDetector(Type type, Predicate<BlockWorldState> sidePredicate,
 			Predicate<BlockWorldState> cornerPredicate, Predicate<Frame> framePredicate) {
+		this(
+				type, sidePredicate, sidePredicate, sidePredicate, sidePredicate, cornerPredicate,
+				framePredicate
+		);
+	}
+
+	public FrameDetector(Type type, Predicate<BlockWorldState> topPredicate,
+			Predicate<BlockWorldState> rightPredicate, Predicate<BlockWorldState> bottomPredicate,
+			Predicate<BlockWorldState> leftPredicate, Predicate<BlockWorldState> cornerPredicate,
+			Predicate<Frame> framePredicate) {
 		this.type = type;
-
-		if(minWidth < 3 || minHeight < 3) {
-			throw new IllegalArgumentException(
-					"Portal frames must be at least 3 blocks in width and height"
-			);
-		}
-
-		this.minWidth = minWidth;
-		this.maxWidth = maxWidth;
-
-		this.minHeight = minHeight;
-		this.maxHeight = maxHeight;
 
 		sidePredicates = ImmutableList.of(
 				topPredicate,
@@ -277,11 +267,20 @@ public class FrameDetector {
 		this.framePredicate = framePredicate;
 	}
 
-	public Frame detect(World world, BlockPos pos) {
+	public Frame detect(World world, BlockPos pos, int minWidth, int maxWidth, int minHeight,
+			int maxHeight) {
+		if(minWidth < 3 || minHeight < 3) {
+			throw new IllegalArgumentException(
+					"Portal frames must be at least 3 blocks in width and height"
+			);
+		}
+
 		final BlockWorldState state = getState(world, pos);
 
 		if(type == Type.LATERAL || type == Type.LATERAL_OR_VERTICAL) {
-			final Frame frame = detect(LATERAL, world, state, pos);
+			final Frame frame = detect(
+					LATERAL, world, state, pos, minWidth, maxWidth, minHeight, maxHeight
+			);
 
 			if(frame != null) {
 				return frame;
@@ -289,7 +288,9 @@ public class FrameDetector {
 		}
 
 		if(type == Type.VERTICAL || type == Type.VERTICAL_X) {
-			final Frame frame = detect(VERTICAL_X, world, state, pos);
+			final Frame frame = detect(
+					VERTICAL_X, world, state, pos, minWidth, maxWidth, minHeight, maxHeight
+			);
 
 			if(frame != null) {
 				return frame;
@@ -297,7 +298,9 @@ public class FrameDetector {
 		}
 
 		if(type == Type.VERTICAL || type == Type.VERTICAL_Z) {
-			final Frame frame = detect(VERTICAL_Z, world, state, pos);
+			final Frame frame = detect(
+					VERTICAL_Z, world, state, pos, minWidth, maxWidth, minHeight, maxHeight
+			);
 
 			if(frame != null) {
 				return frame;
@@ -307,7 +310,8 @@ public class FrameDetector {
 		return null;
 	}
 
-	private Frame detect(EnumFacing[] facings, World world, BlockWorldState state, BlockPos pos) {
+	private Frame detect(EnumFacing[] facings, World world, BlockWorldState state, BlockPos pos,
+			int minWidth, int maxWidth, int minHeight, int maxHeight) {
 		for(int index = 0; index < 4; index++) {
 			final Predicate<BlockWorldState> predicate = sidePredicates.get(index);
 
@@ -335,7 +339,10 @@ public class FrameDetector {
 
 			final HashMap<Integer, Corner> corners = new HashMap<>();
 			corners.put(index, new Corner(pos));
-			final Frame frame = detect(corners, facings, world, pos, index, index);
+			final Frame frame = detect(
+					corners, facings, world, pos, minWidth, maxWidth, minHeight, maxHeight,
+					index, index
+			);
 
 			if(frame == null) {
 				continue;
@@ -350,7 +357,8 @@ public class FrameDetector {
 	}
 
 	private Frame detect(HashMap<Integer, Corner> corners, EnumFacing[] facings, World world,
-			BlockPos pos, int startIndex, int continueIndex) {
+			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight, int startIndex,
+			int continueIndex) {
 		for(int index = continueIndex; index < startIndex + 4; index++) {
 			final int actualIndex = index > 3 ? index - 4 : index;
 			final int nextIndex = actualIndex == 3 ? 0 : actualIndex + 1;
@@ -419,12 +427,8 @@ public class FrameDetector {
 					corners.put(nextIndex, new Corner(cornerPos));
 
 					final Frame frame = detect(
-							corners,
-							facings,
-							world,
-							cornerPos,
-							startIndex,
-							index + 1
+							corners, facings, world, cornerPos,
+							minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
 					);
 
 					if(frame != null) {
@@ -435,12 +439,8 @@ public class FrameDetector {
 						corners.put(nextIndex, new Corner(cornerPos));
 
 						final Frame frame = detect(
-								SerializationUtils.clone(corners),
-								facings,
-								world,
-								cornerPos,
-								startIndex,
-								index + 1
+								SerializationUtils.clone(corners), facings, world, cornerPos,
+								minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
 						);
 
 						if(frame != null) {
