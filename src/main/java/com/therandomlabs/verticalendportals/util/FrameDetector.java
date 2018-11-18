@@ -1,5 +1,6 @@
 package com.therandomlabs.verticalendportals.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +47,10 @@ public class FrameDetector {
 			width = topLeftCorner.sideLength;
 			height = rightCorner.sideLength;
 
-			topLeft = topLeftCorner.pos;
-			topRight = rightCorner.pos;
-			bottomLeft = corners.get(3).pos;
-			bottomRight = corners.get(2).pos;
+			topLeft = topLeftCorner.pos();
+			topRight = rightCorner.pos();
+			bottomLeft = corners.get(3).pos();
+			bottomRight = corners.get(2).pos();
 
 			widthDirection = facings[0];
 			heightDirection = facings[1];
@@ -184,21 +185,22 @@ public class FrameDetector {
 		}
 	}
 
-	private static class Corner implements Cloneable {
-		BlockPos pos;
+	private static class Corner implements Serializable {
+		private static final long serialVersionUID = 6688254550627695183L;
+
+		int x;
+		int y;
+		int z;
 		int sideLength;
 
 		Corner(BlockPos pos) {
-			this.pos = pos;
+			x = pos.getX();
+			y = pos.getY();
+			z = pos.getZ();
 		}
 
-		@Override
-		public Object clone() {
-			try {
-				return super.clone();
-			} catch(CloneNotSupportedException ignored) {}
-
-			return null;
+		BlockPos pos() {
+			return new BlockPos(x, y, z);
 		}
 	}
 
@@ -319,37 +321,62 @@ public class FrameDetector {
 				continue;
 			}
 
+			final int previousIndex = index == 0 ? 3 : index - 1;
+
 			final EnumFacing facing = facings[index];
+			final EnumFacing previousFacing = facings[previousIndex].getOpposite();
+
 			final EnumFacing opposite = facing.getOpposite();
+
+			final Predicate<BlockWorldState> previousPredicate = sidePredicates.get(previousIndex);
 
 			//Get the frame most opposite to the detection direction
 			//If this is a lateral top frame, then we're looking east first,
 			//so we find the westmost frame
 
-			BlockWorldState cornerState;
-			pos = pos.offset(opposite);
+			final int maxLength = index % 2 == 0 ? maxWidth : maxHeight;
 
-			while(predicate.test((cornerState = getState(world, pos)))) {
-				pos = pos.offset(opposite);
-			}
+			final List<BlockPos> possibleCorners = new ArrayList<>();
+			BlockPos checkPos = pos;
+			BlockWorldState checkState;
 
-			if(!cornerPredicate.test(cornerState)) {
+			//Compensate for two corner blocks (length is incremented at least once in the loop)
+			int length = 1;
+
+			do {
+				length++;
+
+				checkPos = checkPos.offset(opposite);
+				checkState = getState(world, checkPos);
+
+				if(previousPredicate.test(getState(world, checkPos.offset(previousFacing)))) {
+					possibleCorners.add(checkPos);
+				}
+
+				if(length == maxLength) {
+					break;
+				}
+			} while(predicate.test(checkState));
+
+			if(possibleCorners.isEmpty() || !cornerPredicate.test(checkState)) {
 				continue;
 			}
 
-			final HashMap<Integer, Corner> corners = new HashMap<>();
-			corners.put(index, new Corner(pos));
-			final Frame frame = detect(
-					corners, facings, world, pos, minWidth, maxWidth, minHeight, maxHeight,
-					index, index
-			);
+			for(BlockPos possibleCorner : possibleCorners) {
+				final HashMap<Integer, Corner> corners = new HashMap<>();
 
-			if(frame == null) {
-				continue;
+				corners.put(index, new Corner(possibleCorner));
+
+				final Frame frame = detect(
+						corners, facings, world, possibleCorner, minWidth, maxWidth, minHeight,
+						maxHeight, index, index
+				);
+
+				if(frame != null) {
+					posCache.clear();
+					return frame;
+				}
 			}
-
-			posCache.clear();
-			return frame;
 		}
 
 		posCache.clear();
@@ -358,108 +385,104 @@ public class FrameDetector {
 
 	private Frame detect(HashMap<Integer, Corner> corners, EnumFacing[] facings, World world,
 			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight, int startIndex,
-			int continueIndex) {
-		for(int index = continueIndex; index < startIndex + 4; index++) {
-			final int actualIndex = index > 3 ? index - 4 : index;
-			final int nextIndex = actualIndex == 3 ? 0 : actualIndex + 1;
+			int index) {
+		final int actualIndex = index > 3 ? index - 4 : index;
+		final int nextIndex = actualIndex == 3 ? 0 : actualIndex + 1;
 
-			final EnumFacing facing = facings[actualIndex];
-			final EnumFacing nextFacing = facings[nextIndex];
+		final EnumFacing facing = facings[actualIndex];
+		final EnumFacing nextFacing = facings[nextIndex];
 
-			final Predicate<BlockWorldState> predicate = sidePredicates.get(actualIndex);
-			final Predicate<BlockWorldState> nextPredicate = sidePredicates.get(nextIndex);
+		final Predicate<BlockWorldState> predicate = sidePredicates.get(actualIndex);
+		final Predicate<BlockWorldState> nextPredicate = sidePredicates.get(nextIndex);
 
-			//Set pos to the first relevant frame block (pos is initially the corner block)
+		//Find the minimum and maximum length of this side
 
-			pos = pos.offset(facings[actualIndex]);
+		final int minLength;
+		final int maxLength;
 
-			//Find the minimum and maximum length of this side
-
-			final int minLength;
-			final int maxLength;
-
-			if(index == startIndex || index == startIndex + 1) {
-				if(index % 2 == 0) {
-					minLength = minWidth;
-					maxLength = maxWidth;
-				} else {
-					minLength = minHeight;
-					maxLength = maxHeight;
-				}
+		if(index == startIndex || index == startIndex + 1) {
+			if(index % 2 == 0) {
+				minLength = minWidth;
+				maxLength = maxWidth;
 			} else {
-				final Corner corner = corners.get(index == 6 ? 0 : index - 2);
-				minLength = corner.sideLength;
-				maxLength = corner.sideLength;
+				minLength = minHeight;
+				maxLength = maxHeight;
+			}
+		} else {
+			final Corner corner = corners.get(index == 6 ? 0 : index - 2);
+			minLength = corner.sideLength;
+			maxLength = corner.sideLength;
+		}
+
+		//Find the other end of the side, i.e. the next corner
+
+		final List<BlockPos> possibleCorners = new ArrayList<>();
+		BlockPos checkPos = pos;
+		BlockWorldState checkState;
+
+		//Compensate for two corner blocks (length is incremented at least once in the loop)
+		int length = 1;
+
+		do {
+			length++;
+
+			checkPos = checkPos.offset(facing);
+			checkState = getState(world, checkPos);
+
+			if(length >= minLength &&
+					nextPredicate.test(getState(world, checkPos.offset(nextFacing)))) {
+				possibleCorners.add(checkPos);
 			}
 
-			//Find the other end of the side, i.e. the next corner
-
-			final List<BlockPos> possibleCorners = new ArrayList<>();
-			BlockWorldState cornerState;
-
-			//Compensate for two corner blocks
-			int length = 2;
-
-			while(predicate.test((cornerState = getState(world, pos)))) {
-				pos = pos.offset(facing);
-				length++;
-
-				if(length >= minLength &&
-						nextPredicate.test(getState(world, pos.offset(nextFacing)))) {
-					possibleCorners.add(pos);
-				}
-
-				if(length == maxLength) {
-					break;
-				}
+			if(length == maxLength) {
+				break;
 			}
+		} while(predicate.test(checkState));
 
-			if(possibleCorners.isEmpty() || !cornerPredicate.test(cornerState)) {
-				return null;
+		if(possibleCorners.isEmpty() || !cornerPredicate.test(checkState)) {
+			return null;
+		}
+
+		corners.get(actualIndex).sideLength = length;
+
+		if(nextIndex == startIndex) {
+			final Frame frame = new Frame(
+					corners,
+					facings
+			);
+
+			return framePredicate.test(frame) ? frame : null;
+		}
+
+		if(possibleCorners.size() == 1) {
+			final BlockPos cornerPos = possibleCorners.get(0);
+
+			corners.put(nextIndex, new Corner(cornerPos));
+
+			final Frame frame = detect(
+					corners, facings, world, cornerPos,
+					minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
+			);
+
+			if(frame != null) {
+				return frame;
 			}
+		} else {
+			for(BlockPos cornerPos : possibleCorners) {
+				corners.put(nextIndex, new Corner(cornerPos));
 
-			corners.get(actualIndex).sideLength = length;
+				final Frame frame = detect(
+						SerializationUtils.clone(corners), facings, world, cornerPos,
+						minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
+				);
 
-			if(nextIndex != startIndex) {
-				if(possibleCorners.size() == 1) {
-					final BlockPos cornerPos = possibleCorners.get(0);
-
-					corners.put(nextIndex, new Corner(cornerPos));
-
-					final Frame frame = detect(
-							corners, facings, world, cornerPos,
-							minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
-					);
-
-					if(frame != null) {
-						return frame;
-					}
-				} else {
-					for(BlockPos cornerPos : possibleCorners) {
-						corners.put(nextIndex, new Corner(cornerPos));
-
-						final Frame frame = detect(
-								SerializationUtils.clone(corners), facings, world, cornerPos,
-								minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
-						);
-
-						if(frame != null) {
-							return frame;
-						}
-					}
+				if(frame != null) {
+					return frame;
 				}
-
-				return null;
 			}
 		}
 
-		final Frame frame = new Frame(
-				corners,
-				facings
-		);
-
-
-		return framePredicate.test(frame) ? frame : null;
+		return null;
 	}
 
 	private BlockWorldState getState(World world, BlockPos pos) {
