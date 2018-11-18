@@ -2,8 +2,6 @@ package com.therandomlabs.verticalendportals.block;
 
 import java.util.List;
 import java.util.Random;
-import com.therandomlabs.verticalendportals.util.BlockPattern;
-import com.therandomlabs.verticalendportals.util.BlockPatternFactory;
 import net.minecraft.block.BlockEndPortalFrame;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.BlockWorldState;
@@ -12,7 +10,6 @@ import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
