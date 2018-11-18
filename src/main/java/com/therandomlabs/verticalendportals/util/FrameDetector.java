@@ -114,6 +114,18 @@ public class FrameDetector {
 			return heightDirection == EnumFacing.SOUTH;
 		}
 
+		public boolean isVertical() {
+			return heightDirection == EnumFacing.DOWN;
+		}
+
+		public boolean isVerticalX() {
+			return widthDirection == EnumFacing.EAST && heightDirection == EnumFacing.DOWN;
+		}
+
+		public boolean isVerticalY() {
+			return widthDirection == EnumFacing.NORTH && heightDirection == EnumFacing.DOWN;
+		}
+
 		public int getWidth() {
 			return width;
 		}
