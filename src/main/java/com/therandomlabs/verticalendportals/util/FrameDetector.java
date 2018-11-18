@@ -1,6 +1,6 @@
 package com.therandomlabs.verticalendportals.util;
 
-import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,6 @@ import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.SerializationUtils;
 
 public class FrameDetector {
 	public enum Type {
@@ -23,6 +22,8 @@ public class FrameDetector {
 	}
 
 	public static class Frame {
+		private final World world;
+
 		private final int width;
 		private final int height;
 
@@ -40,17 +41,19 @@ public class FrameDetector {
 		private final ImmutableList<BlockPos> leftBlocks;
 		private final ImmutableList<BlockPos> innerBlocks;
 
-		private Frame(Map<Integer, Corner> corners, EnumFacing[] facings) {
+		private Frame(World world, Map<Integer, Corner> corners, EnumFacing[] facings) {
+			this.world = world;
+
 			final Corner topLeftCorner = corners.get(0);
 			final Corner rightCorner = corners.get(1);
 
 			width = topLeftCorner.sideLength;
 			height = rightCorner.sideLength;
 
-			topLeft = topLeftCorner.pos();
-			topRight = rightCorner.pos();
-			bottomLeft = corners.get(3).pos();
-			bottomRight = corners.get(2).pos();
+			topLeft = topLeftCorner.pos;
+			topRight = rightCorner.pos;
+			bottomLeft = corners.get(3).pos;
+			bottomRight = corners.get(2).pos;
 
 			widthDirection = facings[0];
 			heightDirection = facings[1];
@@ -109,6 +112,10 @@ public class FrameDetector {
 			}
 
 			this.innerBlocks = ImmutableList.copyOf(innerBlocks);
+		}
+
+		public World getWorld() {
+			return world;
 		}
 
 		public boolean isLateral() {
@@ -185,22 +192,13 @@ public class FrameDetector {
 		}
 	}
 
-	private static class Corner implements Serializable {
-		private static final long serialVersionUID = 6688254550627695183L;
-
-		int x;
-		int y;
-		int z;
+	private static class Corner {
+		BlockPos pos;
 		int sideLength;
 
-		Corner(BlockPos pos) {
-			x = pos.getX();
-			y = pos.getY();
-			z = pos.getZ();
-		}
-
-		BlockPos pos() {
-			return new BlockPos(x, y, z);
+		Corner(BlockPos pos, int sideLength) {
+			this.pos = pos;
+			this.sideLength = sideLength;
 		}
 	}
 
@@ -340,7 +338,6 @@ public class FrameDetector {
 			BlockPos checkPos = pos;
 			BlockWorldState checkState;
 
-			//Compensate for two corner blocks (length is incremented at least once in the loop)
 			int length = 1;
 
 			do {
@@ -349,7 +346,8 @@ public class FrameDetector {
 				checkPos = checkPos.offset(opposite);
 				checkState = getState(world, checkPos);
 
-				if(previousPredicate.test(getState(world, checkPos.offset(previousFacing)))) {
+				if(previousPredicate.test(getState(world, checkPos.offset(previousFacing))) &&
+						cornerPredicate.test(checkState)) {
 					possibleCorners.add(checkPos);
 				}
 
@@ -358,14 +356,14 @@ public class FrameDetector {
 				}
 			} while(predicate.test(checkState));
 
-			if(possibleCorners.isEmpty() || !cornerPredicate.test(checkState)) {
+			if(possibleCorners.isEmpty()) {
 				continue;
 			}
 
 			for(BlockPos possibleCorner : possibleCorners) {
 				final HashMap<Integer, Corner> corners = new HashMap<>();
 
-				corners.put(index, new Corner(possibleCorner));
+				corners.put(index, new Corner(possibleCorner, 0));
 
 				final Frame frame = detect(
 						corners, facings, world, possibleCorner, minWidth, maxWidth, minHeight,
@@ -416,11 +414,11 @@ public class FrameDetector {
 
 		//Find the other end of the side, i.e. the next corner
 
-		final List<BlockPos> possibleCorners = new ArrayList<>();
+		//Possible corner, current side length if corner is valid
+		final List<Map.Entry<BlockPos, Integer>> possibleCorners = new ArrayList<>();
 		BlockPos checkPos = pos;
 		BlockWorldState checkState;
 
-		//Compensate for two corner blocks (length is incremented at least once in the loop)
 		int length = 1;
 
 		do {
@@ -430,8 +428,9 @@ public class FrameDetector {
 			checkState = getState(world, checkPos);
 
 			if(length >= minLength &&
-					nextPredicate.test(getState(world, checkPos.offset(nextFacing)))) {
-				possibleCorners.add(checkPos);
+					nextPredicate.test(getState(world, checkPos.offset(nextFacing))) &&
+					cornerPredicate.test(checkState)) {
+				possibleCorners.add(new AbstractMap.SimpleEntry<>(checkPos, length));
 			}
 
 			if(length == maxLength) {
@@ -439,46 +438,35 @@ public class FrameDetector {
 			}
 		} while(predicate.test(checkState));
 
-		if(possibleCorners.isEmpty() || !cornerPredicate.test(checkState)) {
+		if(possibleCorners.isEmpty()) {
 			return null;
 		}
 
-		corners.get(actualIndex).sideLength = length;
+		//There should only be one possible corner by this time since the length is already known
 
 		if(nextIndex == startIndex) {
+			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
+
 			final Frame frame = new Frame(
-					corners,
-					facings
+					world, corners, facings
 			);
 
 			return framePredicate.test(frame) ? frame : null;
 		}
 
-		if(possibleCorners.size() == 1) {
-			final BlockPos cornerPos = possibleCorners.get(0);
+		for(Map.Entry<BlockPos, Integer> corner : possibleCorners) {
+			final BlockPos cornerPos = corner.getKey();
 
-			corners.put(nextIndex, new Corner(cornerPos));
+			corners.get(actualIndex).sideLength = corner.getValue();
+			corners.put(nextIndex, new Corner(cornerPos, 0));
 
 			final Frame frame = detect(
-					corners, facings, world, cornerPos,
-					minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
+					corners, facings, world, cornerPos, minWidth, maxWidth, minHeight,
+					maxHeight, startIndex, index + 1
 			);
 
 			if(frame != null) {
 				return frame;
-			}
-		} else {
-			for(BlockPos cornerPos : possibleCorners) {
-				corners.put(nextIndex, new Corner(cornerPos));
-
-				final Frame frame = detect(
-						SerializationUtils.clone(corners), facings, world, cornerPos,
-						minWidth, maxWidth, minHeight, maxHeight, startIndex, index + 1
-				);
-
-				if(frame != null) {
-					return frame;
-				}
 			}
 		}
 

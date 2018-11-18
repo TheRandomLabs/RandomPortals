@@ -17,11 +17,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public final class NetherPortalFrameHandler {
-	private static final FrameDetector LATERAL_FRAMES = new FrameDetector(
-			FrameDetector.Type.LATERAL,
-			state -> state.getBlockState().getBlock() == Blocks.END_PORTAL_FRAME,
+	private static final FrameDetector FRAMES = new FrameDetector(
+			FrameDetector.Type.LATERAL_OR_VERTICAL,
+			state -> state.getBlockState().getBlock() == Blocks.OBSIDIAN,
 			BlockWorldState.hasState(state -> state.getBlock() != Blocks.AIR),
-			potentialFrame -> true
+			NetherPortalFrameHandler::validFrame
 	);
 
 	@SuppressWarnings("Duplicates")
@@ -48,7 +48,7 @@ public final class NetherPortalFrameHandler {
 		world.updateComparatorOutputLevel(pos, Blocks.OBSIDIAN);
 		stack.damageItem(1, player);
 
-		final FrameDetector.Frame frame = LATERAL_FRAMES.detect(world, pos, 3, 9000, 3, 9000);
+		final FrameDetector.Frame frame = FRAMES.detect(world, pos, 3, 9000, 3, 9000);
 
 		if(frame == null) {
 			event.setCancellationResult(EnumActionResult.FAIL);
@@ -56,9 +56,21 @@ public final class NetherPortalFrameHandler {
 		}
 
 		for(BlockPos innerPos : frame.getInnerBlocks()) {
-			world.setBlockState(innerPos, Blocks.PORTAL.getDefaultState());
+			world.setBlockState(innerPos, Blocks.PORTAL.getDefaultState(), 2);
 		}
 
 		event.setCancellationResult(EnumActionResult.SUCCESS);
+	}
+
+	private static boolean validFrame(FrameDetector.Frame frame) {
+		final World world = frame.getWorld();
+
+		for(BlockPos innerPos : frame.getInnerBlocks()) {
+			if(world.getBlockState(innerPos).getBlock() != Blocks.AIR) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
