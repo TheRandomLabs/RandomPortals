@@ -3,9 +3,15 @@ package com.therandomlabs.verticalendportals.event;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
+import com.google.common.collect.ImmutableMap;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.util.FrameDetector;
+import com.therandomlabs.verticalendportals.frame.BasicVerticalFrameDetector;
+import com.therandomlabs.verticalendportals.frame.Frame;
+import com.therandomlabs.verticalendportals.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.frame.LateralEndPortalDetector;
+import com.therandomlabs.verticalendportals.frame.RequiredCorner;
+import com.therandomlabs.verticalendportals.frame.VerticalInwardsFacingEndPortalFrameDetector;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortalFrame;
 import net.minecraft.block.state.BlockWorldState;
@@ -32,134 +38,16 @@ import static net.minecraft.block.BlockHorizontal.FACING;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public final class EndPortalFrameHandler {
-	private static final FrameDetector LATERAL_FRAMES = new FrameDetector(
-			FrameDetector.Type.LATERAL,
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.SOUTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.WEST)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.NORTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.EAST)
-			),
-			BlockWorldState.hasState(BlockStateMatcher.ANY),
-			potentialFrame -> true
-	);
+	public static final FrameDetector LATERAL_FRAMES =
+			new LateralEndPortalDetector(Blocks.END_PORTAL_FRAME);
 
-	private static final FrameDetector LATERAL_VERTICAL_FRAMES = new FrameDetector(
-			FrameDetector.Type.LATERAL,
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.SOUTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.WEST)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.NORTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.EAST)
-			),
-			BlockWorldState.hasState(BlockStateMatcher.ANY),
-			potentialFrame -> true
-	);
+	public static final FrameDetector LATERAL_VERTICAL_FRAMES =
+			new LateralEndPortalDetector(VEPBlocks.vertical_end_portal_frame);
 
-	private static final FrameDetector UPSIDE_DOWN_FRAMES = new FrameDetector(
-			FrameDetector.Type.LATERAL,
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.SOUTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.WEST)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.NORTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.EAST)
-			),
-			BlockWorldState.hasState(BlockStateMatcher.ANY),
-			potentialFrame -> true
-	);
+	public static final FrameDetector UPSIDE_DOWN_FRAMES =
+			new LateralEndPortalDetector(VEPBlocks.upside_down_end_portal_frame);
 
-	private static final FrameDetector VERTICAL_INWARDS_FACING_FRAMES_X = new FrameDetector(
-			FrameDetector.Type.VERTICAL_X,
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
-							where(EYE, eye -> eye)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.WEST)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
-							where(EYE, eye -> eye)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.EAST)
-			),
-			BlockWorldState.hasState(BlockStateMatcher.ANY),
-			potentialFrame -> true
-	);
-
-	private static final FrameDetector VERTICAL_INWARDS_FACING_FRAMES_Z = new FrameDetector(
-			FrameDetector.Type.VERTICAL_Z,
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.upside_down_end_portal_frame).
-							where(EYE, eye -> eye)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.SOUTH)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(Blocks.END_PORTAL_FRAME).
-							where(EYE, eye -> eye)
-			),
-			BlockWorldState.hasState(
-					BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-							where(EYE, eye -> eye).
-							where(FACING, facing -> facing == EnumFacing.NORTH)
-			),
-			BlockWorldState.hasState(BlockStateMatcher.ANY),
-			potentialFrame -> true
-	);
-
-	private static final EnumMap<EnumFacing, FrameDetector> VERTICAL_FRAMES =
-			new EnumMap<>(EnumFacing.class);
+	public static final ImmutableMap<EnumFacing, FrameDetector> VERTICAL_FRAMES;
 
 	private static final Block[] frames = {
 			Blocks.END_PORTAL_FRAME,
@@ -170,49 +58,49 @@ public final class EndPortalFrameHandler {
 	private static final Random random = new Random();
 
 	static {
-		VERTICAL_FRAMES.put(EnumFacing.NORTH, new FrameDetector(
-				FrameDetector.Type.VERTICAL_X,
+		final EnumMap<EnumFacing, FrameDetector> verticalFrames = new EnumMap<>(EnumFacing.class);
+
+		verticalFrames.put(EnumFacing.NORTH, new BasicVerticalFrameDetector(
 				BlockWorldState.hasState(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye).
-								where(FACING, facing -> facing == EnumFacing.NORTH)
+								where(EYE, eye -> eye)
 				),
-				BlockWorldState.hasState(BlockStateMatcher.ANY),
-				potentialFrame -> true
+				EnumFacing.NORTH,
+				RequiredCorner.ANY,
+				false
 		));
 
-		VERTICAL_FRAMES.put(EnumFacing.SOUTH, new FrameDetector(
-				FrameDetector.Type.VERTICAL_X,
+		verticalFrames.put(EnumFacing.EAST, new BasicVerticalFrameDetector(
 				BlockWorldState.hasState(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye).
-								where(FACING, facing -> facing == EnumFacing.SOUTH)
+								where(EYE, eye -> eye)
 				),
-				BlockWorldState.hasState(BlockStateMatcher.ANY),
-				potentialFrame -> true
+				EnumFacing.EAST,
+				RequiredCorner.ANY,
+				false
 		));
 
-		VERTICAL_FRAMES.put(EnumFacing.WEST, new FrameDetector(
-				FrameDetector.Type.VERTICAL_Z,
+		verticalFrames.put(EnumFacing.SOUTH, new BasicVerticalFrameDetector(
 				BlockWorldState.hasState(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye).
-								where(FACING, facing -> facing == EnumFacing.WEST)
+								where(EYE, eye -> eye)
 				),
-				BlockWorldState.hasState(BlockStateMatcher.ANY),
-				potentialFrame -> true
+				EnumFacing.SOUTH,
+				RequiredCorner.ANY,
+				false
 		));
 
-		VERTICAL_FRAMES.put(EnumFacing.EAST, new FrameDetector(
-				FrameDetector.Type.VERTICAL_Z,
+		verticalFrames.put(EnumFacing.WEST, new BasicVerticalFrameDetector(
 				BlockWorldState.hasState(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye).
-								where(FACING, facing -> facing == EnumFacing.EAST)
+								where(EYE, eye -> eye)
 				),
-				BlockWorldState.hasState(BlockStateMatcher.ANY),
-				potentialFrame -> true
+				EnumFacing.WEST,
+				RequiredCorner.ANY,
+				false
 		));
+
+		VERTICAL_FRAMES = ImmutableMap.copyOf(verticalFrames);
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -261,7 +149,7 @@ public final class EndPortalFrameHandler {
 				null, pos, SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F
 		);
 
-		FrameDetector.Frame frame = null;
+		Frame frame = null;
 
 		if(block == Blocks.END_PORTAL_FRAME) {
 			frame = LATERAL_FRAMES.detect(world, pos, 3, 9000, 3, 9000);
@@ -272,16 +160,14 @@ public final class EndPortalFrameHandler {
 		}
 
 		if(frame != null && !frame.isCorner(pos)) {
-			final List<BlockPos> innerBlocks = frame.getInnerBlocks();
-
 			if(block == VEPBlocks.upside_down_end_portal_frame) {
-				for(BlockPos innerPos : innerBlocks) {
+				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 					world.setBlockState(
 							innerPos, VEPBlocks.upside_down_end_portal.getDefaultState(), 2
 					);
 				}
 			} else {
-				for(BlockPos innerPos : innerBlocks) {
+				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 					world.setBlockState(
 							innerPos, Blocks.END_PORTAL.getDefaultState(), 2
 					);
@@ -303,12 +189,9 @@ public final class EndPortalFrameHandler {
 		}
 
 		if(frame == null) {
-			frame = VERTICAL_INWARDS_FACING_FRAMES_X.detect(world, pos, 3, 9000, 3, 9000);
-			portalFacing = EnumFacing.NORTH;
-		}
-
-		if(frame == null) {
-			frame = VERTICAL_INWARDS_FACING_FRAMES_Z.detect(world, pos, 3, 9000, 3, 9000);
+			frame = VerticalInwardsFacingEndPortalFrameDetector.INSTANCE.detect(
+					world, pos, 3, 9000, 3, 9000
+			);
 			portalFacing = EnumFacing.WEST;
 		}
 
@@ -317,18 +200,17 @@ public final class EndPortalFrameHandler {
 			return;
 		}
 
-		final EnumFacing portalFacing2 = portalFacing;
-		final List<BlockPos> innerBlocks = frame.getInnerBlocks();
+		final List<BlockPos> innerBlockPositions = frame.getInnerBlockPositions();
 
-		for(BlockPos innerPos : innerBlocks) {
+		for(BlockPos innerPos : innerBlockPositions) {
 			world.setBlockState(
 					innerPos, VEPBlocks.vertical_end_portal.getDefaultState().withProperty(
-							FACING, portalFacing2
+							FACING, portalFacing
 					), 2
 			);
 		}
 
-		world.playBroadcastSound(1038, innerBlocks.get(0), 0);
+		world.playBroadcastSound(1038, innerBlockPositions.get(0), 0);
 
 		event.setCancellationResult(EnumActionResult.SUCCESS);
 	}

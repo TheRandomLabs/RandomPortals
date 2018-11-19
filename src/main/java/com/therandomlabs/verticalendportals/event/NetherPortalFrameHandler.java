@@ -1,8 +1,10 @@
 package com.therandomlabs.verticalendportals.event;
 
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
-import com.therandomlabs.verticalendportals.util.FrameDetector;
-import net.minecraft.block.state.BlockWorldState;
+import com.therandomlabs.verticalendportals.frame.BasicFrameDetector;
+import com.therandomlabs.verticalendportals.frame.Frame;
+import com.therandomlabs.verticalendportals.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.frame.RequiredCorner;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -17,11 +19,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public final class NetherPortalFrameHandler {
-	private static final FrameDetector FRAMES = new FrameDetector(
-			FrameDetector.Type.LATERAL_OR_VERTICAL,
-			state -> state.getBlockState().getBlock() == Blocks.OBSIDIAN,
-			BlockWorldState.hasState(state -> state.getBlock() != Blocks.AIR),
-			NetherPortalFrameHandler::validFrame
+	public static final FrameDetector FRAMES = new BasicFrameDetector(
+			Blocks.OBSIDIAN,
+			RequiredCorner.ANY_NON_AIR,
+			true
 	);
 
 	@SuppressWarnings("Duplicates")
@@ -48,29 +49,17 @@ public final class NetherPortalFrameHandler {
 		world.updateComparatorOutputLevel(pos, Blocks.OBSIDIAN);
 		stack.damageItem(1, player);
 
-		final FrameDetector.Frame frame = FRAMES.detect(world, pos, 3, 9000, 3, 9000);
+		final Frame frame = FRAMES.detect(world, pos, 3, 9000, 3, 9000);
 
 		if(frame == null) {
 			event.setCancellationResult(EnumActionResult.FAIL);
 			return;
 		}
 
-		for(BlockPos innerPos : frame.getInnerBlocks()) {
+		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 			world.setBlockState(innerPos, Blocks.PORTAL.getDefaultState(), 2);
 		}
 
 		event.setCancellationResult(EnumActionResult.SUCCESS);
-	}
-
-	private static boolean validFrame(FrameDetector.Frame frame) {
-		final World world = frame.getWorld();
-
-		for(BlockPos innerPos : frame.getInnerBlocks()) {
-			if(world.getBlockState(innerPos).getBlock() != Blocks.AIR) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
