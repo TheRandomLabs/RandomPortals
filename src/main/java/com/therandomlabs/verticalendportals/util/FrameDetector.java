@@ -287,7 +287,7 @@ public class FrameDetector {
 			}
 		}
 
-		if(type == Type.VERTICAL || type == Type.VERTICAL_X) {
+		if(type == Type.VERTICAL || type == Type.VERTICAL_X || type == Type.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					VERTICAL_X, world, state, pos, minWidth, maxWidth, minHeight, maxHeight
 			);
@@ -297,7 +297,7 @@ public class FrameDetector {
 			}
 		}
 
-		if(type == Type.VERTICAL || type == Type.VERTICAL_Z) {
+		if(type == Type.VERTICAL || type == Type.VERTICAL_Z || type == Type.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					VERTICAL_Z, world, state, pos, minWidth, maxWidth, minHeight, maxHeight
 			);
