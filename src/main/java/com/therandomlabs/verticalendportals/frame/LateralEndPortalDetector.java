@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
 public final class LateralEndPortalDetector extends SidedFrameDetector {
@@ -41,6 +42,7 @@ public final class LateralEndPortalDetector extends SidedFrameDetector {
 
 	private boolean test(BlockWorldState state, EnumFacing facing) {
 		final IBlockState blockState = state.getBlockState();
-		return blockState.getBlock() == block && blockState.getValue(FACING) == facing;
+		return blockState.getBlock() == block && blockState.getValue(EYE) &&
+				blockState.getValue(FACING) == facing;
 	}
 }

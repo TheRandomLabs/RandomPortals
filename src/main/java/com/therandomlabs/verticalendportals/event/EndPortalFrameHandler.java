@@ -193,8 +193,11 @@ public final class EndPortalFrameHandler {
 			frame = VerticalInwardsFacingEndPortalFrameDetector.INSTANCE.detect(
 					world, pos, 3, 9000, 3, 9000
 			);
-			portalFacing = frame.getType() == FrameType.VERTICAL_X ?
-					EnumFacing.NORTH : EnumFacing.EAST;
+
+			if(frame != null) {
+				portalFacing = frame.getType() == FrameType.VERTICAL_X ?
+						EnumFacing.NORTH : EnumFacing.EAST;
+			}
 		}
 
 		if(frame == null || frame.isCorner(pos)) {

@@ -8,7 +8,8 @@ public abstract class SidedFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected final boolean test(FrameType type, BlockWorldState state, FrameSide side, int position) {
+	protected final boolean test(FrameType type, BlockWorldState state, FrameSide side,
+			int position) {
 		if(position == CORNER) {
 			switch(side) {
 			case TOP:
