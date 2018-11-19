@@ -10,7 +10,7 @@ public class BasicFrameDetector extends FrameDetector {
 	private final boolean requireEmpty;
 
 	public BasicFrameDetector(Block block, RequiredCorner requiredCorner, boolean requireEmpty) {
-		super(Type.LATERAL_OR_VERTICAL);
+		super(FrameType.LATERAL_OR_VERTICAL);
 		this.block = block;
 		this.requiredCorner = requiredCorner;
 		this.requireEmpty = requireEmpty;
@@ -18,7 +18,7 @@ public class BasicFrameDetector extends FrameDetector {
 
 	@SuppressWarnings("Duplicates")
 	@Override
-	protected boolean test(Type type, BlockWorldState state, FrameSide side, int position) {
+	protected boolean test(FrameType type, BlockWorldState state, FrameSide side, int position) {
 		final Block block = state.getBlockState().getBlock();
 
 		if(position == CORNER) {

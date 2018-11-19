@@ -11,31 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class FrameDetector {
-	static final class Corner {
-		BlockPos pos;
-		int sideLength;
-
-		Corner(BlockPos pos, int sideLength) {
-			this.pos = pos;
-			this.sideLength = sideLength;
-		}
-	}
-
-	public enum FrameSide {
-		TOP,
-		RIGHT,
-		BOTTOM,
-		LEFT
-	}
-
-	public enum Type {
-		LATERAL,
-		VERTICAL,
-		VERTICAL_X,
-		VERTICAL_Z,
-		LATERAL_OR_VERTICAL
-	}
-
 	public static final int UNKNOWN = 0;
 	public static final int CORNER = 1;
 
@@ -71,10 +46,10 @@ public abstract class FrameDetector {
 			EnumFacing.UP
 	};
 
-	private final Type type;
+	private final FrameType type;
 	private final Map<BlockPos, BlockWorldState> posCache = new HashMap<>();
 
-	protected FrameDetector(Type type) {
+	protected FrameDetector(FrameType type) {
 		this.type = type;
 	}
 
@@ -88,9 +63,9 @@ public abstract class FrameDetector {
 
 		final BlockWorldState state = getState(world, pos);
 
-		if(type == Type.LATERAL || type == Type.LATERAL_OR_VERTICAL) {
+		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					Type.LATERAL, LATERAL, world, state, pos, minWidth, maxWidth, minHeight,
+					FrameType.LATERAL, LATERAL, world, state, pos, minWidth, maxWidth, minHeight,
 					maxHeight
 			);
 
@@ -99,10 +74,11 @@ public abstract class FrameDetector {
 			}
 		}
 
-		if(type == Type.VERTICAL || type == Type.VERTICAL_X || type == Type.LATERAL_OR_VERTICAL) {
+		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_X ||
+				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					Type.VERTICAL_X, VERTICAL_X, world, state, pos, minWidth, maxWidth, minHeight,
-					maxHeight
+					FrameType.VERTICAL_X, VERTICAL_X, world, state, pos, minWidth, maxWidth,
+					minHeight, maxHeight
 			);
 
 			if(frame != null) {
@@ -110,10 +86,11 @@ public abstract class FrameDetector {
 			}
 		}
 
-		if(type == Type.VERTICAL || type == Type.VERTICAL_Z || type == Type.LATERAL_OR_VERTICAL) {
+		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_Z ||
+				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					Type.VERTICAL_Z, VERTICAL_Z, world, state, pos, minWidth, maxWidth, minHeight,
-					maxHeight
+					FrameType.VERTICAL_Z, VERTICAL_Z, world, state, pos, minWidth, maxWidth,
+					minHeight, maxHeight
 			);
 
 			if(frame != null) {
@@ -126,11 +103,12 @@ public abstract class FrameDetector {
 
 	//If the position is unknown, 0 is used
 	//Corners always have position 1 since they're always first on their side
-	protected abstract boolean test(Type type, BlockWorldState state, FrameSide side, int position);
+	protected abstract boolean test(FrameType type, BlockWorldState state, FrameSide side,
+			int position);
 
 	protected abstract boolean test(Frame frame);
 
-	private Frame detect(Type type, EnumFacing[] facings, World world, BlockWorldState state,
+	private Frame detect(FrameType type, EnumFacing[] facings, World world, BlockWorldState state,
 			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
@@ -206,7 +184,7 @@ public abstract class FrameDetector {
 		return null;
 	}
 
-	private Frame detect(HashMap<Integer, Corner> corners, Type type, EnumFacing[] facings,
+	private Frame detect(HashMap<Integer, Corner> corners, FrameType type, EnumFacing[] facings,
 			World world, BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
 			int startIndex, int index) {
 		final int actualIndex = index > 3 ? index - 4 : index;
@@ -285,7 +263,7 @@ public abstract class FrameDetector {
 			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
 
 			final Frame frame = new Frame(
-					world, corners, facings
+					world, type, corners, facings
 			);
 
 			return test(frame) ? frame : null;

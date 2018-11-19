@@ -10,27 +10,27 @@ public final class LateralEndPortalDetector extends SidedFrameDetector {
 	private final Block block;
 
 	public LateralEndPortalDetector(Block block) {
-		super(Type.LATERAL);
+		super(FrameType.LATERAL);
 		this.block = block;
 	}
 
 	@Override
-	protected boolean testTop(Type type, BlockWorldState state, int position) {
+	protected boolean testTop(FrameType type, BlockWorldState state, int position) {
 		return test(state, EnumFacing.SOUTH);
 	}
 
 	@Override
-	protected boolean testRight(Type type, BlockWorldState state, int position) {
+	protected boolean testRight(FrameType type, BlockWorldState state, int position) {
 		return test(state, EnumFacing.WEST);
 	}
 
 	@Override
-	protected boolean testBottom(Type type, BlockWorldState state, int position) {
+	protected boolean testBottom(FrameType type, BlockWorldState state, int position) {
 		return test(state, EnumFacing.NORTH);
 	}
 
 	@Override
-	protected boolean testLeft(Type type, BlockWorldState state, int position) {
+	protected boolean testLeft(FrameType type, BlockWorldState state, int position) {
 		return test(state, EnumFacing.EAST);
 	}
 

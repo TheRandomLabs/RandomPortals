@@ -3,12 +3,12 @@ package com.therandomlabs.verticalendportals.frame;
 import net.minecraft.block.state.BlockWorldState;
 
 public abstract class SidedFrameDetector extends FrameDetector {
-	protected SidedFrameDetector(Type type) {
+	protected SidedFrameDetector(FrameType type) {
 		super(type);
 	}
 
 	@Override
-	protected final boolean test(Type type, BlockWorldState state, FrameSide side, int position) {
+	protected final boolean test(FrameType type, BlockWorldState state, FrameSide side, int position) {
 		if(position == CORNER) {
 			switch(side) {
 			case TOP:
@@ -34,27 +34,27 @@ public abstract class SidedFrameDetector extends FrameDetector {
 		}
 	}
 
-	protected boolean testTopRightCorner(Type type, BlockWorldState state) {
+	protected boolean testTopRightCorner(FrameType type, BlockWorldState state) {
 		return true;
 	}
 
-	protected boolean testTopLeftCorner(Type type, BlockWorldState state) {
+	protected boolean testTopLeftCorner(FrameType type, BlockWorldState state) {
 		return true;
 	}
 
-	protected boolean testBottomRightCorner(Type type, BlockWorldState state) {
+	protected boolean testBottomRightCorner(FrameType type, BlockWorldState state) {
 		return true;
 	}
 
-	protected boolean testBottomLeftCorner(Type type, BlockWorldState state) {
+	protected boolean testBottomLeftCorner(FrameType type, BlockWorldState state) {
 		return true;
 	}
 
-	protected abstract boolean testTop(Type type, BlockWorldState state, int position);
+	protected abstract boolean testTop(FrameType type, BlockWorldState state, int position);
 
-	protected abstract boolean testRight(Type type, BlockWorldState state, int position);
+	protected abstract boolean testRight(FrameType type, BlockWorldState state, int position);
 
-	protected abstract boolean testBottom(Type type, BlockWorldState state, int position);
+	protected abstract boolean testBottom(FrameType type, BlockWorldState state, int position);
 
-	protected abstract boolean testLeft(Type type, BlockWorldState state, int position);
+	protected abstract boolean testLeft(FrameType type, BlockWorldState state, int position);
 }

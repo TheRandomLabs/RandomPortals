@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 
 public class Frame {
 	private final World world;
+	private final FrameType type;
 
 	private final int width;
 	private final int height;
@@ -31,11 +32,12 @@ public class Frame {
 	private final ImmutableList<BlockPos> leftBlocks;
 	private final ImmutableList<BlockPos> innerBlocks;
 
-	Frame(World world, Map<Integer, FrameDetector.Corner> corners, EnumFacing[] facings) {
+	Frame(World world, FrameType type, Map<Integer, Corner> corners, EnumFacing[] facings) {
 		this.world = world;
+		this.type = type;
 
-		final FrameDetector.Corner topLeftCorner = corners.get(0);
-		final FrameDetector.Corner rightCorner = corners.get(1);
+		final Corner topLeftCorner = corners.get(0);
+		final Corner rightCorner = corners.get(1);
 
 		width = topLeftCorner.sideLength;
 		height = rightCorner.sideLength;
@@ -108,20 +110,8 @@ public class Frame {
 		return world;
 	}
 
-	public boolean isLateral() {
-		return heightDirection == EnumFacing.SOUTH;
-	}
-
-	public boolean isVertical() {
-		return heightDirection == EnumFacing.DOWN;
-	}
-
-	public boolean isVerticalX() {
-		return widthDirection == EnumFacing.EAST && heightDirection == EnumFacing.DOWN;
-	}
-
-	public boolean isVerticalY() {
-		return widthDirection == EnumFacing.NORTH && heightDirection == EnumFacing.DOWN;
+	public FrameType getType() {
+		return type;
 	}
 
 	public int getWidth() {
@@ -210,8 +200,7 @@ public class Frame {
 	}
 
 	public boolean isInnerBlock(BlockPos pos) {
-		return !isTopBlock(pos) && !isRightBlock(pos) && !isBottomBlock(pos) &&
-				!isLeftBlock(pos);
+		return isSide(pos, topLeft, bottomRight);
 	}
 
 	public ImmutableList<BlockPos> getInnerBlockPositions() {
@@ -220,6 +209,30 @@ public class Frame {
 
 	public List<IBlockState> getInnerBlocks() {
 		return innerBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+	}
+
+	public FrameSide getSide(BlockPos pos) {
+		if(isTopBlock(pos)) {
+			return FrameSide.TOP;
+		}
+
+		if(isRightBlock(pos)) {
+			return FrameSide.RIGHT;
+		}
+
+		if(isBottomBlock(pos)) {
+			return FrameSide.BOTTOM;
+		}
+
+		if(isLeftBlock(pos)) {
+			return FrameSide.LEFT;
+		}
+
+		if(isInnerBlock(pos)) {
+			return FrameSide.INNER;
+		}
+
+		return FrameSide.NONE;
 	}
 
 	public boolean isEmpty() {

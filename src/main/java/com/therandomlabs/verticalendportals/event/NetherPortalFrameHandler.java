@@ -5,11 +5,13 @@ import com.therandomlabs.verticalendportals.frame.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.frame.Frame;
 import com.therandomlabs.verticalendportals.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.frame.RequiredCorner;
+import net.minecraft.block.BlockPortal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -56,8 +58,13 @@ public final class NetherPortalFrameHandler {
 			return;
 		}
 
+		final EnumFacing.Axis axis = frame.getType().getAxis();
+
 		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-			world.setBlockState(innerPos, Blocks.PORTAL.getDefaultState(), 2);
+			world.setBlockState(innerPos, Blocks.PORTAL.getDefaultState().withProperty(
+					BlockPortal.AXIS,
+					axis
+			), 2);
 		}
 
 		event.setCancellationResult(EnumActionResult.SUCCESS);

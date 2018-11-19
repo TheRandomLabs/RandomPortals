@@ -14,32 +14,32 @@ public final class VerticalInwardsFacingEndPortalFrameDetector extends SidedFram
 			new VerticalInwardsFacingEndPortalFrameDetector();
 
 	public VerticalInwardsFacingEndPortalFrameDetector() {
-		super(Type.VERTICAL);
+		super(FrameType.VERTICAL);
 	}
 
 	@Override
-	protected boolean testTop(Type type, BlockWorldState state, int position) {
+	protected boolean testTop(FrameType type, BlockWorldState state, int position) {
 		return test(
 				type, state, VEPBlocks.upside_down_end_portal_frame, null, null
 		);
 	}
 
 	@Override
-	protected boolean testRight(Type type, BlockWorldState state, int position) {
+	protected boolean testRight(FrameType type, BlockWorldState state, int position) {
 		return test(
 				type, state, VEPBlocks.vertical_end_portal_frame, EnumFacing.WEST, EnumFacing.SOUTH
 		);
 	}
 
 	@Override
-	protected boolean testBottom(Type type, BlockWorldState state, int position) {
+	protected boolean testBottom(FrameType type, BlockWorldState state, int position) {
 		return test(
 				type, state, Blocks.END_PORTAL_FRAME, null, null
 		);
 	}
 
 	@Override
-	protected boolean testLeft(Type type, BlockWorldState state, int position) {
+	protected boolean testLeft(FrameType type, BlockWorldState state, int position) {
 		return test(
 				type, state, VEPBlocks.vertical_end_portal_frame, EnumFacing.EAST, EnumFacing.SOUTH
 		);
@@ -50,7 +50,7 @@ public final class VerticalInwardsFacingEndPortalFrameDetector extends SidedFram
 		return false;
 	}
 
-	private boolean test(Type type, BlockWorldState state, Block block, EnumFacing facingX,
+	private boolean test(FrameType type, BlockWorldState state, Block block, EnumFacing facingX,
 			EnumFacing facingY) {
 		final IBlockState blockState = state.getBlockState();
 		final boolean result = blockState.getBlock() == block && blockState.getValue(EYE);
@@ -59,7 +59,7 @@ public final class VerticalInwardsFacingEndPortalFrameDetector extends SidedFram
 			return result;
 		}
 
-		final EnumFacing facing = type == Type.VERTICAL_X ? facingX : facingY;
+		final EnumFacing facing = type == FrameType.VERTICAL_X ? facingX : facingY;
 		return result && blockState.getValue(FACING) == facing;
 	}
 }

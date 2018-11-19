@@ -14,7 +14,7 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 
 	public BasicVerticalFrameDetector(Predicate<BlockWorldState> predicate,
 			RequiredCorner requiredCorner, boolean requireEmpty) {
-		super(Type.VERTICAL);
+		super(FrameType.VERTICAL);
 		this.predicate = predicate;
 		facing = null;
 		this.requiredCorner = requiredCorner;
@@ -23,7 +23,7 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 
 	public BasicVerticalFrameDetector(Predicate<BlockWorldState> predicate, EnumFacing facing,
 			RequiredCorner requiredCorner, boolean requireEmpty) {
-		super(facing.getAxis() == EnumFacing.Axis.X ? Type.VERTICAL_Z : Type.VERTICAL_X);
+		super(facing.getAxis() == EnumFacing.Axis.X ? FrameType.VERTICAL_Z : FrameType.VERTICAL_X);
 		this.predicate = predicate;
 		this.facing = facing;
 		this.requiredCorner = requiredCorner;
@@ -32,7 +32,7 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 
 	@SuppressWarnings("Duplicates")
 	@Override
-	protected boolean test(Type type, BlockWorldState state, FrameSide side, int position) {
+	protected boolean test(FrameType type, BlockWorldState state, FrameSide side, int position) {
 		if(position == CORNER) {
 			if(requiredCorner == RequiredCorner.ANY) {
 				return true;
