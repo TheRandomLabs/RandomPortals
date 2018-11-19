@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"axis=x": {
+			"model": "verticalendportals:lateral_nether_portal"
+		},
+		"axis=z": {
+			"model": "verticalendportals:lateral_nether_portal"
+		}
+	}
+}

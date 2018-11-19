@@ -12,6 +12,8 @@ tile.endPortalFrameUpsideDown.name=Upside Down End Portal Frame
 tile.endPortalUpsideDown.name=Upside Down End Portal
 tile.endPortalFrame.name=End Portal Frame
 tile.endPortal.name=End Portal
+tile.netherPortalVertical.name=Vertical Nether Portal
+tile.netherPortalLateral.name=Lateral Nether Portal
 
 commands.vepreloadclient.usage=/vepreloadclient
 commands.vepreloadclient.success=Vertical End Portals client-sided configuration reloaded!

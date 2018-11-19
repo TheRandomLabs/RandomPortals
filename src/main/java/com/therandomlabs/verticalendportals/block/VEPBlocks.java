@@ -24,11 +24,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 @GameRegistry.ObjectHolder(VerticalEndPortals.MOD_ID)
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public final class VEPBlocks {
-	public static final BlockVerticalEndPortalFrame vertical_end_portal_frame = null;
-	public static final BlockVerticalEndPortal vertical_end_portal = null;
-	public static final BlockUpsideDownEndPortalFrame upside_down_end_portal_frame = null;
-	public static final BlockUpsideDownEndPortal upside_down_end_portal = null;
-
 	@Mod.EventBusSubscriber(value = Side.CLIENT, modid = VerticalEndPortals.MOD_ID)
 	public static class ModelRegistrar {
 		@SubscribeEvent
@@ -77,8 +72,32 @@ public final class VEPBlocks {
 							"inventory"
 					)
 			);
+
+			ModelLoader.setCustomModelResourceLocation(
+					Item.getItemFromBlock(Blocks.PORTAL),
+					0,
+					new ModelResourceLocation(
+							Blocks.PORTAL.getRegistryName(),
+							"inventory"
+					)
+			);
+
+			ModelLoader.setCustomModelResourceLocation(
+					Item.getItemFromBlock(lateral_nether_portal),
+					0,
+					new ModelResourceLocation(
+							lateral_nether_portal.getRegistryName(),
+							"inventory"
+					)
+			);
 		}
 	}
+
+	public static final BlockVerticalEndPortalFrame vertical_end_portal_frame = null;
+	public static final BlockVerticalEndPortal vertical_end_portal = null;
+	public static final BlockUpsideDownEndPortalFrame upside_down_end_portal_frame = null;
+	public static final BlockUpsideDownEndPortal upside_down_end_portal = null;
+	public static final BlockLateralNetherPortal lateral_nether_portal = null;
 
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
@@ -91,6 +110,8 @@ public final class VEPBlocks {
 		registry.register(new BlockUpsideDownEndPortalFrame());
 		registry.register(new BlockVerticalEndPortal());
 		registry.register(new BlockUpsideDownEndPortal());
+		registry.register(new BlockNetherPortal());
+		registry.register(new BlockLateralNetherPortal());
 
 		GameRegistry.registerTileEntity(TileEntityVerticalEndPortal.class, new ResourceLocation(
 				VerticalEndPortals.MOD_ID,
@@ -110,7 +131,9 @@ public final class VEPBlocks {
 				vertical_end_portal,
 				upside_down_end_portal_frame,
 				upside_down_end_portal,
-				Blocks.END_PORTAL
+				Blocks.END_PORTAL,
+				Blocks.PORTAL,
+				lateral_nether_portal
 		);
 
 		blocks.stream().

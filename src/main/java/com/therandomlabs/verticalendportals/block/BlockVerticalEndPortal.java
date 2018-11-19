@@ -12,6 +12,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
@@ -24,7 +25,8 @@ import net.minecraft.world.World;
 public class BlockVerticalEndPortal extends BlockEndPortal {
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 
-	private static final Map<EnumFacing, AxisAlignedBB> AABB_BLOCK = new EnumMap<>(EnumFacing.class);
+	private static final Map<EnumFacing, AxisAlignedBB> AABB_BLOCK =
+			new EnumMap<>(EnumFacing.class);
 
 	static {
 		AABB_BLOCK.put(EnumFacing.NORTH, new AxisAlignedBB(
@@ -60,10 +62,10 @@ public class BlockVerticalEndPortal extends BlockEndPortal {
 		return new TileEntityVerticalEndPortal();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
-			Entity entity) {
-		return false;
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return AABB_BLOCK.get(state.getValue(FACING));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -108,17 +110,9 @@ public class BlockVerticalEndPortal extends BlockEndPortal {
 		);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return AABB_BLOCK.get(state.getValue(FACING));
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX,
-			float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+		return new ItemStack(VEPBlocks.vertical_end_portal);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -144,8 +138,21 @@ public class BlockVerticalEndPortal extends BlockEndPortal {
 		return state.withRotation(mirror.toRotation(state.getValue(FACING)));
 	}
 
+	@SuppressWarnings("deprecation")
+	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+	}
+
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, FACING);
+	}
+
+	@Override
+	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
+			Entity entity) {
+		return false;
 	}
 }

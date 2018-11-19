@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -55,6 +56,11 @@ public abstract class FrameDetector {
 
 	public final Frame detect(World world, BlockPos pos, int minWidth, int maxWidth, int minHeight,
 			int maxHeight) {
+		return detect(world, pos, minWidth, maxWidth, minHeight, maxHeight, frame -> true);
+	}
+
+	public final Frame detect(World world, BlockPos pos, int minWidth, int maxWidth, int minHeight,
+			int maxHeight, Predicate<Frame> additionalFramePredicate) {
 		if(minWidth < 3 || minHeight < 3) {
 			throw new IllegalArgumentException(
 					"Portal frames must be at least 3 blocks in width and height"
@@ -66,7 +72,7 @@ public abstract class FrameDetector {
 		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					FrameType.LATERAL, LATERAL, world, state, pos, minWidth, maxWidth, minHeight,
-					maxHeight
+					maxHeight, additionalFramePredicate
 			);
 
 			if(frame != null) {
@@ -78,7 +84,7 @@ public abstract class FrameDetector {
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					FrameType.VERTICAL_X, VERTICAL_X, world, state, pos, minWidth, maxWidth,
-					minHeight, maxHeight
+					minHeight, maxHeight, additionalFramePredicate
 			);
 
 			if(frame != null) {
@@ -90,7 +96,7 @@ public abstract class FrameDetector {
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					FrameType.VERTICAL_Z, VERTICAL_Z, world, state, pos, minWidth, maxWidth,
-					minHeight, maxHeight
+					minHeight, maxHeight, additionalFramePredicate
 			);
 
 			if(frame != null) {
@@ -109,7 +115,8 @@ public abstract class FrameDetector {
 	protected abstract boolean test(Frame frame);
 
 	private Frame detect(FrameType type, EnumFacing[] facings, World world, BlockWorldState state,
-			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight) {
+			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
+			Predicate<Frame> additionalFramePredicate) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
 
@@ -170,7 +177,7 @@ public abstract class FrameDetector {
 
 				final Frame frame = detect(
 						corners, type, facings, world, possibleCorner, minWidth, maxWidth,
-						minHeight, maxHeight, index, index
+						minHeight, maxHeight, index, index, additionalFramePredicate
 				);
 
 				if(frame != null) {
@@ -186,7 +193,7 @@ public abstract class FrameDetector {
 
 	private Frame detect(HashMap<Integer, Corner> corners, FrameType type, EnumFacing[] facings,
 			World world, BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
-			int startIndex, int index) {
+			int startIndex, int index, Predicate<Frame> additionalFramePredicate) {
 		final int actualIndex = index > 3 ? index - 4 : index;
 		final int nextIndex = actualIndex == 3 ? 0 : actualIndex + 1;
 
@@ -266,7 +273,7 @@ public abstract class FrameDetector {
 					world, type, corners, facings
 			);
 
-			return test(frame) ? frame : null;
+			return test(frame) && additionalFramePredicate.test(frame) ? frame : null;
 		}
 
 		for(Map.Entry<BlockPos, Integer> corner : possibleCorners) {
@@ -277,7 +284,7 @@ public abstract class FrameDetector {
 
 			final Frame frame = detect(
 					corners, type, facings, world, cornerPos, minWidth, maxWidth, minHeight,
-					maxHeight, startIndex, index + 1
+					maxHeight, startIndex, index + 1, additionalFramePredicate
 			);
 
 			if(frame != null) {

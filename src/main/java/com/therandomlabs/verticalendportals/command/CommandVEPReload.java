@@ -21,11 +21,6 @@ public class CommandVEPReload extends CommandBase {
 	}
 
 	@Override
-	public int getRequiredPermissionLevel() {
-		return isClient ? 0 : 4;
-	}
-
-	@Override
 	public String getUsage(ICommandSender sender) {
 		return isClient ? "commands.vepreloadclient.usage" : "/vepreload";
 	}
@@ -40,5 +35,10 @@ public class CommandVEPReload extends CommandBase {
 		} else {
 			sender.sendMessage(new TextComponentTranslation("commands.vepreloadclient.success"));
 		}
+	}
+
+	@Override
+	public int getRequiredPermissionLevel() {
+		return isClient ? 0 : 4;
 	}
 }

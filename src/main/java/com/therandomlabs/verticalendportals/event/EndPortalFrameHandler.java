@@ -68,7 +68,7 @@ public final class EndPortalFrameHandler {
 				),
 				EnumFacing.NORTH,
 				RequiredCorner.ANY,
-				false
+				frame -> true
 		));
 
 		verticalFrames.put(EnumFacing.EAST, new BasicVerticalFrameDetector(
@@ -78,7 +78,7 @@ public final class EndPortalFrameHandler {
 				),
 				EnumFacing.EAST,
 				RequiredCorner.ANY,
-				false
+				frame -> true
 		));
 
 		verticalFrames.put(EnumFacing.SOUTH, new BasicVerticalFrameDetector(
@@ -88,7 +88,7 @@ public final class EndPortalFrameHandler {
 				),
 				EnumFacing.SOUTH,
 				RequiredCorner.ANY,
-				false
+				frame -> true
 		));
 
 		verticalFrames.put(EnumFacing.WEST, new BasicVerticalFrameDetector(
@@ -98,7 +98,7 @@ public final class EndPortalFrameHandler {
 				),
 				EnumFacing.WEST,
 				RequiredCorner.ANY,
-				false
+				frame -> true
 		));
 
 		VERTICAL_FRAMES = ImmutableMap.copyOf(verticalFrames);

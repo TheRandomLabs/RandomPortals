@@ -15,7 +15,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
-	private static final Map<EnumFacing, AxisAlignedBB> AABB_BLOCK = new EnumMap<>(EnumFacing.class);
+	private static final Map<EnumFacing, AxisAlignedBB> AABB_BLOCK =
+			new EnumMap<>(EnumFacing.class);
 	private static final Map<EnumFacing, AxisAlignedBB> AABB_EYE = new EnumMap<>(EnumFacing.class);
 
 	static {

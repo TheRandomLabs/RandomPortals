@@ -1,11 +1,13 @@
 package com.therandomlabs.verticalendportals.event;
 
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
+import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.frame.Frame;
 import com.therandomlabs.verticalendportals.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.frame.RequiredCorner;
-import net.minecraft.block.BlockPortal;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -24,7 +26,7 @@ public final class NetherPortalFrameHandler {
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
 			Blocks.OBSIDIAN,
 			RequiredCorner.ANY_NON_AIR,
-			true
+			Frame::isEmpty
 	);
 
 	@SuppressWarnings("Duplicates")
@@ -51,20 +53,27 @@ public final class NetherPortalFrameHandler {
 		world.updateComparatorOutputLevel(pos, Blocks.OBSIDIAN);
 		stack.damageItem(1, player);
 
-		final Frame frame = FRAMES.detect(world, pos, 3, 9000, 3, 9000);
+		final Frame frame = FRAMES.detect(
+				world, pos, 3, 9000, 3, 9000,
+				potentialFrame -> potentialFrame.isFacingInwards(pos, event.getFace())
+		);
 
-		if(frame == null || !frame.isFacingInwards(pos, event.getFace())) {
+		if(frame == null) {
 			event.setCancellationResult(EnumActionResult.FAIL);
 			return;
 		}
 
 		final EnumFacing.Axis axis = frame.getType().getAxis();
+		final IBlockState state;
+
+		if(axis == EnumFacing.Axis.Y) {
+			state = VEPBlocks.lateral_nether_portal.getDefaultState();
+		} else {
+			state = Blocks.PORTAL.getDefaultState().withProperty(BlockNetherPortal.AXIS, axis);
+		}
 
 		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-			world.setBlockState(innerPos, Blocks.PORTAL.getDefaultState().withProperty(
-					BlockPortal.AXIS,
-					axis
-			), 2);
+			world.setBlockState(innerPos, state, 2);
 		}
 
 		event.setCancellationResult(EnumActionResult.SUCCESS);

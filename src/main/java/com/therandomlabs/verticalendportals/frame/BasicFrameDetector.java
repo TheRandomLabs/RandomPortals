@@ -1,5 +1,6 @@
 package com.therandomlabs.verticalendportals.frame;
 
+import java.util.function.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockWorldState;
 import static net.minecraft.init.Blocks.AIR;
@@ -7,13 +8,14 @@ import static net.minecraft.init.Blocks.AIR;
 public class BasicFrameDetector extends FrameDetector {
 	private final Block block;
 	private final RequiredCorner requiredCorner;
-	private final boolean requireEmpty;
+	private final Predicate<Frame> framePredicate;
 
-	public BasicFrameDetector(Block block, RequiredCorner requiredCorner, boolean requireEmpty) {
+	public BasicFrameDetector(Block block, RequiredCorner requiredCorner,
+			Predicate<Frame> framePredicate) {
 		super(FrameType.LATERAL_OR_VERTICAL);
 		this.block = block;
 		this.requiredCorner = requiredCorner;
-		this.requireEmpty = requireEmpty;
+		this.framePredicate = framePredicate;
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -36,6 +38,6 @@ public class BasicFrameDetector extends FrameDetector {
 
 	@Override
 	protected boolean test(Frame frame) {
-		return !requireEmpty || frame.isEmpty();
+		return framePredicate.test(frame);
 	}
 }

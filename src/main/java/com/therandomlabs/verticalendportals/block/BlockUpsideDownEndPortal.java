@@ -6,6 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -33,10 +34,10 @@ public class BlockUpsideDownEndPortal extends BlockEndPortal {
 		return new TileEntityUpsideDownEndPortal();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
-			Entity entity) {
-		return false;
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return AABB_BLOCK;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -52,9 +53,14 @@ public class BlockUpsideDownEndPortal extends BlockEndPortal {
 		);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return AABB_BLOCK;
+	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+		return new ItemStack(VEPBlocks.upside_down_end_portal);
+	}
+
+	@Override
+	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
+			Entity entity) {
+		return false;
 	}
 }
