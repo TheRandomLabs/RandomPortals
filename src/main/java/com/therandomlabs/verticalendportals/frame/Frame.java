@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFire;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -235,9 +237,36 @@ public class Frame {
 		return FrameSide.NONE;
 	}
 
+	public boolean isFacingInwards(BlockPos pos, EnumFacing facing) {
+		if(isCorner(pos)) {
+			return false;
+		}
+
+		switch(getSide(pos)) {
+		case TOP:
+			return facing == heightDirection;
+		case RIGHT:
+			return facing == widthDirection.getOpposite();
+		case BOTTOM:
+			return facing == heightDirection.getOpposite();
+		case LEFT:
+			return facing == widthDirection;
+		default:
+			return false;
+		}
+	}
+
 	public boolean isEmpty() {
-		for(IBlockState state : getInnerBlocks()) {
-			if(state.getBlock() != Blocks.AIR) {
+		for(BlockPos innerPos : innerBlocks) {
+			final IBlockState state = world.getBlockState(innerPos);
+
+			if(state.getMaterial() == Material.FIRE) {
+				continue;
+			}
+
+			final Block block = state.getBlock();
+
+			if(!block.isReplaceable(world, innerPos)) {
 				return false;
 			}
 		}

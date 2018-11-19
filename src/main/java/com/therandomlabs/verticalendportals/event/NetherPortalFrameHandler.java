@@ -53,7 +53,7 @@ public final class NetherPortalFrameHandler {
 
 		final Frame frame = FRAMES.detect(world, pos, 3, 9000, 3, 9000);
 
-		if(frame == null) {
+		if(frame == null || !frame.isFacingInwards(pos, event.getFace())) {
 			event.setCancellationResult(EnumActionResult.FAIL);
 			return;
 		}

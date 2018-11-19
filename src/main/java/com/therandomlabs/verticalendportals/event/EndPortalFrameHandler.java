@@ -9,6 +9,7 @@ import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.BasicVerticalFrameDetector;
 import com.therandomlabs.verticalendportals.frame.Frame;
 import com.therandomlabs.verticalendportals.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.frame.FrameType;
 import com.therandomlabs.verticalendportals.frame.LateralEndPortalDetector;
 import com.therandomlabs.verticalendportals.frame.RequiredCorner;
 import com.therandomlabs.verticalendportals.frame.VerticalInwardsFacingEndPortalFrameDetector;
@@ -192,7 +193,8 @@ public final class EndPortalFrameHandler {
 			frame = VerticalInwardsFacingEndPortalFrameDetector.INSTANCE.detect(
 					world, pos, 3, 9000, 3, 9000
 			);
-			portalFacing = EnumFacing.WEST;
+			portalFacing = frame.getType() == FrameType.VERTICAL_X ?
+					EnumFacing.NORTH : EnumFacing.EAST;
 		}
 
 		if(frame == null || frame.isCorner(pos)) {

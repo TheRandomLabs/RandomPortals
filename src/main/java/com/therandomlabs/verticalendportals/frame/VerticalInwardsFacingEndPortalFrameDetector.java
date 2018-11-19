@@ -47,7 +47,7 @@ public final class VerticalInwardsFacingEndPortalFrameDetector extends SidedFram
 
 	@Override
 	protected boolean test(Frame frame) {
-		return false;
+		return true;
 	}
 
 	private boolean test(FrameType type, BlockWorldState state, Block block, EnumFacing facingX,
