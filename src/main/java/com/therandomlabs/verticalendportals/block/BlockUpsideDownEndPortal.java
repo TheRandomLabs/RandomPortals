@@ -21,7 +21,6 @@ public class BlockUpsideDownEndPortal extends BlockEndPortal {
 
 	public BlockUpsideDownEndPortal() {
 		super(Material.PORTAL);
-		setLightLevel(1.0F);
 		setHardness(-1.0F);
 		setResistance(6000000.0F);
 		setCreativeTab(CreativeTabs.DECORATIONS);
@@ -55,7 +54,7 @@ public class BlockUpsideDownEndPortal extends BlockEndPortal {
 
 	@Override
 	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-		return new ItemStack(VEPBlocks.upside_down_end_portal);
+		return new ItemStack(this);
 	}
 
 	@Override

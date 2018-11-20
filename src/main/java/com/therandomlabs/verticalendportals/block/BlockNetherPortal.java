@@ -62,6 +62,87 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@SuppressWarnings("deprecation")
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		switch(getAxis(state)) {
+		case X:
+			return AABB_X;
+		case Y:
+			return AABB_Y;
+		default:
+			return AABB_Z;
+		}
+	}
+
+	@Override
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+		if(!world.provider.isSurfaceWorld() || !world.getGameRules().getBoolean("doMobSpawning") ||
+				random.nextInt(2000) > world.getDifficulty().getId()) {
+			return;
+		}
+
+		final int y = pos.getY();
+		BlockPos spawnPos = pos;
+
+		while(!world.getBlockState(spawnPos).isSideSolid(world, spawnPos, EnumFacing.UP) &&
+				spawnPos.getY() > 0) {
+			spawnPos = spawnPos.down();
+		}
+
+		if(y > 0 && !world.getBlockState(spawnPos.up()).isNormalCube()) {
+			final Entity pigZombie = ItemMonsterPlacer.spawnCreature(
+					world,
+					EntityList.getKey(EntityPigZombie.class),
+					spawnPos.getX() + 0.5,
+					spawnPos.getY() + 1.1,
+					spawnPos.getZ() + 0.5
+			);
+
+			if(pigZombie != null) {
+				pigZombie.timeUntilPortal = pigZombie.getPortalCooldown();
+			}
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world,
+			BlockPos pos) {
+		return NULL_AABB;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
+
+	@Override
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
+			BlockPos fromPos) {
+		final BlockPos checkPos1;
+		final BlockPos checkPos2;
+
+		switch(getAxis(state)) {
+		case X:
+			checkPos1 = pos.offset(EnumFacing.NORTH);
+			checkPos2 = pos.offset(EnumFacing.SOUTH);
+			break;
+		case Y:
+			checkPos1 = pos.offset(EnumFacing.UP);
+			checkPos2 = pos.offset(EnumFacing.DOWN);
+			break;
+		default:
+			checkPos1 = pos.offset(EnumFacing.EAST);
+			checkPos2 = pos.offset(EnumFacing.WEST);
+		}
+
+		if(!checkPos1.equals(fromPos) && !checkPos2.equals(fromPos)) {
+			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		}
+	}
+
+	@SuppressWarnings("deprecation")
 	@SideOnly(Side.CLIENT)
 	@Override
 	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
@@ -108,6 +189,23 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
+	public int quantityDropped(Random random) {
+		return 0;
+	}
+
+	@Override
+	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+		if(!entity.isRiding() && !entity.isBeingRidden() && entity.isNonBoss()) {
+			entity.setPortal(pos);
+		}
+	}
+
+	@Override
+	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+		return new ItemStack(this);
+	}
+
+	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		meta = meta & 3;
 		final EnumFacing.Axis axis;
@@ -123,84 +221,10 @@ public class BlockNetherPortal extends BlockPortal {
 		return getDefaultState().withProperty(AXIS, axis);
 	}
 
+	@SideOnly(Side.CLIENT)
 	@Override
-	public int getMetaFromState(IBlockState state) {
-		return BlockPortal.getMetaForAxis(state.getValue(AXIS));
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public IBlockState withRotation(IBlockState state, Rotation rotation) {
-		switch(rotation) {
-		case COUNTERCLOCKWISE_90:
-		case CLOCKWISE_90:
-			switch(state.getValue(AXIS)) {
-			case X:
-				return state.withProperty(AXIS, EnumFacing.Axis.Z);
-			case Z:
-				return state.withProperty(AXIS, EnumFacing.Axis.X);
-			default:
-				return state;
-			}
-		default:
-			return state;
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean isFullCube(IBlockState state) {
-		return false;
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		switch(getAxis(state)) {
-		case X:
-			return AABB_X;
-		case Y:
-			return AABB_Y;
-		default:
-			return AABB_Z;
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world,
-			BlockPos pos) {
-		return NULL_AABB;
-	}
-
-	@Override
-	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
-		if(!world.provider.isSurfaceWorld() || !world.getGameRules().getBoolean("doMobSpawning") ||
-				random.nextInt(2000) > world.getDifficulty().getId()) {
-			return;
-		}
-
-		final int y = pos.getY();
-		BlockPos spawnPos = pos;
-
-		while(!world.getBlockState(spawnPos).isSideSolid(world, spawnPos, EnumFacing.UP) &&
-				spawnPos.getY() > 0) {
-			spawnPos = spawnPos.down();
-		}
-
-		if(y > 0 && !world.getBlockState(spawnPos.up()).isNormalCube()) {
-			final Entity pigZombie = ItemMonsterPlacer.spawnCreature(
-					world,
-					EntityList.getKey(EntityPigZombie.class),
-					spawnPos.getX() + 0.5,
-					spawnPos.getY() + 1.1,
-					spawnPos.getZ() + 0.5
-			);
-
-			if(pigZombie != null) {
-				pigZombie.timeUntilPortal = pigZombie.getPortalCooldown();
-			}
-		}
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.TRANSLUCENT;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -244,39 +268,32 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
-			BlockPos fromPos) {
-		final BlockPos checkPos1;
-		final BlockPos checkPos2;
+	public int getMetaFromState(IBlockState state) {
+		return BlockPortal.getMetaForAxis(state.getValue(AXIS));
+	}
 
-		switch(getAxis(state)) {
-		case X:
-			checkPos1 = pos.offset(EnumFacing.NORTH);
-			checkPos2 = pos.offset(EnumFacing.SOUTH);
-			break;
-		case Y:
-			checkPos1 = pos.offset(EnumFacing.UP);
-			checkPos2 = pos.offset(EnumFacing.DOWN);
-			break;
+	@SuppressWarnings("deprecation")
+	@Override
+	public IBlockState withRotation(IBlockState state, Rotation rotation) {
+		switch(rotation) {
+		case COUNTERCLOCKWISE_90:
+		case CLOCKWISE_90:
+			switch(state.getValue(AXIS)) {
+			case X:
+				return state.withProperty(AXIS, EnumFacing.Axis.Z);
+			case Z:
+				return state.withProperty(AXIS, EnumFacing.Axis.X);
+			default:
+				return state;
+			}
 		default:
-			checkPos1 = pos.offset(EnumFacing.EAST);
-			checkPos2 = pos.offset(EnumFacing.WEST);
-		}
-
-		if(!checkPos1.equals(fromPos) && !checkPos2.equals(fromPos)) {
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			return state;
 		}
 	}
 
 	@Override
-	public int quantityDropped(Random random) {
-		return 0;
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, AXIS);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -288,23 +305,6 @@ public class BlockNetherPortal extends BlockPortal {
 				AXIS,
 				axis == EnumFacing.Axis.X ? EnumFacing.Axis.Z : EnumFacing.Axis.X
 		);
-	}
-
-	@Override
-	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(!entity.isRiding() && !entity.isBeingRidden() && entity.isNonBoss()) {
-			entity.setPortal(pos);
-		}
-	}
-
-	@Override
-	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-		return new ItemStack(Blocks.PORTAL);
-	}
-
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, AXIS);
 	}
 
 	protected EnumFacing.Axis getAxis(IBlockState state) {

@@ -153,7 +153,7 @@ public class Frame {
 	}
 
 	public boolean isTopBlock(BlockPos pos) {
-		return isSide(pos, topLeft, topRight);
+		return isBetween(pos, topLeft, topRight);
 	}
 
 	public ImmutableList<BlockPos> getTopBlockPositions() {
@@ -165,7 +165,7 @@ public class Frame {
 	}
 
 	public boolean isRightBlock(BlockPos pos) {
-		return isSide(pos, topRight, bottomRight);
+		return isBetween(pos, topRight, bottomRight);
 	}
 
 	public ImmutableList<BlockPos> getRightBlockPositions() {
@@ -177,7 +177,7 @@ public class Frame {
 	}
 
 	public boolean isBottomBlock(BlockPos pos) {
-		return isSide(pos, bottomRight, bottomLeft);
+		return isBetween(pos, bottomRight, bottomLeft);
 	}
 
 	public ImmutableList<BlockPos> getBottomBlockPositions() {
@@ -189,7 +189,7 @@ public class Frame {
 	}
 
 	public boolean isLeftBlock(BlockPos pos) {
-		return isSide(pos, bottomLeft, topLeft);
+		return isBetween(pos, bottomLeft, topLeft);
 	}
 
 	public ImmutableList<BlockPos> getLeftBlockPositions() {
@@ -201,7 +201,7 @@ public class Frame {
 	}
 
 	public boolean isInnerBlock(BlockPos pos) {
-		return isSide(pos, topLeft, bottomRight);
+		return isBetween(pos, topLeft, bottomRight, false);
 	}
 
 	public ImmutableList<BlockPos> getInnerBlockPositions() {
@@ -234,6 +234,10 @@ public class Frame {
 		}
 
 		return FrameSide.NONE;
+	}
+
+	public boolean contains(BlockPos pos) {
+		return isBetween(pos, topLeft, bottomRight);
 	}
 
 	public boolean isFacingInwards(BlockPos pos, EnumFacing facing) {
@@ -273,7 +277,11 @@ public class Frame {
 		return true;
 	}
 
-	private boolean isSide(BlockPos pos, BlockPos corner1, BlockPos corner2) {
+	private boolean isBetween(BlockPos pos, BlockPos corner1, BlockPos corner2) {
+		return isBetween(pos, corner1, corner2, true);
+	}
+
+	private boolean isBetween(BlockPos pos, BlockPos corner1, BlockPos corner2, boolean inclusive) {
 		final int corner1X = corner1.getX();
 		final int corner1Y = corner1.getY();
 		final int corner1Z = corner1.getZ();
@@ -294,6 +302,10 @@ public class Frame {
 		final int y = pos.getY();
 		final int z = pos.getZ();
 
-		return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
+		if(inclusive) {
+			return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
+		}
+
+		return x > minX && y > minY && z > minZ && x < maxX && y < maxY && z < maxZ;
 	}
 }

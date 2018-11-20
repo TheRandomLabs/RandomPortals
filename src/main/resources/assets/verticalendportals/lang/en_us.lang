@@ -6,12 +6,15 @@ verticalendportals.config.misc=Miscellaneous
 verticalendportals.config.misc.tooltip=Options that don't fit into any other categories.
 verticalendportals.config.misc.vepreloadCommand=/vepreload
 
+tile.endPortalFrameLateral.name=Lateral End Portal Frame
+tile.endPortalLateral.name=Lateral End Portal
+
 tile.endPortalFrameVertical.name=Vertical End Portal Frame
 tile.endPortalVertical.name=Vertical End Portal
+
 tile.endPortalFrameUpsideDown.name=Upside Down End Portal Frame
 tile.endPortalUpsideDown.name=Upside Down End Portal
-tile.endPortalFrame.name=End Portal Frame
-tile.endPortal.name=End Portal
+
 tile.netherPortalVertical.name=Vertical Nether Portal
 tile.netherPortalLateral.name=Lateral Nether Portal
 

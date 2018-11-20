@@ -17,6 +17,11 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
+	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+		return new ItemStack(this);
+	}
+
+	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		return getDefaultState();
 	}
@@ -29,11 +34,6 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
 		return getDefaultState();
-	}
-
-	@Override
-	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-		return new ItemStack(VEPBlocks.lateral_nether_portal);
 	}
 
 	@Override

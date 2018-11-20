@@ -4,9 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.block.BlockEndPortal;
-import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -21,10 +19,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import static net.minecraft.block.BlockHorizontal.FACING;
 
 public class BlockVerticalEndPortal extends BlockEndPortal {
-	public static final PropertyDirection FACING = BlockHorizontal.FACING;
-
 	private static final Map<EnumFacing, AxisAlignedBB> AABB_BLOCK =
 			new EnumMap<>(EnumFacing.class);
 
@@ -48,7 +45,6 @@ public class BlockVerticalEndPortal extends BlockEndPortal {
 
 	public BlockVerticalEndPortal() {
 		super(Material.PORTAL);
-		setLightLevel(1.0F);
 		setHardness(-1.0F);
 		setResistance(6000000.0F);
 		setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
@@ -112,7 +108,7 @@ public class BlockVerticalEndPortal extends BlockEndPortal {
 
 	@Override
 	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-		return new ItemStack(VEPBlocks.vertical_end_portal);
+		return new ItemStack(this);
 	}
 
 	@SuppressWarnings("deprecation")

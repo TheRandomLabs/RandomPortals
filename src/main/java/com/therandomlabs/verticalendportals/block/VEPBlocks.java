@@ -7,7 +7,6 @@ import com.therandomlabs.verticalendportals.tileentity.TileEntityUpsideDownEndPo
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -38,15 +37,6 @@ public final class VEPBlocks {
 			);
 
 			ModelLoader.setCustomModelResourceLocation(
-					Item.getItemFromBlock(vertical_end_portal),
-					0,
-					new ModelResourceLocation(
-							vertical_end_portal.getRegistryName(),
-							"inventory"
-					)
-			);
-
-			ModelLoader.setCustomModelResourceLocation(
 					Item.getItemFromBlock(upside_down_end_portal_frame),
 					0,
 					new ModelResourceLocation(
@@ -56,19 +46,28 @@ public final class VEPBlocks {
 			);
 
 			ModelLoader.setCustomModelResourceLocation(
-					Item.getItemFromBlock(upside_down_end_portal),
+					Item.getItemFromBlock(Blocks.END_PORTAL),
 					0,
 					new ModelResourceLocation(
-							upside_down_end_portal.getRegistryName(),
+							Blocks.END_PORTAL.getRegistryName(),
 							"inventory"
 					)
 			);
 
 			ModelLoader.setCustomModelResourceLocation(
-					Item.getItemFromBlock(Blocks.END_PORTAL),
+					Item.getItemFromBlock(vertical_end_portal),
 					0,
 					new ModelResourceLocation(
-							Blocks.END_PORTAL.getRegistryName(),
+							vertical_end_portal.getRegistryName(),
+							"inventory"
+					)
+			);
+
+			ModelLoader.setCustomModelResourceLocation(
+					Item.getItemFromBlock(upside_down_end_portal),
+					0,
+					new ModelResourceLocation(
+							upside_down_end_portal.getRegistryName(),
 							"inventory"
 					)
 			);
@@ -94,20 +93,20 @@ public final class VEPBlocks {
 	}
 
 	public static final BlockVerticalEndPortalFrame vertical_end_portal_frame = null;
-	public static final BlockVerticalEndPortal vertical_end_portal = null;
 	public static final BlockUpsideDownEndPortalFrame upside_down_end_portal_frame = null;
+	public static final BlockVerticalEndPortal vertical_end_portal = null;
 	public static final BlockUpsideDownEndPortal upside_down_end_portal = null;
 	public static final BlockLateralNetherPortal lateral_nether_portal = null;
 
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
-		Blocks.END_PORTAL.setCreativeTab(CreativeTabs.DECORATIONS);
-		Blocks.END_PORTAL.setTranslationKey("endPortal");
+		Blocks.END_PORTAL_FRAME.setTranslationKey("endPortalFrameLateral");
 
 		final IForgeRegistry<Block> registry = event.getRegistry();
 
 		registry.register(new BlockVerticalEndPortalFrame());
 		registry.register(new BlockUpsideDownEndPortalFrame());
+		registry.register(new BlockLateralEndPortal());
 		registry.register(new BlockVerticalEndPortal());
 		registry.register(new BlockUpsideDownEndPortal());
 		registry.register(new BlockNetherPortal());
@@ -128,10 +127,10 @@ public final class VEPBlocks {
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		final List<Block> blocks = Arrays.asList(
 				vertical_end_portal_frame,
-				vertical_end_portal,
 				upside_down_end_portal_frame,
-				upside_down_end_portal,
 				Blocks.END_PORTAL,
+				vertical_end_portal,
+				upside_down_end_portal,
 				Blocks.PORTAL,
 				lateral_nether_portal
 		);

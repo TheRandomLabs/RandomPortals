@@ -1,8 +1,9 @@
 package com.therandomlabs.verticalendportals.tileentity;
 
-import com.therandomlabs.verticalendportals.block.BlockVerticalEndPortal;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntityEndPortal;
 import net.minecraft.util.EnumFacing;
+import static net.minecraft.block.BlockHorizontal.FACING;
 
 public class TileEntityVerticalEndPortal extends TileEntityEndPortal {
 	private EnumFacing facing;
@@ -10,7 +11,14 @@ public class TileEntityVerticalEndPortal extends TileEntityEndPortal {
 	@Override
 	public boolean shouldRenderFace(EnumFacing facing) {
 		if(this.facing == null) {
-			this.facing = world.getBlockState(pos).getValue(BlockVerticalEndPortal.FACING);
+			//https://github.com/TechReborn/TechReborn/issues/1515
+			final IBlockState state = world.getBlockState(pos);
+
+			if(!state.getProperties().containsKey(FACING)) {
+				return false;
+			}
+
+			this.facing = state.getValue(FACING);
 		}
 
 		return this.facing == facing || this.facing.getOpposite() == facing;
