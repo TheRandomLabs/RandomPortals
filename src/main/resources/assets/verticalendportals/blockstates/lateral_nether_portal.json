@@ -1,9 +1,15 @@
 {
 	"variants": {
-		"axis=x": {
+		"axis=x,manually_placed=false": {
 			"model": "verticalendportals:lateral_nether_portal"
 		},
-		"axis=z": {
+		"axis=x,manually_placed=true": {
+			"model": "verticalendportals:lateral_nether_portal"
+		},
+		"axis=z,manually_placed=false": {
+			"model": "verticalendportals:lateral_nether_portal"
+		},
+		"axis=z,manually_placed=true": {
 			"model": "verticalendportals:lateral_nether_portal"
 		}
 	}

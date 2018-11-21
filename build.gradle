@@ -47,6 +47,12 @@ processResources {
 	}
 }
 
+jar {
+	manifest {
+		attributes "FMLAT": "verticalendportals_at.cfg"
+	}
+}
+
 task signJar(type: SignJar, dependsOn: reobfJar) {
 	onlyIf {
 		project.hasProperty("keyStore")

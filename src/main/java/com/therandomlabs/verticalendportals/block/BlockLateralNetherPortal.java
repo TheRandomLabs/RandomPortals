@@ -27,6 +27,11 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
+	protected EnumFacing.Axis getAxis(IBlockState state) {
+		return EnumFacing.Axis.Y;
+	}
+
+	@Override
 	public int getMetaFromState(IBlockState state) {
 		return 1;
 	}
@@ -34,10 +39,5 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
 		return getDefaultState();
-	}
-
-	@Override
-	protected EnumFacing.Axis getAxis(IBlockState state) {
-		return EnumFacing.Axis.Y;
 	}
 }

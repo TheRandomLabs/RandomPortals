@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.event;
+package com.therandomlabs.verticalendportals.handler;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -38,7 +38,7 @@ import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
-public final class EndPortalFrameHandler {
+public final class EndPortalPlaceHandler {
 	public static final FrameDetector LATERAL_FRAMES =
 			new LateralEndPortalDetector(Blocks.END_PORTAL_FRAME);
 
@@ -161,18 +161,16 @@ public final class EndPortalFrameHandler {
 		}
 
 		if(frame != null && !frame.isCorner(pos)) {
+			final IBlockState portalState;
+
 			if(block == VEPBlocks.upside_down_end_portal_frame) {
-				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-					world.setBlockState(
-							innerPos, VEPBlocks.upside_down_end_portal.getDefaultState(), 2
-					);
-				}
+				portalState = VEPBlocks.upside_down_end_portal.getDefaultState();
 			} else {
-				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-					world.setBlockState(
-							innerPos, Blocks.END_PORTAL.getDefaultState(), 2
-					);
-				}
+				portalState = VEPBlocks.lateral_end_portal.getDefaultState();
+			}
+
+			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+				world.setBlockState(innerPos, portalState, 2);
 			}
 
 			world.playBroadcastSound(1038, frame.getTopLeft().add(1, 0, 1), 0);

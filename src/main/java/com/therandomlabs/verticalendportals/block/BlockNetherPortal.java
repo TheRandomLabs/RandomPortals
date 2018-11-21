@@ -1,37 +1,32 @@
 package com.therandomlabs.verticalendportals.block;
 
-import java.util.Random;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.util.VEPTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
-	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.create(
-			"axis", EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z
-	);
+	public static final PropertyBool MANUALLY_PLACED = PropertyBool.create("manually_placed");
 
 	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(
 			0.0, 0.0, 0.375, 1.0, 1.0, 0.625
@@ -47,13 +42,13 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public BlockNetherPortal() {
 		this(true);
-		setDefaultState(blockState.getBaseState().withProperty(AXIS, EnumFacing.Axis.X));
+		setDefaultState(blockState.getBaseState().withProperty(AXIS, EnumFacing.Axis.X).
+				withProperty(MANUALLY_PLACED, true));
 		setTranslationKey("netherPortalVertical");
 		setRegistryName("minecraft:portal");
 	}
 
 	protected BlockNetherPortal(boolean flag) {
-		super();//super(Material.PORTAL, false);
 		setTickRandomly(true);
 		setHardness(-1.0F);
 		setSoundType(SoundType.GLASS);
@@ -75,71 +70,40 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
-		if(!world.provider.isSurfaceWorld() || !world.getGameRules().getBoolean("doMobSpawning") ||
-				random.nextInt(2000) > world.getDifficulty().getId()) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
+			BlockPos fromPos) {
+		if(state.getValue(MANUALLY_PLACED)) {
 			return;
 		}
 
-		final int y = pos.getY();
-		BlockPos spawnPos = pos;
+		final IBlockState fromState = world.getBlockState(fromPos);
 
-		while(!world.getBlockState(spawnPos).isSideSolid(world, spawnPos, EnumFacing.UP) &&
-				spawnPos.getY() > 0) {
-			spawnPos = spawnPos.down();
+		if(fromState.getBlock() == this && !fromState.getValue(MANUALLY_PLACED)) {
+			return;
 		}
 
-		if(y > 0 && !world.getBlockState(spawnPos.up()).isNormalCube()) {
-			final Entity pigZombie = ItemMonsterPlacer.spawnCreature(
-					world,
-					EntityList.getKey(EntityPigZombie.class),
-					spawnPos.getX() + 0.5,
-					spawnPos.getY() + 1.1,
-					spawnPos.getZ() + 0.5
-			);
-
-			if(pigZombie != null) {
-				pigZombie.timeUntilPortal = pigZombie.getPortalCooldown();
-			}
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world,
-			BlockPos pos) {
-		return NULL_AABB;
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean isFullCube(IBlockState state) {
-		return false;
-	}
-
-	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
-			BlockPos fromPos) {
-		final BlockPos checkPos1;
-		final BlockPos checkPos2;
+		final EnumFacing checkFacing1;
+		final EnumFacing checkFacing2;
 
 		switch(getAxis(state)) {
 		case X:
-			checkPos1 = pos.offset(EnumFacing.NORTH);
-			checkPos2 = pos.offset(EnumFacing.SOUTH);
+			checkFacing1 = EnumFacing.NORTH;
+			checkFacing2 = EnumFacing.SOUTH;
 			break;
 		case Y:
-			checkPos1 = pos.offset(EnumFacing.UP);
-			checkPos2 = pos.offset(EnumFacing.DOWN);
+			checkFacing1 = EnumFacing.UP;
+			checkFacing2 = EnumFacing.DOWN;
 			break;
 		default:
-			checkPos1 = pos.offset(EnumFacing.EAST);
-			checkPos2 = pos.offset(EnumFacing.WEST);
+			checkFacing1 = EnumFacing.EAST;
+			checkFacing2 = EnumFacing.WEST;
 		}
 
-		if(!checkPos1.equals(fromPos) && !checkPos2.equals(fromPos)) {
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		if(pos.offset(checkFacing1).equals(fromPos) || pos.offset(checkFacing2).equals(fromPos)) {
+			return;
 		}
+
+		world.setBlockToAir(pos);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -189,14 +153,22 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public int quantityDropped(Random random) {
-		return 0;
-	}
-
-	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
 		if(!entity.isRiding() && !entity.isBeingRidden() && entity.isNonBoss()) {
 			entity.setPortal(pos);
+
+			if(world.isRemote) {
+				return;
+			}
+
+			final MinecraftServer server = world.getMinecraftServer();
+			final WorldServer overworld = server.getWorld(DimensionType.OVERWORLD.getId());
+
+			if(!(overworld.worldTeleporter instanceof VEPTeleporter)) {
+				overworld.worldTeleporter = new VEPTeleporter(overworld);
+				final WorldServer nether = server.getWorld(DimensionType.NETHER.getId());
+				nether.worldTeleporter = new VEPTeleporter(nether);
+			}
 		}
 	}
 
@@ -221,79 +193,9 @@ public class BlockNetherPortal extends BlockPortal {
 		return getDefaultState().withProperty(AXIS, axis);
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random random) {
-		if(random.nextInt(100) == 0) {
-			world.playSound(
-					pos.getX() + 0.5,
-					pos.getY() + 0.5,
-					pos.getZ() + 0.5,
-					SoundEvents.BLOCK_PORTAL_AMBIENT,
-					SoundCategory.BLOCKS,
-					0.5F,
-					random.nextFloat() * 0.4F + 0.8F,
-					false
-			);
-		}
-
-		for(int i = 0; i < 4; ++i) {
-			double x = pos.getX() + random.nextFloat();
-			final double y = pos.getY() + random.nextFloat();
-			double z = pos.getZ() + random.nextFloat();
-
-			double xSpeed = (random.nextFloat() - 0.5) * 0.5;
-			final double ySpeed = (random.nextFloat() - 0.5) * 0.5;
-			double zSpeed = (random.nextFloat() - 0.5) * 0.5;
-
-			final int multiplier = random.nextInt(2) * 2 - 1;
-
-			if(world.getBlockState(pos.west()).getBlock() != this &&
-					world.getBlockState(pos.east()).getBlock() != this) {
-				x = pos.getX() + 0.5 + 0.25 * multiplier;
-				xSpeed = random.nextFloat() * 2.0F * multiplier;
-			} else {
-				z = pos.getZ() + 0.5 + 0.25 * multiplier;
-				zSpeed = random.nextFloat() * 2.0F * multiplier;
-			}
-
-			world.spawnParticle(EnumParticleTypes.PORTAL, x, y, z, xSpeed, ySpeed, zSpeed);
-		}
-	}
-
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return BlockPortal.getMetaForAxis(state.getValue(AXIS));
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public IBlockState withRotation(IBlockState state, Rotation rotation) {
-		switch(rotation) {
-		case COUNTERCLOCKWISE_90:
-		case CLOCKWISE_90:
-			switch(state.getValue(AXIS)) {
-			case X:
-				return state.withProperty(AXIS, EnumFacing.Axis.Z);
-			case Z:
-				return state.withProperty(AXIS, EnumFacing.Axis.X);
-			default:
-				return state;
-			}
-		default:
-			return state;
-		}
-	}
-
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, AXIS);
+		return new BlockStateContainer(this, AXIS, MANUALLY_PLACED);
 	}
 
 	@SuppressWarnings("deprecation")
