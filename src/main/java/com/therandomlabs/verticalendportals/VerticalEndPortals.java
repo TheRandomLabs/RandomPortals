@@ -7,6 +7,7 @@ import net.minecraft.util.ReportedException;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -49,6 +50,11 @@ public final class VerticalEndPortals {
 	@Mod.EventHandler
 	public static void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit();
+	}
+
+	@Mod.EventHandler
+	public static void init(FMLInitializationEvent event) {
+		proxy.init();
 	}
 
 	@Mod.EventHandler

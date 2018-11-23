@@ -3,6 +3,7 @@ package com.therandomlabs.verticalendportals.block;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityUpsideDownEndPortal;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
@@ -56,7 +57,7 @@ public final class VEPBlocks {
 
 	public static final BlockLateralNetherPortal lateral_nether_portal = null;
 
-	private static final List<Block> blocks = new ArrayList<>();
+	private static final ArrayList<Block> blocks = new ArrayList<>();
 
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
@@ -104,5 +105,10 @@ public final class VEPBlocks {
 		GameRegistry.registerTileEntity(clazz, new ResourceLocation(
 				VerticalEndPortals.MOD_ID, key
 		));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Block> getBlocks() {
+		return (List<Block>) blocks.clone();
 	}
 }

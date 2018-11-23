@@ -3,6 +3,7 @@ package com.therandomlabs.verticalendportals;
 import com.therandomlabs.randompatches.RandomPatches;
 import com.therandomlabs.randompatches.TileEntityEndPortalRenderer;
 import com.therandomlabs.verticalendportals.command.CommandVEPReload;
+import com.therandomlabs.verticalendportals.item.CreativeTabPortals;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityUpsideDownEndPortal;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -54,5 +55,12 @@ public final class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(
 				TileEntityUpsideDownEndPortal.class, new TileEntityEndPortalRenderer(true)
 		);
+	}
+
+	@Override
+	public void init() {
+		super.init();
+
+		CreativeTabPortals.init();
 	}
 }

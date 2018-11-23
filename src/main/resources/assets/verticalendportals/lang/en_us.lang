@@ -1,10 +1,13 @@
 verticalendportals.config.client=Client
 verticalendportals.config.client.tooltip=Options related to features that only work client-side.
+verticalendportals.config.client.portalsCreativeTab=Portals creative tab
 verticalendportals.config.client.vepreloadclientCommand=/vepreloadclient
 
 verticalendportals.config.misc=Miscellaneous
 verticalendportals.config.misc.tooltip=Options that don't fit into any other categories.
 verticalendportals.config.misc.vepreloadCommand=/vepreload
+
+itemGroup.portals=Portals
 
 tile.endPortalFrameLateral.name=Lateral End Portal Frame
 tile.endPortalLateral.name=Lateral End Portal

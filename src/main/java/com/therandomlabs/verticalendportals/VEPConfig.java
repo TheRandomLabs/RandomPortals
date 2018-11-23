@@ -21,6 +21,10 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 @Config(modid = VerticalEndPortals.MOD_ID, name = VerticalEndPortals.MOD_ID, category = "")
 public class VEPConfig {
 	public static class Client {
+		@Config.LangKey("verticalendportals.config.client.portalsCreativeTab")
+		@Config.Comment("Enables the Portals creative tab.")
+		public boolean portalsCreativeTab = true;
+
 		@Config.RequiresMcRestart
 		@Config.LangKey("verticalendportals.config.client.vepreloadclientCommand")
 		@Config.Comment("Enables the client-sided /vepreloadclient command.")

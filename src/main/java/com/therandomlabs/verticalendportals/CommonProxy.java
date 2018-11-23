@@ -6,4 +6,6 @@ public class CommonProxy {
 	public void preInit() {
 		VEPConfig.reload();
 	}
+
+	public void init() {}
 }
