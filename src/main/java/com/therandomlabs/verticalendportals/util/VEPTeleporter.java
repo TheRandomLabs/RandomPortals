@@ -1,6 +1,5 @@
 package com.therandomlabs.verticalendportals.util;
 
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.BlockVEPFire;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
