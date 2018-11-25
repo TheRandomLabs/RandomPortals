@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
-	public static final PropertyBool MANUALLY_PLACED = PropertyBool.create("manually_placed");
+	public static final PropertyBool USER_PLACED = PropertyBool.create("user_placed");
 
 	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(
 			0.0, 0.0, 0.375, 1.0, 1.0, 0.625
@@ -38,8 +38,9 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public BlockNetherPortal() {
 		this(true);
-		setDefaultState(blockState.getBaseState().withProperty(AXIS, EnumFacing.Axis.X).
-				withProperty(MANUALLY_PLACED, true));
+		setDefaultState(blockState.getBaseState().
+				withProperty(AXIS, EnumFacing.Axis.X).
+				withProperty(USER_PLACED, true));
 		setTranslationKey("netherPortalVertical");
 		setRegistryName("minecraft:portal");
 	}
@@ -68,13 +69,13 @@ public class BlockNetherPortal extends BlockPortal {
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
 			BlockPos fromPos) {
-		if(state.getValue(MANUALLY_PLACED)) {
+		if(state.getValue(USER_PLACED)) {
 			return;
 		}
 
 		final IBlockState fromState = world.getBlockState(fromPos);
 
-		if(fromState.getBlock() == this && !fromState.getValue(MANUALLY_PLACED)) {
+		if(fromState.getBlock() == this && !fromState.getValue(USER_PLACED)) {
 			return;
 		}
 
@@ -161,20 +162,14 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
-		return state.getValue(MANUALLY_PLACED) ?
-				super.getMetaFromState(state) + 3 : super.getMetaFromState(state);
-	}
-
-	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		final boolean manuallyPlaced;
+		final boolean userPlaced;
 
 		if(meta > 2) {
-			manuallyPlaced = true;
+			userPlaced = true;
 			meta -= 3;
 		} else {
-			manuallyPlaced = false;
+			userPlaced = false;
 		}
 
 		final EnumFacing.Axis axis;
@@ -189,12 +184,18 @@ public class BlockNetherPortal extends BlockPortal {
 
 		return getDefaultState().
 				withProperty(AXIS, axis).
-				withProperty(MANUALLY_PLACED, manuallyPlaced);
+				withProperty(USER_PLACED, userPlaced);
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(USER_PLACED) ?
+				super.getMetaFromState(state) + 3 : super.getMetaFromState(state);
 	}
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, AXIS, MANUALLY_PLACED);
+		return new BlockStateContainer(this, AXIS, USER_PLACED);
 	}
 
 	@SuppressWarnings("deprecation")

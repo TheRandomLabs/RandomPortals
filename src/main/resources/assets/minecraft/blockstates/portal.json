@@ -1,15 +1,15 @@
 {
 	"variants": {
-		"axis=x,manually_placed=false": {
+		"axis=x,user_placed=false": {
 			"model": "portal_ns"
 		},
-		"axis=x,manually_placed=true": {
+		"axis=x,user_placed=true": {
 			"model": "portal_ns"
 		},
-		"axis=z,manually_placed=false": {
+		"axis=z,user_placed=false": {
 			"model": "portal_ew"
 		},
-		"axis=z,manually_placed=true": {
+		"axis=z,user_placed=true": {
 			"model": "portal_ew"
 		}
 	}

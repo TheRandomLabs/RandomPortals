@@ -1,5 +1,8 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.frame.endportal;
 
+import com.therandomlabs.verticalendportals.frame.Frame;
+import com.therandomlabs.verticalendportals.frame.FrameType;
+import com.therandomlabs.verticalendportals.frame.SidedFrameDetector;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;

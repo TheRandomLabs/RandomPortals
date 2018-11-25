@@ -109,6 +109,11 @@ public class Frame {
 		this.innerBlocks = ImmutableList.copyOf(innerBlocks);
 	}
 
+	@Override
+	public String toString() {
+		return "Frame[topLeft=" + topLeft + ",type=" + type + "]";
+	}
+
 	public World getWorld() {
 		return world;
 	}

@@ -27,13 +27,13 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
-	protected EnumFacing.Axis getAxis(IBlockState state) {
-		return EnumFacing.Axis.Y;
+	public int getMetaFromState(IBlockState state) {
+		return 1;
 	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
-		return 1;
+	protected EnumFacing.Axis getAxis(IBlockState state) {
+		return EnumFacing.Axis.Y;
 	}
 
 	@SuppressWarnings("deprecation")

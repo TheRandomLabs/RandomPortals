@@ -89,7 +89,7 @@ public class BlockVEPFire extends BlockFire {
 					withProperty(BlockNetherPortal.AXIS, axis);
 		}
 
-		state = state.withProperty(BlockNetherPortal.MANUALLY_PLACED, false);
+		state = state.withProperty(BlockNetherPortal.USER_PLACED, false);
 
 		final List<BlockPos> innerBlockPositions = frame.getInnerBlockPositions();
 
