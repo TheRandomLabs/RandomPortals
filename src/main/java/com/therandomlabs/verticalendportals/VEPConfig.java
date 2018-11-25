@@ -98,8 +98,6 @@ public class VEPConfig {
 
 	private static final Field CONFIGS = RPUtils.findField(ConfigManager.class, "CONFIGS");
 
-	private static final Map<String, FrameSize> frameSizes = new HashMap<>();
-
 	public static void reload() {
 		ConfigManager.sync(VerticalEndPortals.MOD_ID, Config.Type.INSTANCE);
 
@@ -111,7 +109,7 @@ public class VEPConfig {
 			RPUtils.crashReport("Error while modifying config", ex);
 		}
 
-		frameSizes.clear();
+		FrameSize.reload();
 	}
 
 	public static void reloadFromDisk() {
@@ -196,26 +194,6 @@ public class VEPConfig {
 		} catch(IOException ex) {
 			RPUtils.crashReport("Failed to write to: " + path, ex);
 		}
-	}
-
-	public static FrameSize getFrameSize(String name) {
-		FrameSize size = frameSizes.get(name);
-
-		if(size != null) {
-			return size;
-		}
-
-		size = readJson(name, FrameSize.class);
-
-		if(size == null) {
-			size = new FrameSize();
-		}
-
-		size.ensureCorrect();
-		writeJson(name, size);
-		frameSizes.put(name, size);
-
-		return size;
 	}
 
 	private static void modifyConfig() throws IllegalAccessException, InvocationTargetException {

@@ -2,7 +2,6 @@ package com.therandomlabs.verticalendportals.frame;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
-import com.therandomlabs.verticalendportals.VEPConfig;
 
 public abstract class FrameSizeFunction implements Function<FrameType, FrameSize> {
 	public final FrameSize apply(FrameType type) {
@@ -23,29 +22,28 @@ public abstract class FrameSizeFunction implements Function<FrameType, FrameSize
 
 	public abstract FrameSize getVerticalZ();
 
-	public static FrameSizeFunction fromJSONs(String directory, BooleanSupplier useAllTypes) {
+	public static FrameSizeFunction fromJSONs(String species, BooleanSupplier useAllTypes) {
 		return new FrameSizeFunction() {
 			@Override
 			public FrameSize getLateral() {
 				final FrameSize all = getAllTypes();
-				return all == null ? VEPConfig.getFrameSize(directory + "/lateral") : all;
+				return all == null ? FrameSize.get(species, "lateral") : all;
 			}
 
 			@Override
 			public FrameSize getVerticalX() {
 				final FrameSize all = getAllTypes();
-				return all == null ? VEPConfig.getFrameSize(directory + "/vertical_x") : all;
+				return all == null ? FrameSize.get(species, "vertical_x") : all;
 			}
 
 			@Override
 			public FrameSize getVerticalZ() {
 				final FrameSize all = getAllTypes();
-				return all == null ? VEPConfig.getFrameSize(directory + "/vertical_z") : all;
+				return all == null ? FrameSize.get(species, "vertical_z") : all;
 			}
 
 			private FrameSize getAllTypes() {
-				return useAllTypes.getAsBoolean() ?
-						VEPConfig.getFrameSize(directory + "/all_types") : null;
+				return useAllTypes.getAsBoolean() ? FrameSize.get(species, "all_types") : null;
 			}
 		};
 	}
