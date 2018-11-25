@@ -131,45 +131,6 @@ public class VEPConfig {
 		}
 	}
 
-	private static void modifyConfig() throws IllegalAccessException, InvocationTargetException {
-		final Configuration config = (Configuration) GET_CONFIGURATION.invoke(
-				null, VerticalEndPortals.MOD_ID, NAME
-		);
-
-		final Map<Property, String> comments = new HashMap<>();
-
-		//Remove old elements
-		for(String name : config.getCategoryNames()) {
-			final ConfigCategory category = config.getCategory(name);
-
-			category.getValues().forEach((key, property) -> {
-				final String comment = property.getComment();
-
-				if(comment == null || comment.isEmpty()) {
-					category.remove(key);
-					return;
-				}
-
-				//Add default value to comment
-				comments.put(property, comment);
-				property.setComment(comment + "\nDefault: " + property.getDefault());
-			});
-
-			if(category.getValues().isEmpty() || category.getComment() == null) {
-				config.removeCategory(category);
-			}
-		}
-
-		config.save();
-
-		//Remove default values from comments so they don't show up in the configuration GUI
-		for(String name : config.getCategoryNames()) {
-			config.getCategory(name).getValues().forEach(
-					(key, property) -> property.setComment(comments.get(property))
-			);
-		}
-	}
-
 	public static Path getConfig(String name) {
 		final Path path = Paths.get("config", VerticalEndPortals.MOD_ID, name);
 		final Path parent = path.getParent();
@@ -201,6 +162,11 @@ public class VEPConfig {
 
 	public static <T> T readJson(String jsonName, Class<T> clazz) {
 		final Path path = getConfig(jsonName + ".json");
+
+		if(!Files.exists(path)) {
+			return null;
+		}
+
 		String raw = read(path);
 
 		if(raw != null) {
@@ -248,5 +214,44 @@ public class VEPConfig {
 		frameSizes.put(name, size);
 
 		return size;
+	}
+
+	private static void modifyConfig() throws IllegalAccessException, InvocationTargetException {
+		final Configuration config = (Configuration) GET_CONFIGURATION.invoke(
+				null, VerticalEndPortals.MOD_ID, NAME
+		);
+
+		final Map<Property, String> comments = new HashMap<>();
+
+		//Remove old elements
+		for(String name : config.getCategoryNames()) {
+			final ConfigCategory category = config.getCategory(name);
+
+			category.getValues().forEach((key, property) -> {
+				final String comment = property.getComment();
+
+				if(comment == null || comment.isEmpty()) {
+					category.remove(key);
+					return;
+				}
+
+				//Add default value to comment
+				comments.put(property, comment);
+				property.setComment(comment + "\nDefault: " + property.getDefault());
+			});
+
+			if(category.getValues().isEmpty() || category.getComment() == null) {
+				config.removeCategory(category);
+			}
+		}
+
+		config.save();
+
+		//Remove default values from comments so they don't show up in the configuration GUI
+		for(String name : config.getCategoryNames()) {
+			config.getCategory(name).getValues().forEach(
+					(key, property) -> property.setComment(comments.get(property))
+			);
+		}
 	}
 }

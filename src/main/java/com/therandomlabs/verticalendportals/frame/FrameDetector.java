@@ -56,7 +56,7 @@ public abstract class FrameDetector {
 	}
 
 	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size) {
-			return detect(world, pos, size, frame -> true);
+		return detect(world, pos, size, frame -> true);
 	}
 
 	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size,
