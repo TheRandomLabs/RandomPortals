@@ -201,12 +201,14 @@ public class VEPConfig {
 	public static FrameSize getFrameSize(String name) {
 		FrameSize size = frameSizes.get(name);
 
-		if(size == null) {
-			size = readJson(name, FrameSize.class);
+		if(size != null) {
+			return size;
+		}
 
-			if(size == null) {
-				size = new FrameSize();
-			}
+		size = readJson(name, FrameSize.class);
+
+		if(size == null) {
+			size = new FrameSize();
 		}
 
 		size.ensureCorrect();
