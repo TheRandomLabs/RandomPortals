@@ -9,10 +9,12 @@ buildscript {
 
 	dependencies {
 		classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+		classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
 	}
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
+apply plugin: "com.github.johnrengelman.shadow"
 
 version = "1.12.2-1.0.0.0"
 group = "com.therandomlabs.verticalendportals"
@@ -21,9 +23,32 @@ archivesBaseName = "verticalendportals"
 sourceCompatibility = targetCompatibility = "1.8"
 
 repositories {
-	maven {
-		url "https://jitpack.io"
+	ivy {
+		artifactPattern "https://endless.blue/files/ivy/[module]-[revision].[ext]"
 	}
+}
+
+dependencies {
+	shadow "blue.endless:Jankson:0.0.4"
+	compile "blue.endless:Jankson:0.0.4"
+}
+
+shadowJar {
+	classifier = ""
+	relocate "blue.endless.jankson", "com.therandomlabs.randomconfigs.repackage.blue.endless.jankson"
+	configurations = [project.configurations.shadow]
+}
+
+reobf {
+	shadowJar {
+		mappingType = "SEARGE"
+	}
+}
+
+tasks.build.dependsOn reobfShadowJar
+
+artifacts {
+	archives shadowJar
 }
 
 minecraft {

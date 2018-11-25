@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals.item;
 
 import java.lang.reflect.Field;
+import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
@@ -12,19 +13,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.ArrayUtils;
 
-//A lot of this is there just so creative tab configuration options can be toggled in-game
-//Worth it? Maybe
 @Mod.EventBusSubscriber(value = Side.CLIENT, modid = VerticalEndPortals.MOD_ID)
 public final class CreativeTabPortals extends CreativeTabs {
 	public static final CreativeTabs INSTANCE = new CreativeTabPortals();
 
-	public static final Field TAB_PAGE =
-			ReflectionHelper.findField(GuiContainerCreative.class, "tabPage");
+	public static final Field TAB_PAGE = RPUtils.findField(GuiContainerCreative.class, "tabPage");
 
 	private static CreativeTabs originalLateralEndPortalFrameTab;
 	private static boolean firstInit;
@@ -55,13 +52,13 @@ public final class CreativeTabPortals extends CreativeTabs {
 
 			Blocks.END_PORTAL_FRAME.setCreativeTab(INSTANCE);
 
-			for(Block block : VEPBlocks.getBlocks()) {
+			for(Block block : VEPBlocks.getBlocksWithItems()) {
 				block.setCreativeTab(INSTANCE);
 			}
 		} else if(firstInit) {
 			Blocks.END_PORTAL_FRAME.setCreativeTab(originalLateralEndPortalFrameTab);
 
-			for(Block block : VEPBlocks.getBlocks()) {
+			for(Block block : VEPBlocks.getBlocksWithItems()) {
 				block.setCreativeTab(DECORATIONS);
 			}
 		}
@@ -92,7 +89,7 @@ public final class CreativeTabPortals extends CreativeTabs {
 			try {
 				TAB_PAGE.set(null, 0);
 			} catch(Exception ex) {
-				VerticalEndPortals.crashReport("Error while disabling creative tab", ex);
+				RPUtils.crashReport("Error while disabling creative tab", ex);
 			}
 		}
 	}

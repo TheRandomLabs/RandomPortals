@@ -1,9 +1,10 @@
 package com.therandomlabs.verticalendportals.block;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityUpsideDownEndPortal;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;
@@ -24,6 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.registries.IForgeRegistry;
 
 @GameRegistry.ObjectHolder(VerticalEndPortals.MOD_ID)
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
@@ -32,7 +34,7 @@ public final class VEPBlocks {
 	public static class ModelRegistrar {
 		@SubscribeEvent
 		public static void registerModels(ModelRegistryEvent event) {
-			blocks.forEach(block -> ModelLoader.setCustomModelResourceLocation(
+			blocksWithItems.forEach(block -> ModelLoader.setCustomModelResourceLocation(
 					Item.getItemFromBlock(block), 0, new ModelResourceLocation(
 							block.getRegistryName(), "inventory"
 					)
@@ -57,22 +59,42 @@ public final class VEPBlocks {
 
 	public static final BlockLateralNetherPortal lateral_nether_portal = null;
 
-	private static final ArrayList<Block> blocks = new ArrayList<>();
+	private static ImmutableList<Block> blocksWithItems;
 
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
 		Blocks.END_PORTAL_FRAME.setTranslationKey("endPortalFrameLateral");
 
-		event.getRegistry().registerAll(
-				new BlockVEPFire(),
-				new BlockVerticalEndPortalFrame(),
-				new BlockUpsideDownEndPortalFrame(),
-				new BlockLateralEndPortal(),
-				new BlockVerticalEndPortal(),
-				new BlockUpsideDownEndPortal(),
-				new BlockNetherPortal(),
-				new BlockLateralNetherPortal()
-		);
+		final List<Block> blocksWithItems = new ArrayList<>();
+
+		final IForgeRegistry<Block> registry = event.getRegistry();
+
+		if(VEPConfig.endPortals.enabled) {
+			Collections.addAll(
+					blocksWithItems,
+					new BlockVerticalEndPortalFrame(),
+					new BlockUpsideDownEndPortalFrame(),
+					new BlockLateralEndPortal(),
+					new BlockVerticalEndPortal(),
+					new BlockUpsideDownEndPortal()
+			);
+		}
+
+		if(VEPConfig.netherPortals.enabled) {
+			registry.register(new BlockVEPFire());
+
+			Collections.addAll(
+					blocksWithItems,
+					new BlockNetherPortal(),
+					new BlockLateralNetherPortal()
+			);
+		}
+
+		for(Block block : blocksWithItems) {
+			registry.register(block);
+		}
+
+		VEPBlocks.blocksWithItems = ImmutableList.copyOf(blocksWithItems);
 
 		registerTileEntities();
 	}
@@ -81,17 +103,7 @@ public final class VEPBlocks {
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		BlockFire.init();
 
-		try {
-			for(Field field : VEPBlocks.class.getDeclaredFields()) {
-				if(!"blocks".equals(field.getName()) && !"fire".equals(field.getName())) {
-					blocks.add((Block) field.get(null));
-				}
-			}
-		} catch(IllegalAccessException ex) {
-			VerticalEndPortals.crashReport("Could not register blocks", ex);
-		}
-
-		blocks.stream().
+		blocksWithItems.stream().
 				map(block -> new ItemBlock(block).setRegistryName(block.getRegistryName())).
 				forEach(event.getRegistry()::register);
 	}
@@ -107,8 +119,7 @@ public final class VEPBlocks {
 		));
 	}
 
-	@SuppressWarnings("unchecked")
-	public static List<Block> getBlocks() {
-		return (List<Block>) blocks.clone();
+	public static ImmutableList<Block> getBlocksWithItems() {
+		return blocksWithItems;
 	}
 }

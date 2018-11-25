@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.util.EnumFacing;
@@ -54,25 +55,18 @@ public abstract class FrameDetector {
 		this.type = type;
 	}
 
-	public final Frame detect(World world, BlockPos pos, int minWidth, int maxWidth, int minHeight,
-			int maxHeight) {
-		return detect(world, pos, minWidth, maxWidth, minHeight, maxHeight, frame -> true);
+	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size) {
+			return detect(world, pos, size, frame -> true);
 	}
 
-	public final Frame detect(World world, BlockPos pos, int minWidth, int maxWidth, int minHeight,
-			int maxHeight, Predicate<Frame> additionalFramePredicate) {
-		if(minWidth < 3 || minHeight < 3) {
-			throw new IllegalArgumentException(
-					"Portal frames must be at least 3 blocks in width and height"
-			);
-		}
-
+	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size,
+			Predicate<Frame> additionalFramePredicate) {
 		final BlockWorldState state = getState(world, pos);
 
 		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.LATERAL, LATERAL, world, state, pos, minWidth, maxWidth, minHeight,
-					maxHeight, additionalFramePredicate
+					FrameType.LATERAL, LATERAL, world, state, pos, size.apply(FrameType.LATERAL),
+					additionalFramePredicate
 			);
 
 			if(frame != null) {
@@ -83,8 +77,8 @@ public abstract class FrameDetector {
 		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_X ||
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.VERTICAL_X, VERTICAL_X, world, state, pos, minWidth, maxWidth,
-					minHeight, maxHeight, additionalFramePredicate
+					FrameType.VERTICAL_X, VERTICAL_X, world, state, pos,
+					size.apply(FrameType.VERTICAL_X), additionalFramePredicate
 			);
 
 			if(frame != null) {
@@ -95,8 +89,8 @@ public abstract class FrameDetector {
 		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_Z ||
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.VERTICAL_Z, VERTICAL_Z, world, state, pos, minWidth, maxWidth,
-					minHeight, maxHeight, additionalFramePredicate
+					FrameType.VERTICAL_Z, VERTICAL_Z, world, state, pos,
+					size.apply(FrameType.VERTICAL_Z), additionalFramePredicate
 			);
 
 			if(frame != null) {
@@ -115,8 +109,7 @@ public abstract class FrameDetector {
 	protected abstract boolean test(Frame frame);
 
 	private Frame detect(FrameType type, EnumFacing[] facings, World world, BlockWorldState state,
-			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
-			Predicate<Frame> additionalFramePredicate) {
+			BlockPos pos, FrameSize size, Predicate<Frame> additionalFramePredicate) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
 
@@ -137,7 +130,7 @@ public abstract class FrameDetector {
 			//If this is a lateral top frame, then we're looking east first,
 			//so we find the westmost corner
 
-			final int maxLength = index % 2 == 0 ? maxWidth : maxHeight;
+			final int maxLength = index % 2 == 0 ? size.maxWidth : size.maxHeight;
 
 			final List<BlockPos> possibleCorners = new ArrayList<>();
 			BlockPos checkPos = pos;
@@ -176,8 +169,8 @@ public abstract class FrameDetector {
 				corners.put(index, new Corner(possibleCorner, 0));
 
 				final Frame frame = detect(
-						corners, type, facings, world, possibleCorner, minWidth, maxWidth,
-						minHeight, maxHeight, index, index, additionalFramePredicate
+						corners, type, facings, world, possibleCorner, size.minWidth, size.maxWidth,
+						size.minHeight, size.maxHeight, index, index, additionalFramePredicate
 				);
 
 				if(frame != null) {

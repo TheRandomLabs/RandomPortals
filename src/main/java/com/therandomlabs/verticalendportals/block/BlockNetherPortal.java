@@ -169,6 +169,8 @@ public class BlockNetherPortal extends BlockPortal {
 				final WorldServer nether = server.getWorld(DimensionType.NETHER.getId());
 				nether.worldTeleporter = new VEPTeleporter(nether);
 			}
+
+			VerticalEndPortals.LOGGER.error(overworld.worldTeleporter);
 		}
 	}
 

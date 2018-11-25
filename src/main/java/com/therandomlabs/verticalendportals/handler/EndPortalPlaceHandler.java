@@ -4,11 +4,12 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
 import com.google.common.collect.ImmutableMap;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.BasicVerticalFrameDetector;
 import com.therandomlabs.verticalendportals.frame.Frame;
 import com.therandomlabs.verticalendportals.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.frame.FrameSizeFunction;
 import com.therandomlabs.verticalendportals.frame.FrameType;
 import com.therandomlabs.verticalendportals.frame.LateralEndPortalDetector;
 import com.therandomlabs.verticalendportals.frame.RequiredCorner;
@@ -30,14 +31,11 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.commons.lang3.ArrayUtils;
 import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
-@Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public final class EndPortalPlaceHandler {
 	public static final FrameDetector LATERAL_FRAMES =
 			new LateralEndPortalDetector(Blocks.END_PORTAL_FRAME);
@@ -50,11 +48,9 @@ public final class EndPortalPlaceHandler {
 
 	public static final ImmutableMap<EnumFacing, FrameDetector> VERTICAL_FRAMES;
 
-	private static final Block[] frames = {
-			Blocks.END_PORTAL_FRAME,
-			VEPBlocks.vertical_end_portal_frame,
-			VEPBlocks.upside_down_end_portal_frame
-	};
+	public static final FrameSizeFunction END_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
+			"end_portals", () -> VEPConfig.endPortals.useAllTypesJson
+	);
 
 	private static final Random random = new Random();
 
@@ -106,7 +102,7 @@ public final class EndPortalPlaceHandler {
 
 	@SuppressWarnings("Duplicates")
 	@SubscribeEvent(priority = EventPriority.LOW)
-	public static void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
+	public void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
 		final World world = event.getWorld();
 		final EntityPlayer player = event.getEntityPlayer();
 		final ItemStack stack = event.getItemStack();
@@ -114,7 +110,7 @@ public final class EndPortalPlaceHandler {
 		final IBlockState state = world.getBlockState(pos);
 		final Block block = state.getBlock();
 
-		if(stack.getItem() != Items.ENDER_EYE || !ArrayUtils.contains(frames, block) ||
+		if(stack.getItem() != Items.ENDER_EYE || !isFrameBlock(block) ||
 				!player.canPlayerEdit(pos, event.getFace(), stack) ||
 				state.getValue(BlockEndPortalFrame.EYE)) {
 			return;
@@ -153,11 +149,11 @@ public final class EndPortalPlaceHandler {
 		Frame frame = null;
 
 		if(block == Blocks.END_PORTAL_FRAME) {
-			frame = LATERAL_FRAMES.detect(world, pos, 3, 9000, 3, 9000);
+			frame = LATERAL_FRAMES.detect(world, pos, END_PORTAL_FRAME_SIZE);
 		} else if(block == VEPBlocks.vertical_end_portal_frame) {
-			frame = LATERAL_VERTICAL_FRAMES.detect(world, pos, 3, 9000, 3, 9000);
+			frame = LATERAL_VERTICAL_FRAMES.detect(world, pos, END_PORTAL_FRAME_SIZE);
 		} else if(block == VEPBlocks.upside_down_end_portal_frame) {
-			frame = UPSIDE_DOWN_FRAMES.detect(world, pos, 3, 9000, 3, 9000);
+			frame = UPSIDE_DOWN_FRAMES.detect(world, pos, END_PORTAL_FRAME_SIZE);
 		}
 
 		if(frame != null && !frame.isCorner(pos)) {
@@ -183,13 +179,13 @@ public final class EndPortalPlaceHandler {
 		EnumFacing portalFacing = null;
 
 		if(block == VEPBlocks.vertical_end_portal_frame) {
-			frame = VERTICAL_FRAMES.get(facing).detect(world, pos, 3, 9000, 3, 9000);
+			frame = VERTICAL_FRAMES.get(facing).detect(world, pos, END_PORTAL_FRAME_SIZE);
 			portalFacing = facing;
 		}
 
 		if(frame == null) {
 			frame = VerticalInwardsFacingEndPortalFrameDetector.INSTANCE.detect(
-					world, pos, 3, 9000, 3, 9000
+					world, pos, END_PORTAL_FRAME_SIZE
 			);
 
 			if(frame != null) {
@@ -216,5 +212,11 @@ public final class EndPortalPlaceHandler {
 		world.playBroadcastSound(1038, innerBlockPositions.get(0), 0);
 
 		event.setCancellationResult(EnumActionResult.SUCCESS);
+	}
+
+	@SuppressWarnings("ConditionCoveredByFurtherCondition")
+	private static boolean isFrameBlock(Block block) {
+		return block == Blocks.END_PORTAL_FRAME || block == VEPBlocks.vertical_end_portal_frame ||
+				block == VEPBlocks.upside_down_end_portal_frame;
 	}
 }

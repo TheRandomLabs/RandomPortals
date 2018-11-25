@@ -1,9 +1,11 @@
 package com.therandomlabs.verticalendportals.block;
 
 import java.util.List;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.frame.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.frame.Frame;
 import com.therandomlabs.verticalendportals.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.frame.FrameSizeFunction;
 import com.therandomlabs.verticalendportals.frame.RequiredCorner;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.SoundType;
@@ -18,6 +20,10 @@ public class BlockVEPFire extends BlockFire {
 			Blocks.OBSIDIAN,
 			RequiredCorner.ANY_NON_AIR,
 			Frame::isEmpty
+	);
+
+	public static final FrameSizeFunction NETHER_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
+			"nether_portals", () -> VEPConfig.netherPortals.useAllTypesJson
 	);
 
 	private static final EnumFacing[] facings = EnumFacing.values();
@@ -55,7 +61,7 @@ public class BlockVEPFire extends BlockFire {
 
 			if(world.getBlockState(offset).getBlock() == Blocks.OBSIDIAN) {
 				frame = NETHER_PORTAL_FRAMES.detect(
-						world, offset, 3, 9000, 3, 9000,
+						world, offset, NETHER_PORTAL_FRAME_SIZE,
 						potentialFrame -> potentialFrame.isFacingInwards(
 								offset, facing.getOpposite()
 						)

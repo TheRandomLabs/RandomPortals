@@ -36,6 +36,7 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 		return 1;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
 		return getDefaultState();
