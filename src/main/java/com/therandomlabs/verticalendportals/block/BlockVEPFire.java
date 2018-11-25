@@ -23,7 +23,7 @@ public class BlockVEPFire extends BlockFire {
 	);
 
 	public static final FrameSizeFunction NETHER_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
-			"nether_portals", () -> VEPConfig.netherPortals.useAllTypesJson
+			"nether_portal", () -> VEPConfig.netherPortals.useAllTypesJson
 	);
 
 	private static final EnumFacing[] facings = EnumFacing.values();

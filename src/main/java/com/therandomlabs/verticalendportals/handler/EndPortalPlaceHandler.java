@@ -49,7 +49,7 @@ public final class EndPortalPlaceHandler {
 	public static final ImmutableMap<EnumFacing, FrameDetector> VERTICAL_FRAMES;
 
 	public static final FrameSizeFunction END_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
-			"end_portals", () -> VEPConfig.endPortals.useAllTypesJson
+			"end_portal", () -> VEPConfig.endPortals.useAllTypesJson
 	);
 
 	private static final Random random = new Random();
