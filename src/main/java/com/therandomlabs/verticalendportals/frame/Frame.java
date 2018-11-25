@@ -3,10 +3,12 @@ package com.therandomlabs.verticalendportals.frame;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -270,6 +272,18 @@ public class Frame {
 			final Block block = state.getBlock();
 
 			if(!block.isReplaceable(world, innerPos)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public boolean testInnerBlocks(BiPredicate<World, BlockWorldState> predicate) {
+		for(BlockPos innerPos : innerBlocks) {
+			final BlockWorldState state = new BlockWorldState(world, innerPos, true);
+
+			if(!predicate.test(world, state)) {
 				return false;
 			}
 		}

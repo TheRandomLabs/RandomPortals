@@ -6,6 +6,7 @@ verticalendportals.config.client.vepreloadclientCommand=/vepreloadclient
 verticalendportals.config.endPortals=End Portals
 verticalendportals.config.endPortals.tooltip=Options related to End portals.
 verticalendportals.config.endPortals.enabled=Enabled
+verticalendportals.config.endPortals.useAllTypesJson=Use all_types JSON
 
 verticalendportals.config.misc=Miscellaneous
 verticalendportals.config.misc.tooltip=Options that don't fit into any other categories.
@@ -14,6 +15,7 @@ verticalendportals.config.misc.vepreloadCommand=/vepreload
 verticalendportals.config.netherPortals=Nether Portals
 verticalendportals.config.netherPortals.tooltip=Options related to Nether portals.
 verticalendportals.config.netherPortals.enabled=Enabled
+verticalendportals.config.netherPortals.useAllTypesJson=Use all_types JSON
 
 itemGroup.portals=Portals
 

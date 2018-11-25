@@ -1,7 +1,6 @@
 package com.therandomlabs.verticalendportals.block;
 
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
-import com.therandomlabs.verticalendportals.util.VEPTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
@@ -12,14 +11,11 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -156,21 +152,6 @@ public class BlockNetherPortal extends BlockPortal {
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
 		if(!entity.isRiding() && !entity.isBeingRidden() && entity.isNonBoss()) {
 			entity.setPortal(pos);
-
-			if(world.isRemote) {
-				return;
-			}
-
-			final MinecraftServer server = world.getMinecraftServer();
-			final WorldServer overworld = server.getWorld(DimensionType.OVERWORLD.getId());
-
-			if(!(overworld.worldTeleporter instanceof VEPTeleporter)) {
-				overworld.worldTeleporter = new VEPTeleporter(overworld);
-				final WorldServer nether = server.getWorld(DimensionType.NETHER.getId());
-				nether.worldTeleporter = new VEPTeleporter(nether);
-			}
-
-			VerticalEndPortals.LOGGER.error(overworld.worldTeleporter);
 		}
 	}
 
@@ -180,8 +161,22 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(MANUALLY_PLACED) ?
+				super.getMetaFromState(state) + 3 : super.getMetaFromState(state);
+	}
+
+	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		meta = meta & 3;
+		final boolean manuallyPlaced;
+
+		if(meta > 2) {
+			manuallyPlaced = true;
+			meta -= 3;
+		} else {
+			manuallyPlaced = false;
+		}
+
 		final EnumFacing.Axis axis;
 
 		if(meta == 0) {
@@ -192,7 +187,9 @@ public class BlockNetherPortal extends BlockPortal {
 			axis = EnumFacing.Axis.Z;
 		}
 
-		return getDefaultState().withProperty(AXIS, axis);
+		return getDefaultState().
+				withProperty(AXIS, axis).
+				withProperty(MANUALLY_PLACED, manuallyPlaced);
 	}
 
 	@Override

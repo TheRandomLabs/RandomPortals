@@ -9,6 +9,8 @@ import com.therandomlabs.verticalendportals.frame.FrameSizeFunction;
 import com.therandomlabs.verticalendportals.frame.RequiredCorner;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -19,7 +21,7 @@ public class BlockVEPFire extends BlockFire {
 	public static final FrameDetector NETHER_PORTAL_FRAMES = new BasicFrameDetector(
 			Blocks.OBSIDIAN,
 			RequiredCorner.ANY_NON_AIR,
-			Frame::isEmpty
+			frame -> frame.testInnerBlocks(BlockVEPFire::isEmpty)
 	);
 
 	public static final FrameSizeFunction NETHER_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
@@ -106,5 +108,16 @@ public class BlockVEPFire extends BlockFire {
 		}
 
 		return false;
+	}
+
+	private static boolean isEmpty(World world, BlockWorldState state) {
+		final IBlockState blockState = state.getBlockState();
+		final Material material = blockState.getMaterial();
+
+		if(material == Material.AIR || material == Material.FIRE || material == Material.PORTAL) {
+			return true;
+		}
+
+		return blockState.getBlock().isReplaceable(world, state.getPos());
 	}
 }
