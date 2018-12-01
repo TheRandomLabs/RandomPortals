@@ -32,7 +32,7 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
-	protected EnumFacing.Axis getAxis(IBlockState state) {
+	public EnumFacing.Axis getAxis(IBlockState state) {
 		return EnumFacing.Axis.Y;
 	}
 

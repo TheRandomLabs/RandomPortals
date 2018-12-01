@@ -1,33 +1,19 @@
 package com.therandomlabs.verticalendportals.block;
 
 import java.util.List;
-import com.therandomlabs.verticalendportals.VEPConfig;
-import com.therandomlabs.verticalendportals.frame.BasicFrameDetector;
-import com.therandomlabs.verticalendportals.frame.Frame;
-import com.therandomlabs.verticalendportals.frame.FrameDetector;
-import com.therandomlabs.verticalendportals.frame.FrameSizeFunction;
-import com.therandomlabs.verticalendportals.frame.RequiredCorner;
+import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 
 public class BlockVEPFire extends BlockFire {
-	public static final FrameDetector NETHER_PORTAL_FRAMES = new BasicFrameDetector(
-			Blocks.OBSIDIAN,
-			RequiredCorner.ANY_NON_AIR,
-			frame -> frame.testInnerBlocks(BlockVEPFire::isEmpty)
-	);
-
-	public static final FrameSizeFunction NETHER_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
-			"nether_portal", () -> VEPConfig.netherPortals.useAllTypesJson
-	);
-
 	private static final EnumFacing[] facings = EnumFacing.values();
 
 	public BlockVEPFire() {
@@ -57,25 +43,30 @@ public class BlockVEPFire extends BlockFire {
 
 	private boolean trySpawnPortal(World world, BlockPos pos) {
 		Frame frame = null;
+		BlockPos framePos = null;
 
 		for(EnumFacing facing : facings) {
 			final BlockPos offset = pos.offset(facing);
 
 			if(world.getBlockState(offset).getBlock() == Blocks.OBSIDIAN) {
-				frame = NETHER_PORTAL_FRAMES.detect(
-						world, offset, NETHER_PORTAL_FRAME_SIZE,
-						potentialFrame -> potentialFrame.isFacingInwards(
+				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
+						world, offset, potentialFrame -> potentialFrame.isFacingInwards(
 								offset, facing.getOpposite()
 						)
 				);
 
 				if(frame != null) {
+					framePos = offset;
 					break;
 				}
 			}
 		}
 
 		if(frame == null) {
+			return false;
+		}
+
+		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Activate(frame, framePos))) {
 			return false;
 		}
 
@@ -108,16 +99,5 @@ public class BlockVEPFire extends BlockFire {
 		}
 
 		return false;
-	}
-
-	private static boolean isEmpty(World world, BlockWorldState state) {
-		final IBlockState blockState = state.getBlockState();
-		final Material material = blockState.getMaterial();
-
-		if(material == Material.AIR || material == Material.FIRE || material == Material.PORTAL) {
-			return true;
-		}
-
-		return blockState.getBlock().isReplaceable(world, state.getPos());
 	}
 }

@@ -1,15 +1,11 @@
 package com.therandomlabs.verticalendportals.util;
 
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
-import com.therandomlabs.verticalendportals.block.BlockVEPFire;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.frame.BasicFrameDetector;
-import com.therandomlabs.verticalendportals.frame.Frame;
-import com.therandomlabs.verticalendportals.frame.FrameDetector;
-import com.therandomlabs.verticalendportals.frame.RequiredCorner;
-import net.minecraft.block.Block;
+import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.BlockPortal;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -19,16 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 public class VEPTeleporter extends Teleporter {
-	public static final FrameDetector ACTIVATED_NETHER_PORTAL_FRAMES = new BasicFrameDetector(
-			Blocks.OBSIDIAN,
-			RequiredCorner.ANY_NON_AIR,
-			frame -> frame.testInnerBlocks(VEPTeleporter::isPortal)
-	);
-
 	public VEPTeleporter(WorldServer world) {
 		super(world);
 	}
@@ -68,8 +57,9 @@ public class VEPTeleporter extends Teleporter {
 					for(; pos1.getY() >= 0; pos1 = pos2) {
 						pos2 = pos1.down();
 
-						if(isPortal(world, pos1)) {
-							for(pos2 = pos1.down(); isPortal(world, pos2); pos2 = pos2.down()) {
+						if(BlockNetherPortal.isPortal(world, pos1)) {
+							for(pos2 = pos1.down(); BlockNetherPortal.isPortal(world, pos2);
+								pos2 = pos2.down()) {
 								pos1 = pos2;
 							}
 
@@ -99,10 +89,18 @@ public class VEPTeleporter extends Teleporter {
 		BlockPos framePos = pos.down();
 
 		if(world.getBlockState(framePos).getBlock() != Blocks.OBSIDIAN) {
-			final int maxWidth = BlockVEPFire.NETHER_PORTAL_FRAME_SIZE.getLateral().maxWidth;
+			final IBlockState portalState = world.getBlockState(pos);
+			final EnumFacing.Axis axis =
+					((BlockNetherPortal) portalState.getBlock()).getAxis(portalState);
+			final EnumFacing frameCheckDirection =
+					axis == EnumFacing.Axis.Z ? EnumFacing.NORTH : EnumFacing.WEST;
 
-			for(int x = 0; x < maxWidth; x++) {
-				framePos = pos.add(x, 0, 0);
+			final int maxWidth = NetherPortalFrames.SIZE.apply(FrameType.fromAxis(axis)).maxWidth;
+
+			framePos = pos;
+
+			for(int offset = 1; offset < maxWidth - 1; offset++) {
+				framePos = framePos.offset(frameCheckDirection, offset);
 
 				if(world.getBlockState(framePos).getBlock() == Blocks.OBSIDIAN) {
 					break;
@@ -112,9 +110,13 @@ public class VEPTeleporter extends Teleporter {
 			}
 		}
 
-		final Frame frame = framePos == null ? null : BlockVEPFire.NETHER_PORTAL_FRAMES.detect(
-				world, framePos, BlockVEPFire.NETHER_PORTAL_FRAME_SIZE
-		);
+		final Frame frame;
+
+		if(framePos == null) {
+			frame = null;
+		} else {
+			frame = NetherPortalFrames.ACTIVATED_FRAMES.detect(world, framePos);
+		}
 
 		final EnumFacing entityFacing = entity.getHorizontalFacing();
 
@@ -387,16 +389,5 @@ public class VEPTeleporter extends Teleporter {
 		}
 
 		return true;
-	}
-
-	private static boolean isPortal(World world, BlockWorldState state) {
-		return isPortal(world, state.getPos());
-	}
-
-	@SuppressWarnings("ConditionCoveredByFurtherCondition")
-	private static boolean isPortal(World world, BlockPos pos) {
-		final Block block = world.getBlockState(pos).getBlock();
-		return block == VEPBlocks.vertical_nether_portal ||
-				block == VEPBlocks.lateral_nether_portal;
 	}
 }

@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class Frame {
+	private final FrameDetector detector;
 	private final World world;
 	private final FrameType type;
 
@@ -35,7 +36,9 @@ public class Frame {
 	private final ImmutableList<BlockPos> leftBlocks;
 	private final ImmutableList<BlockPos> innerBlocks;
 
-	Frame(World world, FrameType type, Map<Integer, Corner> corners, EnumFacing[] facings) {
+	Frame(FrameDetector detector, World world, FrameType type, Map<Integer, Corner> corners,
+			EnumFacing[] facings) {
+		this.detector = detector;
 		this.world = world;
 		this.type = type;
 
@@ -112,6 +115,10 @@ public class Frame {
 	@Override
 	public String toString() {
 		return "Frame[topLeft=" + topLeft + ",type=" + type + "]";
+	}
+
+	public FrameDetector getDetector() {
+		return detector;
 	}
 
 	public World getWorld() {

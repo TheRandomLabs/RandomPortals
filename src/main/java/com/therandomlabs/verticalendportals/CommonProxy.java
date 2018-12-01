@@ -1,6 +1,6 @@
 package com.therandomlabs.verticalendportals;
 
-import com.therandomlabs.verticalendportals.handler.EndPortalPlaceHandler;
+import com.therandomlabs.verticalendportals.handler.EndPortalActivationHandler;
 import net.minecraftforge.common.MinecraftForge;
 
 public class CommonProxy {
@@ -10,7 +10,7 @@ public class CommonProxy {
 
 	public void init() {
 		if(VEPConfig.endPortals.enabled) {
-			MinecraftForge.EVENT_BUS.register(new EndPortalPlaceHandler());
+			MinecraftForge.EVENT_BUS.register(new EndPortalActivationHandler());
 		}
 	}
 }

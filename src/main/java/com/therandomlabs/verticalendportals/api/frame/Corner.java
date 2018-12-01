@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
 import net.minecraft.util.math.BlockPos;
 

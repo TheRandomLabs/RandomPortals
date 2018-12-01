@@ -1,12 +1,15 @@
 package com.therandomlabs.verticalendportals.block;
 
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,12 +19,28 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
+	public static final class Matcher {
+		public static final BlockStateMatcher LATERAL =
+				BlockStateMatcher.forBlock(VEPBlocks.lateral_nether_portal);
+
+		public static final BlockStateMatcher VERTICAL_X = BlockStateMatcher.forBlock(
+				VEPBlocks.vertical_nether_portal
+		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
+
+		public static final BlockStateMatcher VERTICAL_Z = BlockStateMatcher.forBlock(
+				VEPBlocks.vertical_nether_portal
+		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
+
+		private Matcher() {}
+	}
+
 	public static final PropertyBool USER_PLACED = PropertyBool.create("user_placed");
 
 	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(
@@ -72,6 +91,8 @@ public class BlockNetherPortal extends BlockPortal {
 		if(state.getValue(USER_PLACED)) {
 			return;
 		}
+
+		//TODO fix redstone signal triggering destruction, optimize
 
 		final IBlockState fromState = world.getBlockState(fromPos);
 
@@ -149,11 +170,24 @@ public class BlockNetherPortal extends BlockPortal {
 		return z && (side == EnumFacing.NORTH || side == EnumFacing.SOUTH);
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(!entity.isRiding() && !entity.isBeingRidden() && entity.isNonBoss()) {
-			entity.setPortal(pos);
+		if(world.isRemote || entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
+			return;
 		}
+
+		final AxisAlignedBB aabb = entity.getEntityBoundingBox();
+
+		if(!aabb.intersects(state.getBoundingBox(world, pos).offset(pos))) {
+			return;
+		}
+
+		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport(null, entity, pos))) {
+			return;
+		}
+
+		entity.setPortal(pos);
 	}
 
 	@Override
@@ -209,7 +243,18 @@ public class BlockNetherPortal extends BlockPortal {
 		);
 	}
 
-	protected EnumFacing.Axis getAxis(IBlockState state) {
+	public EnumFacing.Axis getAxis(IBlockState state) {
 		return state.getValue(AXIS);
+	}
+
+	public static boolean isPortal(World world, BlockWorldState state) {
+		return isPortal(world, state.getPos());
+	}
+
+	@SuppressWarnings("ConditionCoveredByFurtherCondition")
+	public static boolean isPortal(World world, BlockPos pos) {
+		final Block block = world.getBlockState(pos).getBlock();
+		return block == VEPBlocks.vertical_nether_portal ||
+				block == VEPBlocks.lateral_nether_portal;
 	}
 }

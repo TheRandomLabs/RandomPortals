@@ -1,9 +1,11 @@
 package com.therandomlabs.verticalendportals.frame.endportal;
 
+import java.util.function.Function;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameSize;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.api.frame.SidedFrameDetector;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.frame.Frame;
-import com.therandomlabs.verticalendportals.frame.FrameType;
-import com.therandomlabs.verticalendportals.frame.SidedFrameDetector;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
@@ -12,12 +14,19 @@ import net.minecraft.util.EnumFacing;
 import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
-public final class VerticalInwardsFacingEndPortalFrameDetector extends SidedFrameDetector {
-	public static final VerticalInwardsFacingEndPortalFrameDetector INSTANCE =
-			new VerticalInwardsFacingEndPortalFrameDetector();
-
-	public VerticalInwardsFacingEndPortalFrameDetector() {
+public final class VerticalInwardsEndPortalFrameDetector extends SidedFrameDetector {
+	VerticalInwardsEndPortalFrameDetector() {
 		super(FrameType.VERTICAL);
+	}
+
+	@Override
+	public Function<FrameType, FrameSize> getDefaultSize() {
+		return EndPortalFrames.VERTICAL_INWARDS_FACING_SIZE;
+	}
+
+	@Override
+	protected boolean test(Frame frame) {
+		return true;
 	}
 
 	@Override
@@ -44,13 +53,8 @@ public final class VerticalInwardsFacingEndPortalFrameDetector extends SidedFram
 	@Override
 	protected boolean testLeft(FrameType type, BlockWorldState state, int position) {
 		return test(
-				type, state, VEPBlocks.vertical_end_portal_frame, EnumFacing.EAST, EnumFacing.SOUTH
+				type, state, VEPBlocks.vertical_end_portal_frame, EnumFacing.EAST, EnumFacing.NORTH
 		);
-	}
-
-	@Override
-	protected boolean test(Frame frame) {
-		return true;
 	}
 
 	private boolean test(FrameType type, BlockWorldState state, Block block, EnumFacing facingX,

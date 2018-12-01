@@ -1,12 +1,16 @@
 package com.therandomlabs.verticalendportals.block;
 
+import com.therandomlabs.verticalendportals.api.event.EndPortalEvent;
 import net.minecraft.block.BlockEndPortal;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 
 public class BlockLateralEndPortal extends BlockEndPortal {
 	public BlockLateralEndPortal() {
@@ -16,6 +20,26 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		setCreativeTab(CreativeTabs.DECORATIONS);
 		setTranslationKey("endPortalLateral");
 		setRegistryName("minecraft:end_portal");
+	}
+
+	@SuppressWarnings("Duplicates")
+	@Override
+	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+		if(world.isRemote || entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
+			return;
+		}
+
+		final AxisAlignedBB aabb = entity.getEntityBoundingBox();
+
+		if(!aabb.intersects(state.getBoundingBox(world, pos).offset(pos))) {
+			return;
+		}
+
+		if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Teleport(null, entity, pos))) {
+			return;
+		}
+
+		entity.changeDimension(1);
 	}
 
 	@Override

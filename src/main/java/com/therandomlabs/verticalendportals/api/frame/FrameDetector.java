@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -55,18 +55,31 @@ public abstract class FrameDetector {
 		this.type = type;
 	}
 
-	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size) {
-		return detect(world, pos, size, frame -> true);
+	public final Frame detect(World world, BlockPos pos) {
+		return detect(world, pos, getDefaultSize());
 	}
 
-	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size,
-			Predicate<Frame> additionalFramePredicate) {
+	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size) {
+		return detectWithCondition(world, pos, size, frame -> true);
+	}
+
+	public final Frame detectWithCondition(World world, BlockPos pos,
+			Predicate<Frame> frameCondition) {
+		return detectWithCondition(world, pos, getDefaultSize(), frameCondition);
+	}
+
+	public final Frame detectWithCondition(World world, BlockPos pos,
+			Function<FrameType, FrameSize> size, Predicate<Frame> frameCondition) {
+		if(size == null) {
+			size = type -> new FrameSize();
+		}
+
 		final BlockWorldState state = getState(world, pos);
 
 		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					FrameType.LATERAL, LATERAL, world, state, pos, size.apply(FrameType.LATERAL),
-					additionalFramePredicate
+					frameCondition
 			);
 
 			if(frame != null) {
@@ -78,7 +91,7 @@ public abstract class FrameDetector {
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					FrameType.VERTICAL_X, VERTICAL_X, world, state, pos,
-					size.apply(FrameType.VERTICAL_X), additionalFramePredicate
+					size.apply(FrameType.VERTICAL_X), frameCondition
 			);
 
 			if(frame != null) {
@@ -90,7 +103,7 @@ public abstract class FrameDetector {
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
 					FrameType.VERTICAL_Z, VERTICAL_Z, world, state, pos,
-					size.apply(FrameType.VERTICAL_Z), additionalFramePredicate
+					size.apply(FrameType.VERTICAL_Z), frameCondition
 			);
 
 			if(frame != null) {
@@ -98,6 +111,10 @@ public abstract class FrameDetector {
 			}
 		}
 
+		return null;
+	}
+
+	public Function<FrameType, FrameSize> getDefaultSize() {
 		return null;
 	}
 
@@ -109,7 +126,7 @@ public abstract class FrameDetector {
 	protected abstract boolean test(Frame frame);
 
 	private Frame detect(FrameType type, EnumFacing[] facings, World world, BlockWorldState state,
-			BlockPos pos, FrameSize size, Predicate<Frame> additionalFramePredicate) {
+			BlockPos pos, FrameSize size, Predicate<Frame> frameCondition) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
 
@@ -170,7 +187,7 @@ public abstract class FrameDetector {
 
 				final Frame frame = detect(
 						corners, type, facings, world, possibleCorner, size.minWidth, size.maxWidth,
-						size.minHeight, size.maxHeight, index, index, additionalFramePredicate
+						size.minHeight, size.maxHeight, index, index, frameCondition
 				);
 
 				if(frame != null) {
@@ -186,7 +203,7 @@ public abstract class FrameDetector {
 
 	private Frame detect(HashMap<Integer, Corner> corners, FrameType type, EnumFacing[] facings,
 			World world, BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
-			int startIndex, int index, Predicate<Frame> additionalFramePredicate) {
+			int startIndex, int index, Predicate<Frame> frameCondition) {
 		final int actualIndex = index > 3 ? index - 4 : index;
 		final int nextIndex = actualIndex == 3 ? 0 : actualIndex + 1;
 
@@ -261,12 +278,8 @@ public abstract class FrameDetector {
 
 		if(nextIndex == startIndex) {
 			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
-
-			final Frame frame = new Frame(
-					world, type, corners, facings
-			);
-
-			return test(frame) && additionalFramePredicate.test(frame) ? frame : null;
+			final Frame frame = new Frame(this, world, type, corners, facings);
+			return test(frame) && frameCondition.test(frame) ? frame : null;
 		}
 
 		for(Map.Entry<BlockPos, Integer> corner : possibleCorners) {
@@ -277,7 +290,7 @@ public abstract class FrameDetector {
 
 			final Frame frame = detect(
 					corners, type, facings, world, cornerPos, minWidth, maxWidth, minHeight,
-					maxHeight, startIndex, index + 1, additionalFramePredicate
+					maxHeight, startIndex, index + 1, frameCondition
 			);
 
 			if(frame != null) {

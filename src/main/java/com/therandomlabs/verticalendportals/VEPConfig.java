@@ -16,7 +16,7 @@ import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.therandomlabs.randompatches.util.RPUtils;
-import com.therandomlabs.verticalendportals.frame.FrameSize;
+import com.therandomlabs.verticalendportals.api.frame.FrameSize;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
@@ -48,10 +48,11 @@ public class VEPConfig {
 		@Config.Comment("Enables vertical End portals and a variety of End portal tweaks.")
 		public boolean enabled = true;
 
-		@Config.LangKey("verticalendportals.config.endPortals.useAllTypesJson")
-		@Config.Comment("Whether to read from the all_types JSON rather than the different JSONs " +
-				"for the specific frame types.")
-		public boolean useAllTypesJson = true;
+		@Config.LangKey("verticalendportals.config.endPortals.useAllVariantsJson")
+		@Config.Comment(
+				"Whether to read from the all_variants JSON rather than the different JSONs " +
+						"for the specific frame types.")
+		public boolean useAllVariantsJson = true;
 	}
 
 	public static class Misc {
@@ -67,10 +68,11 @@ public class VEPConfig {
 		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
 		public boolean enabled = true;
 
-		@Config.LangKey("verticalendportals.config.netherPortals.useAllTypesJson")
-		@Config.Comment("Whether to read from the all_types JSON rather than the different JSONs " +
-				"for the specific frame types.")
-		public boolean useAllTypesJson = true;
+		@Config.LangKey("verticalendportals.config.netherPortals.useAllVariantsJson")
+		@Config.Comment(
+				"Whether to read from the all_variants JSON rather than the different JSONs " +
+						"for the specific frame types.")
+		public boolean useAllVariantsJson = true;
 	}
 
 	@Config.Ignore

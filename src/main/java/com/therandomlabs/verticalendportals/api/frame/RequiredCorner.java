@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
 public enum RequiredCorner {
 	ANY,

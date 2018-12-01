@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +16,9 @@ public class FrameSize {
 	public int maxHeight = 9000;
 
 	static {
-		register("end_portal");
+		register("end_portal/normal");
+		register("end_portal", "lateral_with_vertical_frames", "upside_down");
+		registerVertical("end_portal/inwards_facing");
 		register("nether_portal");
 	}
 
@@ -67,7 +69,11 @@ public class FrameSize {
 	}
 
 	public static void register(String species) {
-		register(species, "all_types", "lateral", "vertical_x", "vertical_z");
+		register(species, "all_variants", "lateral", "vertical_x", "vertical_z");
+	}
+
+	public static void registerVertical(String species) {
+		register(species, "all_variants", "vertical_x", "vertical_z");
 	}
 
 	public static void register(String species, String... names) {

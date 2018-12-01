@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
 import net.minecraft.util.EnumFacing;
 
@@ -23,5 +23,15 @@ public enum FrameType {
 
 	public boolean isVertical() {
 		return vertical;
+	}
+
+	public static FrameType fromAxis(EnumFacing.Axis axis) {
+		for(FrameType type : values()) {
+			if(type.axis == axis) {
+				return type;
+			}
+		}
+
+		return null;
 	}
 }

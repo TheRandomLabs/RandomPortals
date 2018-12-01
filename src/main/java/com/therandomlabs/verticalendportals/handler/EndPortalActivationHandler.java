@@ -1,24 +1,15 @@
 package com.therandomlabs.verticalendportals.handler;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
-import com.google.common.collect.ImmutableMap;
-import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.api.event.EndPortalEvent;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.frame.BasicVerticalFrameDetector;
-import com.therandomlabs.verticalendportals.frame.Frame;
-import com.therandomlabs.verticalendportals.frame.FrameDetector;
-import com.therandomlabs.verticalendportals.frame.FrameSizeFunction;
-import com.therandomlabs.verticalendportals.frame.FrameType;
-import com.therandomlabs.verticalendportals.frame.RequiredCorner;
-import com.therandomlabs.verticalendportals.frame.endportal.LateralEndPortalDetector;
-import com.therandomlabs.verticalendportals.frame.endportal.VerticalInwardsFacingEndPortalFrameDetector;
+import com.therandomlabs.verticalendportals.frame.endportal.EndPortalFrames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortalFrame;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -30,77 +21,15 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
-public final class EndPortalPlaceHandler {
-	public static final FrameDetector LATERAL_FRAMES =
-			new LateralEndPortalDetector(Blocks.END_PORTAL_FRAME);
-
-	public static final FrameDetector LATERAL_VERTICAL_FRAMES =
-			new LateralEndPortalDetector(VEPBlocks.vertical_end_portal_frame);
-
-	public static final FrameDetector UPSIDE_DOWN_FRAMES =
-			new LateralEndPortalDetector(VEPBlocks.upside_down_end_portal_frame);
-
-	public static final ImmutableMap<EnumFacing, FrameDetector> VERTICAL_FRAMES;
-
-	public static final FrameSizeFunction END_PORTAL_FRAME_SIZE = FrameSizeFunction.fromJSONs(
-			"end_portal", () -> VEPConfig.endPortals.useAllTypesJson
-	);
-
+public final class EndPortalActivationHandler {
 	private static final Random random = new Random();
 
-	static {
-		final EnumMap<EnumFacing, FrameDetector> verticalFrames = new EnumMap<>(EnumFacing.class);
-
-		verticalFrames.put(EnumFacing.NORTH, new BasicVerticalFrameDetector(
-				BlockWorldState.hasState(
-						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye)
-				),
-				EnumFacing.NORTH,
-				RequiredCorner.ANY,
-				frame -> true
-		));
-
-		verticalFrames.put(EnumFacing.EAST, new BasicVerticalFrameDetector(
-				BlockWorldState.hasState(
-						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye)
-				),
-				EnumFacing.EAST,
-				RequiredCorner.ANY,
-				frame -> true
-		));
-
-		verticalFrames.put(EnumFacing.SOUTH, new BasicVerticalFrameDetector(
-				BlockWorldState.hasState(
-						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye)
-				),
-				EnumFacing.SOUTH,
-				RequiredCorner.ANY,
-				frame -> true
-		));
-
-		verticalFrames.put(EnumFacing.WEST, new BasicVerticalFrameDetector(
-				BlockWorldState.hasState(
-						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
-								where(EYE, eye -> eye)
-				),
-				EnumFacing.WEST,
-				RequiredCorner.ANY,
-				frame -> true
-		));
-
-		VERTICAL_FRAMES = ImmutableMap.copyOf(verticalFrames);
-	}
-
-	@SuppressWarnings("Duplicates")
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
 		final World world = event.getWorld();
@@ -149,14 +78,18 @@ public final class EndPortalPlaceHandler {
 		Frame frame = null;
 
 		if(block == Blocks.END_PORTAL_FRAME) {
-			frame = LATERAL_FRAMES.detect(world, pos, END_PORTAL_FRAME_SIZE);
+			frame = EndPortalFrames.LATERAL.detect(world, pos);
 		} else if(block == VEPBlocks.vertical_end_portal_frame) {
-			frame = LATERAL_VERTICAL_FRAMES.detect(world, pos, END_PORTAL_FRAME_SIZE);
+			frame = EndPortalFrames.LATERAL_WITH_VERTICAL_FRAMES.detect(world, pos);
 		} else if(block == VEPBlocks.upside_down_end_portal_frame) {
-			frame = UPSIDE_DOWN_FRAMES.detect(world, pos, END_PORTAL_FRAME_SIZE);
+			frame = EndPortalFrames.UPSIDE_DOWN.detect(world, pos);
 		}
 
 		if(frame != null && !frame.isCorner(pos)) {
+			if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Activate(frame, pos))) {
+				return;
+			}
+
 			final IBlockState portalState;
 
 			if(block == VEPBlocks.upside_down_end_portal_frame) {
@@ -179,14 +112,12 @@ public final class EndPortalPlaceHandler {
 		EnumFacing portalFacing = null;
 
 		if(block == VEPBlocks.vertical_end_portal_frame) {
-			frame = VERTICAL_FRAMES.get(facing).detect(world, pos, END_PORTAL_FRAME_SIZE);
+			frame = EndPortalFrames.VERTICAL.get(facing).detect(world, pos);
 			portalFacing = facing;
 		}
 
 		if(frame == null) {
-			frame = VerticalInwardsFacingEndPortalFrameDetector.INSTANCE.detect(
-					world, pos, END_PORTAL_FRAME_SIZE
-			);
+			frame = EndPortalFrames.VERTICAL_INWARDS_FACING.detect(world, pos);
 
 			if(frame != null) {
 				portalFacing = frame.getType() == FrameType.VERTICAL_X ?
@@ -196,6 +127,10 @@ public final class EndPortalPlaceHandler {
 
 		if(frame == null || frame.isCorner(pos)) {
 			event.setCancellationResult(EnumActionResult.FAIL);
+			return;
+		}
+
+		if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Activate(frame, pos))) {
 			return;
 		}
 

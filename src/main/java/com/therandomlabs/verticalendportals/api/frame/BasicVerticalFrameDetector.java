@@ -1,5 +1,6 @@
-package com.therandomlabs.verticalendportals.frame;
+package com.therandomlabs.verticalendportals.api.frame;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.util.EnumFacing;
@@ -7,27 +8,37 @@ import static net.minecraft.block.BlockHorizontal.FACING;
 import static net.minecraft.init.Blocks.AIR;
 
 public class BasicVerticalFrameDetector extends FrameDetector {
+	private final Function<FrameType, FrameSize> defaultSize;
 	private final Predicate<BlockWorldState> predicate;
 	private final EnumFacing facing;
 	private final RequiredCorner requiredCorner;
 	private final Predicate<Frame> framePredicate;
 
-	public BasicVerticalFrameDetector(Predicate<BlockWorldState> predicate,
-			RequiredCorner requiredCorner, Predicate<Frame> framePredicate) {
+	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
+			Predicate<BlockWorldState> predicate, RequiredCorner requiredCorner,
+			Predicate<Frame> framePredicate) {
 		super(FrameType.VERTICAL);
+		this.defaultSize = defaultSize;
 		this.predicate = predicate;
 		facing = null;
 		this.requiredCorner = requiredCorner;
 		this.framePredicate = framePredicate;
 	}
 
-	public BasicVerticalFrameDetector(Predicate<BlockWorldState> predicate, EnumFacing facing,
-			RequiredCorner requiredCorner, Predicate<Frame> framePredicate) {
+	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
+			Predicate<BlockWorldState> predicate, EnumFacing facing, RequiredCorner requiredCorner,
+			Predicate<Frame> framePredicate) {
 		super(facing.getAxis() == EnumFacing.Axis.X ? FrameType.VERTICAL_Z : FrameType.VERTICAL_X);
+		this.defaultSize = defaultSize;
 		this.predicate = predicate;
 		this.facing = facing;
 		this.requiredCorner = requiredCorner;
 		this.framePredicate = framePredicate;
+	}
+
+	@Override
+	public Function<FrameType, FrameSize> getDefaultSize() {
+		return defaultSize;
 	}
 
 	@SuppressWarnings("Duplicates")
