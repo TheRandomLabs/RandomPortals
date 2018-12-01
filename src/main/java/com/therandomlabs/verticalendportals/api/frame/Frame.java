@@ -1,11 +1,14 @@
 package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockWorldState;
@@ -22,18 +25,19 @@ public class Frame {
 	private final int width;
 	private final int height;
 
+	private final EnumFacing widthDirection;
+	private final EnumFacing heightDirection;
+
 	private final BlockPos topLeft;
 	private final BlockPos topRight;
 	private final BlockPos bottomLeft;
 	private final BlockPos bottomRight;
 
-	private final EnumFacing widthDirection;
-	private final EnumFacing heightDirection;
-
 	private final ImmutableList<BlockPos> topBlocks;
 	private final ImmutableList<BlockPos> rightBlocks;
 	private final ImmutableList<BlockPos> bottomBlocks;
 	private final ImmutableList<BlockPos> leftBlocks;
+	private final ImmutableList<BlockPos> frameBlocks;
 	private final ImmutableList<BlockPos> innerBlocks;
 
 	Frame(FrameDetector detector, World world, FrameType type, Map<Integer, Corner> corners,
@@ -48,13 +52,13 @@ public class Frame {
 		width = topLeftCorner.sideLength;
 		height = rightCorner.sideLength;
 
+		widthDirection = facings[0];
+		heightDirection = facings[1];
+
 		topLeft = topLeftCorner.pos;
 		topRight = rightCorner.pos;
 		bottomLeft = corners.get(3).pos;
 		bottomRight = corners.get(2).pos;
-
-		widthDirection = facings[0];
-		heightDirection = facings[1];
 
 		final List<BlockPos> topBlocks = new ArrayList<>(width);
 
@@ -98,6 +102,19 @@ public class Frame {
 
 		this.leftBlocks = ImmutableList.copyOf(leftBlocks);
 
+		//Each corner is in two lists, so we use a set to remove duplicates
+
+		final Set<BlockPos> frameBlocks = new HashSet<>(
+				topBlocks.size() + rightBlocks.size() + bottomBlocks.size() + leftBlocks.size()
+		);
+
+		frameBlocks.addAll(topBlocks);
+		frameBlocks.addAll(rightBlocks);
+		frameBlocks.addAll(bottomBlocks);
+		frameBlocks.addAll(leftBlocks);
+
+		this.frameBlocks = ImmutableList.copyOf(frameBlocks);
+
 		final List<BlockPos> innerBlocks = new ArrayList<>((width - 2) * (height - 2));
 
 		for(int width = 1; width < this.width - 1; width++) {
@@ -137,6 +154,32 @@ public class Frame {
 		return height;
 	}
 
+	public EnumFacing getWidthDirection() {
+		return widthDirection;
+	}
+
+	public EnumFacing getHeightDirection() {
+		return heightDirection;
+	}
+
+	public boolean isCorner(BlockPos pos) {
+		return topLeft.equals(pos) || topRight.equals(pos) || bottomLeft.equals(pos) ||
+				bottomRight.equals(pos);
+	}
+
+	public ImmutableList<BlockPos> getCornerBlockPositions() {
+		return ImmutableList.of(topLeft, topRight, bottomLeft, bottomRight);
+	}
+
+	public List<IBlockState> getCornerBlocks() {
+		return Lists.newArrayList(
+				world.getBlockState(topLeft),
+				world.getBlockState(topRight),
+				world.getBlockState(bottomLeft),
+				world.getBlockState(bottomRight)
+		);
+	}
+
 	public BlockPos getTopLeft() {
 		return topLeft;
 	}
@@ -151,19 +194,6 @@ public class Frame {
 
 	public BlockPos getBottomRight() {
 		return bottomRight;
-	}
-
-	public EnumFacing getWidthDirection() {
-		return widthDirection;
-	}
-
-	public EnumFacing getHeightDirection() {
-		return heightDirection;
-	}
-
-	public boolean isCorner(BlockPos pos) {
-		return topLeft.equals(pos) || topRight.equals(pos) || bottomLeft.equals(pos) ||
-				bottomRight.equals(pos);
 	}
 
 	public boolean isTopBlock(BlockPos pos) {
@@ -212,6 +242,18 @@ public class Frame {
 
 	public List<IBlockState> getLeftBlocks() {
 		return leftBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+	}
+
+	public boolean isFrameBlock(BlockPos pos) {
+		return isBetween(pos, topLeft, bottomRight) && !isInnerBlock(pos);
+	}
+
+	public ImmutableList<BlockPos> getFrameBlockPositions() {
+		return frameBlocks;
+	}
+
+	public List<IBlockState> getFrameBlocks() {
+		return frameBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
 	}
 
 	public boolean isInnerBlock(BlockPos pos) {

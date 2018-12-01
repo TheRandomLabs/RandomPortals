@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+//TODO - find out why portals can't be used as portal frames
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
 	public static final class Matcher {
@@ -383,8 +384,12 @@ public class BlockNetherPortal extends BlockPortal {
 			checkPos = checkPos.offset(frameDirection);
 
 			final IBlockState checkState = world.getBlockState(checkPos);
+			final Block checkBlock = checkState.getBlock();
 
-			if(VEPConfig.netherPortalFrameBlocks.contains(checkState.getBlock())) {
+			//If the frame block is a portal, the portal must be user-placed
+			if(VEPConfig.netherPortalFrameBlocks.containsKey(checkBlock) &&
+					(!(checkBlock instanceof BlockNetherPortal) ||
+							checkState.getValue(USER_PLACED))) {
 				framePos = checkPos;
 				break;
 			}

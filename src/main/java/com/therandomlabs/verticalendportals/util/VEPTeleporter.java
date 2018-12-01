@@ -90,8 +90,9 @@ public class VEPTeleporter extends Teleporter {
 
 		final Frame frame;
 		BlockPos framePos = pos.down();
+		final IBlockState frameState = world.getBlockState(framePos);
 
-		if(VEPConfig.netherPortalFrameBlocks.contains(world.getBlockState(framePos).getBlock())) {
+		if(VEPConfig.netherPortalFrameBlocks.containsKey(frameState.getBlock())) {
 			final BlockPos pos2 = pos;
 			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
 					world, framePos,
@@ -317,7 +318,8 @@ public class VEPTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		final Block[] frameBlocks = VEPConfig.netherPortalFrameBlocks.toArray(new Block[0]);
+		final Block[] frameBlocks = VEPConfig.netherPortalFrameBlocks.keySet().
+				toArray(new Block[0]);
 		final Block randomFrameBlock = frameBlocks[random.nextInt(frameBlocks.length)];
 		final IBlockState frameBlock = randomFrameBlock.getDefaultState();
 

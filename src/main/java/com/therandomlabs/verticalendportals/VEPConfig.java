@@ -11,9 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
@@ -33,6 +31,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 @Config(modid = VerticalEndPortals.MOD_ID, name = VEPConfig.NAME, category = "")
@@ -75,9 +74,10 @@ public class VEPConfig {
 		public boolean enabled = true;
 
 		@Config.LangKey("verticalendportals.config.netherPortals.frameBlocks")
-		@Config.Comment("The registry names of the Nether portal frame blocks.")
+		@Config.Comment("The registry names and minimum amounts of the Nether portal frame " +
+				"blocks. Registry names and amounts should be separated with a comma.")
 		public String[] frameBlocks = new String[] {
-				"minecraft:obsidian"
+				"minecraft:obsidian,0"
 		};
 
 		@Config.LangKey("verticalendportals.config.netherPortals.useAllVariantsJson")
@@ -107,7 +107,7 @@ public class VEPConfig {
 	public static NetherPortals netherPortals = new NetherPortals();
 
 	@Config.Ignore
-	public static Set<Block> netherPortalFrameBlocks;
+	public static Map<Block, Integer> netherPortalFrameBlocks;
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
@@ -129,14 +129,20 @@ public class VEPConfig {
 		FrameSize.reload();
 
 		if(netherPortals.frameBlocks.length == 0) {
-			netherPortalFrameBlocks = Collections.singleton(Blocks.OBSIDIAN);
+			netherPortalFrameBlocks = Collections.singletonMap(Blocks.OBSIDIAN, 0);
 			return;
 		}
 
-		netherPortalFrameBlocks = new HashSet<>(netherPortals.frameBlocks.length);
+		netherPortalFrameBlocks = new HashMap<>(netherPortals.frameBlocks.length);
 
 		for(String block : netherPortals.frameBlocks) {
-			netherPortalFrameBlocks.add(VEPUtils.getBlock(block, Blocks.OBSIDIAN));
+			final String[] split = StringUtils.split(block, ',');
+			final int requiredAmount = split.length == 1 ? 0 : NumberUtils.toInt(split[1], 0);
+
+			netherPortalFrameBlocks.put(
+					VEPUtils.getBlock(split[0], Blocks.OBSIDIAN),
+					requiredAmount < 0 ? 0 : requiredAmount
+			);
 		}
 	}
 
