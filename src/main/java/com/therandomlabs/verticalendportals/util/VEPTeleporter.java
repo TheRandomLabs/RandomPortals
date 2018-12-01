@@ -5,6 +5,7 @@ import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -89,24 +90,27 @@ public class VEPTeleporter extends Teleporter {
 		BlockPos framePos = pos.down();
 
 		if(world.getBlockState(framePos).getBlock() != Blocks.OBSIDIAN) {
+			framePos = null;
+
 			final IBlockState portalState = world.getBlockState(pos);
 			final EnumFacing.Axis axis =
 					((BlockNetherPortal) portalState.getBlock()).getAxis(portalState);
-			final EnumFacing frameCheckDirection =
-					axis == EnumFacing.Axis.Z ? EnumFacing.NORTH : EnumFacing.WEST;
-
 			final int maxWidth = NetherPortalFrames.SIZE.apply(FrameType.fromAxis(axis)).maxWidth;
 
-			framePos = pos;
+			BlockPos checkPos = pos;
 
 			for(int offset = 1; offset < maxWidth - 1; offset++) {
-				framePos = framePos.offset(frameCheckDirection, offset);
+				checkPos = checkPos.offset(EnumFacing.NORTH, offset);
+				final Block block = world.getBlockState(checkPos).getBlock();
 
-				if(world.getBlockState(framePos).getBlock() == Blocks.OBSIDIAN) {
+				if(block == Blocks.OBSIDIAN) {
+					framePos = checkPos;
 					break;
 				}
 
-				framePos = null;
+				if(block != VEPBlocks.lateral_nether_portal) {
+					break;
+				}
 			}
 		}
 
