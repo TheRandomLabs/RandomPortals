@@ -85,7 +85,7 @@ public class BlockVEPFire extends BlockFire {
 		final List<BlockPos> innerBlockPositions = frame.getInnerBlockPositions();
 
 		for(BlockPos innerPos : innerBlockPositions) {
-			world.setBlockState(innerPos, state, 2);
+			world.setBlockState(innerPos, state, 3);
 		}
 
 		return true;

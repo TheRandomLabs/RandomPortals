@@ -3,8 +3,15 @@ package com.therandomlabs.verticalendportals.api.frame;
 import net.minecraft.block.state.BlockWorldState;
 
 public abstract class SidedFrameDetector extends FrameDetector {
-	protected SidedFrameDetector(FrameType type) {
-		super(type);
+	private final FrameType defaultType;
+
+	protected SidedFrameDetector(FrameType defaultType) {
+		this.defaultType = defaultType;
+	}
+
+	@Override
+	public FrameType getDefaultType() {
+		return defaultType;
 	}
 
 	@Override

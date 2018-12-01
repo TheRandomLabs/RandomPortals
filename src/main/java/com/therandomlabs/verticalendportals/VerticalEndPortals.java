@@ -1,7 +1,6 @@
 package com.therandomlabs.verticalendportals;
 
 import com.therandomlabs.verticalendportals.command.CommandVEPReload;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,9 +26,6 @@ public final class VerticalEndPortals {
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
 
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-
-	public static final boolean IS_DEOBFUSCATED =
-			(boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
 	@SidedProxy(
 			clientSide = "com.therandomlabs.verticalendportals.ClientProxy",

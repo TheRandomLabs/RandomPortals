@@ -8,7 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 //Because BlockPortal forces the AXIS property, which only accepts X and Z,
-//we have to behave as if the block is on the Y-axis but the AXIS property is always X
+//we have to behave as if the block is on the Y-axis while ignoring the AXIS property,
+//which is always X
 public class BlockLateralNetherPortal extends BlockNetherPortal {
 	public BlockLateralNetherPortal() {
 		super(true);

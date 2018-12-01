@@ -8,6 +8,7 @@ import static net.minecraft.block.BlockHorizontal.FACING;
 import static net.minecraft.init.Blocks.AIR;
 
 public class BasicVerticalFrameDetector extends FrameDetector {
+	private final FrameType defaultType;
 	private final Function<FrameType, FrameSize> defaultSize;
 	private final Predicate<BlockWorldState> predicate;
 	private final EnumFacing facing;
@@ -17,23 +18,29 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
 			Predicate<BlockWorldState> predicate, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate) {
-		super(FrameType.VERTICAL);
-		this.defaultSize = defaultSize;
-		this.predicate = predicate;
-		facing = null;
-		this.requiredCorner = requiredCorner;
-		this.framePredicate = framePredicate;
+		this(defaultSize, predicate, null, requiredCorner, framePredicate);
 	}
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
 			Predicate<BlockWorldState> predicate, EnumFacing facing, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate) {
-		super(facing.getAxis() == EnumFacing.Axis.X ? FrameType.VERTICAL_Z : FrameType.VERTICAL_X);
+		if(facing == null) {
+			defaultType = FrameType.VERTICAL;
+		} else {
+			defaultType = facing.getAxis() == EnumFacing.Axis.X ?
+					FrameType.VERTICAL_Z : FrameType.VERTICAL_X;
+		}
+
 		this.defaultSize = defaultSize;
 		this.predicate = predicate;
 		this.facing = facing;
 		this.requiredCorner = requiredCorner;
 		this.framePredicate = framePredicate;
+	}
+
+	@Override
+	public FrameType getDefaultType() {
+		return defaultType;
 	}
 
 	@Override

@@ -48,32 +48,42 @@ public abstract class FrameDetector {
 			EnumFacing.UP
 	};
 
-	private final FrameType type;
 	private final Map<BlockPos, BlockWorldState> posCache = new HashMap<>();
 
-	protected FrameDetector(FrameType type) {
-		this.type = type;
+	public final Frame detect(World world, BlockPos pos) {
+		return detect(world, pos, getDefaultType());
 	}
 
-	public final Frame detect(World world, BlockPos pos) {
-		return detect(world, pos, getDefaultSize());
+	public final Frame detect(World world, BlockPos pos, FrameType type) {
+		return detect(world, pos, type, getDefaultSize());
 	}
 
 	public final Frame detect(World world, BlockPos pos, Function<FrameType, FrameSize> size) {
-		return detectWithCondition(world, pos, size, frame -> true);
+		return detect(world, pos, getDefaultType(), size);
+	}
+
+	public final Frame detect(World world, BlockPos pos, FrameType type,
+			Function<FrameType, FrameSize> size) {
+		return detectWithCondition(world, pos, type, size, frame -> true);
 	}
 
 	public final Frame detectWithCondition(World world, BlockPos pos,
 			Predicate<Frame> frameCondition) {
-		return detectWithCondition(world, pos, getDefaultSize(), frameCondition);
+		return detectWithCondition(world, pos, getDefaultType(), getDefaultSize(), frameCondition);
+	}
+
+	public final Frame detectWithCondition(World world, BlockPos pos, FrameType type,
+			Predicate<Frame> frameCondition) {
+		return detectWithCondition(world, pos, type, getDefaultSize(), frameCondition);
 	}
 
 	public final Frame detectWithCondition(World world, BlockPos pos,
 			Function<FrameType, FrameSize> size, Predicate<Frame> frameCondition) {
-		if(size == null) {
-			size = type -> new FrameSize();
-		}
+		return detectWithCondition(world, pos, getDefaultType(), size, frameCondition);
+	}
 
+	public final Frame detectWithCondition(World world, BlockPos pos, FrameType type,
+			Function<FrameType, FrameSize> size, Predicate<Frame> frameCondition) {
 		final BlockWorldState state = getState(world, pos);
 
 		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
@@ -114,8 +124,12 @@ public abstract class FrameDetector {
 		return null;
 	}
 
+	public FrameType getDefaultType() {
+		return FrameType.LATERAL_OR_VERTICAL;
+	}
+
 	public Function<FrameType, FrameSize> getDefaultSize() {
-		return null;
+		return type -> new FrameSize();
 	}
 
 	//If the position is unknown, 0 is used

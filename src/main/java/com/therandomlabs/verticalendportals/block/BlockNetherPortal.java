@@ -1,7 +1,12 @@
 package com.therandomlabs.verticalendportals.block;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
@@ -13,6 +18,7 @@ import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -55,6 +61,8 @@ public class BlockNetherPortal extends BlockPortal {
 			0.375, 0.0, 0.0, 0.625, 1.0, 1.0
 	);
 
+	private static final List<BlockPos> removing = new ArrayList<>();
+
 	public BlockNetherPortal() {
 		this(true);
 		setDefaultState(blockState.getBaseState().
@@ -85,14 +93,13 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
 			BlockPos fromPos) {
-		if(state.getValue(USER_PLACED)) {
+		if(removing.contains(fromPos) || state.getValue(USER_PLACED)) {
 			return;
 		}
-
-		//TODO fix redstone signal triggering destruction, optimize
 
 		final IBlockState fromState = world.getBlockState(fromPos);
 
@@ -100,28 +107,112 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final EnumFacing checkFacing1;
-		final EnumFacing checkFacing2;
+		final EnumFacing.Axis axis = getAxis(state);
 
-		switch(getAxis(state)) {
+		final EnumFacing irrelevantFacing;
+		final EnumFacing frameDirection;
+		final EnumFacing[] relevantFacings;
+
+		switch(axis) {
 		case X:
-			checkFacing1 = EnumFacing.NORTH;
-			checkFacing2 = EnumFacing.SOUTH;
+			irrelevantFacing = EnumFacing.NORTH;
+			frameDirection = EnumFacing.DOWN;
+			relevantFacings = new EnumFacing[] {
+					EnumFacing.UP,
+					EnumFacing.EAST,
+					EnumFacing.DOWN,
+					EnumFacing.WEST
+			};
 			break;
 		case Y:
-			checkFacing1 = EnumFacing.UP;
-			checkFacing2 = EnumFacing.DOWN;
+			irrelevantFacing = EnumFacing.UP;
+			frameDirection = EnumFacing.NORTH;
+			relevantFacings = new EnumFacing[] {
+					EnumFacing.UP,
+					EnumFacing.NORTH,
+					EnumFacing.DOWN,
+					EnumFacing.SOUTH
+			};
 			break;
 		default:
-			checkFacing1 = EnumFacing.EAST;
-			checkFacing2 = EnumFacing.WEST;
+			irrelevantFacing = EnumFacing.EAST;
+			frameDirection = EnumFacing.DOWN;
+			relevantFacings = new EnumFacing[] {
+					EnumFacing.NORTH,
+					EnumFacing.EAST,
+					EnumFacing.SOUTH,
+					EnumFacing.WEST
+			};
 		}
 
-		if(pos.offset(checkFacing1).equals(fromPos) || pos.offset(checkFacing2).equals(fromPos)) {
+		if(pos.offset(irrelevantFacing).equals(fromPos) ||
+				pos.offset(irrelevantFacing.getOpposite()).equals(fromPos)) {
 			return;
 		}
 
-		world.setBlockToAir(pos);
+		final FrameType type = FrameType.fromAxis(axis);
+		final int maxWidth = NetherPortalFrames.SIZE.apply(type).maxWidth;
+
+		BlockPos framePos = null;
+		BlockPos checkPos = pos;
+
+		for(int offset = 1; offset < maxWidth - 1; offset++) {
+			checkPos = checkPos.offset(frameDirection, offset);
+			final Block checkBlock = world.getBlockState(checkPos).getBlock();
+
+			if(checkBlock == Blocks.OBSIDIAN) {
+				framePos = checkPos;
+				break;
+			}
+
+			if(checkBlock != this) {
+				break;
+			}
+		}
+
+		final Frame frame;
+
+		if(framePos == null) {
+			frame = null;
+		} else {
+			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
+					world, framePos, type,
+					potentialFrame -> potentialFrame.getInnerBlockPositions().contains(pos)
+			);
+		}
+
+		if(frame != null) {
+			return;
+		}
+
+		removing.add(pos);
+
+		int previousSize = -1;
+
+		for(int i = 0; removing.size() != previousSize; i++) {
+			previousSize = removing.size();
+			final BlockPos removingPos = removing.get(i);
+
+			for(EnumFacing facing : relevantFacings) {
+				final BlockPos neighbor = removingPos.offset(facing);
+
+				if(removing.contains(neighbor)) {
+					continue;
+				}
+
+				final IBlockState neighborState = world.getBlockState(neighbor);
+
+				if(neighborState.getBlock() == this && !neighborState.getValue(USER_PLACED)) {
+					removing.add(neighbor);
+				}
+			}
+		}
+
+		for(BlockPos removePos : removing) {
+			world.setBlockToAir(removePos);
+		}
+
+		removing.clear();
 	}
 
 	@SuppressWarnings("deprecation")

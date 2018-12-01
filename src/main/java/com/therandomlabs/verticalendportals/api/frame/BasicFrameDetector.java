@@ -19,11 +19,15 @@ public class BasicFrameDetector extends FrameDetector {
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize, Block block,
 			RequiredCorner requiredCorner, Predicate<Frame> framePredicate) {
-		super(FrameType.LATERAL_OR_VERTICAL);
 		this.defaultSize = defaultSize;
 		this.block = block;
 		this.requiredCorner = requiredCorner;
 		this.framePredicate = framePredicate;
+	}
+
+	@Override
+	public FrameType getDefaultType() {
+		return FrameType.LATERAL_OR_VERTICAL;
 	}
 
 	@Override

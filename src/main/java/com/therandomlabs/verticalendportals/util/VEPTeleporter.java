@@ -23,6 +23,7 @@ public class VEPTeleporter extends Teleporter {
 		super(world);
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean placeInExistingPortal(Entity entity, float yaw) {
 		double distance = -1.0D;
@@ -92,10 +93,7 @@ public class VEPTeleporter extends Teleporter {
 		if(world.getBlockState(framePos).getBlock() != Blocks.OBSIDIAN) {
 			framePos = null;
 
-			final IBlockState portalState = world.getBlockState(pos);
-			final EnumFacing.Axis axis =
-					((BlockNetherPortal) portalState.getBlock()).getAxis(portalState);
-			final int maxWidth = NetherPortalFrames.SIZE.apply(FrameType.fromAxis(axis)).maxWidth;
+			final int maxWidth = NetherPortalFrames.SIZE.apply(FrameType.LATERAL).maxWidth;
 
 			BlockPos checkPos = pos;
 
