@@ -9,11 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
@@ -107,7 +107,7 @@ public class VEPConfig {
 	public static NetherPortals netherPortals = new NetherPortals();
 
 	@Config.Ignore
-	public static List<Block> netherPortalFrameBlocks;
+	public static Set<Block> netherPortalFrameBlocks;
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
@@ -129,11 +129,11 @@ public class VEPConfig {
 		FrameSize.reload();
 
 		if(netherPortals.frameBlocks.length == 0) {
-			netherPortalFrameBlocks = Collections.singletonList(Blocks.OBSIDIAN);
+			netherPortalFrameBlocks = Collections.singleton(Blocks.OBSIDIAN);
 			return;
 		}
 
-		netherPortalFrameBlocks = new ArrayList<>(netherPortals.frameBlocks.length);
+		netherPortalFrameBlocks = new HashSet<>(netherPortals.frameBlocks.length);
 
 		for(String block : netherPortals.frameBlocks) {
 			netherPortalFrameBlocks.add(VEPUtils.getBlock(block, Blocks.OBSIDIAN));

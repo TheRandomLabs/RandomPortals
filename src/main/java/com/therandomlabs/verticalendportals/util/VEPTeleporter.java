@@ -5,6 +5,7 @@ import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -315,7 +316,10 @@ public class VEPTeleporter extends Teleporter {
 		}
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
-		final IBlockState frameBlock = VEPConfig.netherPortalFrameBlocks.get(0).getDefaultState();
+
+		final Block[] frameBlocks = VEPConfig.netherPortalFrameBlocks.toArray(new Block[0]);
+		final Block randomFrameBlock = frameBlocks[random.nextInt(frameBlocks.length)];
+		final IBlockState frameBlock = randomFrameBlock.getDefaultState();
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
