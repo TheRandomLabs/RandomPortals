@@ -6,6 +6,7 @@ import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.Block;
@@ -113,13 +114,13 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
+		final EnumFacing.Axis axis = getAxis(state);
 		final IBlockState fromState = world.getBlockState(fromPos);
 
-		if(fromState.getBlock() == this && !fromState.getValue(USER_PLACED)) {
+		if(fromState.getBlock() == this && !fromState.getValue(USER_PLACED) &&
+				getAxis(fromState) == axis) {
 			return;
 		}
-
-		final EnumFacing.Axis axis = getAxis(state);
 
 		final EnumFacing irrelevantFacing;
 		final EnumFacing[] relevantFacings;
@@ -137,19 +138,19 @@ public class BlockNetherPortal extends BlockPortal {
 		case Y:
 			irrelevantFacing = EnumFacing.UP;
 			relevantFacings = new EnumFacing[] {
-					EnumFacing.UP,
 					EnumFacing.NORTH,
-					EnumFacing.DOWN,
-					EnumFacing.SOUTH
+					EnumFacing.EAST,
+					EnumFacing.SOUTH,
+					EnumFacing.WEST
 			};
 			break;
 		default:
 			irrelevantFacing = EnumFacing.EAST;
 			relevantFacings = new EnumFacing[] {
+					EnumFacing.UP,
 					EnumFacing.NORTH,
-					EnumFacing.EAST,
-					EnumFacing.SOUTH,
-					EnumFacing.WEST
+					EnumFacing.DOWN,
+					EnumFacing.SOUTH
 			};
 		}
 
@@ -158,7 +159,36 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		if(findFrame(world, pos) != null) {
+		final Frame frame = findFrame(NetherPortalFrames.FRAMES, world, pos);
+
+		if(frame != null) {
+			boolean nonPortalFound = false;
+
+			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+				if(!isPortal(world, innerPos)) {
+					nonPortalFound = true;
+					break;
+				}
+			}
+
+			if(!nonPortalFound) {
+				return;
+			}
+
+			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+				final IBlockState innerState = world.getBlockState(innerPos);
+
+				if(innerState.getBlock() == this && !state.getValue(USER_PLACED) &&
+						getAxis(innerState) == axis) {
+					removing.add(innerPos);
+				}
+			}
+
+			for(BlockPos removingPos : removing) {
+				world.setBlockToAir(removingPos);
+			}
+
+			removing.clear();
 			return;
 		}
 
@@ -166,7 +196,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		int previousSize = -1;
 
-		for(int i = 0; removing.size() != previousSize; i++) {
+		for(int i = 0; i < removing.size() || removing.size() != previousSize; i++) {
 			previousSize = removing.size();
 			final BlockPos removingPos = removing.get(i);
 
@@ -179,7 +209,8 @@ public class BlockNetherPortal extends BlockPortal {
 
 				final IBlockState neighborState = world.getBlockState(neighbor);
 
-				if(neighborState.getBlock() == this && !neighborState.getValue(USER_PLACED)) {
+				if(neighborState.getBlock() == this && !neighborState.getValue(USER_PLACED) &&
+						getAxis(neighborState) == axis) {
 					removing.add(neighbor);
 				}
 			}
@@ -315,18 +346,25 @@ public class BlockNetherPortal extends BlockPortal {
 		return state.getValue(AXIS);
 	}
 
+	public static boolean isPortal(IBlockState state) {
+		return isPortal(state.getBlock());
+	}
+
 	public static boolean isPortal(World world, BlockWorldState state) {
 		return isPortal(world, state.getPos());
 	}
 
-	@SuppressWarnings("ConditionCoveredByFurtherCondition")
 	public static boolean isPortal(World world, BlockPos pos) {
-		final Block block = world.getBlockState(pos).getBlock();
+		return isPortal(world.getBlockState(pos).getBlock());
+	}
+
+	@SuppressWarnings("ConditionCoveredByFurtherCondition")
+	public static boolean isPortal(Block block) {
 		return block == VEPBlocks.vertical_nether_portal ||
 				block == VEPBlocks.lateral_nether_portal;
 	}
 
-	public static Frame findFrame(World world, BlockPos portalPos) {
+	public static Frame findFrame(FrameDetector detector, World world, BlockPos portalPos) {
 		final IBlockState state = world.getBlockState(portalPos);
 
 		final EnumFacing.Axis axis = ((BlockNetherPortal) state.getBlock()).getAxis(state);
@@ -342,7 +380,8 @@ public class BlockNetherPortal extends BlockPortal {
 		BlockPos checkPos = portalPos;
 
 		for(int offset = 1; offset < maxWidth - 1; offset++) {
-			checkPos = checkPos.offset(frameDirection, offset);
+			checkPos = checkPos.offset(frameDirection);
+
 			final IBlockState checkState = world.getBlockState(checkPos);
 
 			if(VEPConfig.netherPortalFrameBlocks.contains(checkState.getBlock())) {
@@ -359,7 +398,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return null;
 		}
 
-		return NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
+		return detector.detectWithCondition(
 				world, framePos, type,
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
 		);

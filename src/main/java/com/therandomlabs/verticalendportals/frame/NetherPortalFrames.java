@@ -19,6 +19,14 @@ public final class NetherPortalFrames {
 			"nether_portal", () -> VEPConfig.netherPortals.useAllVariantsJson
 	);
 
+	public static final FrameDetector FRAMES = new BasicFrameDetector(
+			SIZE,
+			() -> VEPConfig.netherPortalFrameBlocks,
+			RequiredCorner.ANY_NON_AIR,
+			frame -> true,
+			(world, state) -> true
+	);
+
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
 			SIZE,
 			() -> VEPConfig.netherPortalFrameBlocks,
