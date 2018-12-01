@@ -1,11 +1,10 @@
 package com.therandomlabs.verticalendportals.util;
 
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
-import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -88,36 +87,17 @@ public class VEPTeleporter extends Teleporter {
 			);
 		}
 
+		final Frame frame;
 		BlockPos framePos = pos.down();
 
-		if(world.getBlockState(framePos).getBlock() != Blocks.OBSIDIAN) {
-			framePos = null;
-
-			final int maxWidth = NetherPortalFrames.SIZE.apply(FrameType.LATERAL).maxWidth;
-
-			BlockPos checkPos = pos;
-
-			for(int offset = 1; offset < maxWidth - 1; offset++) {
-				checkPos = checkPos.offset(EnumFacing.NORTH, offset);
-				final Block block = world.getBlockState(checkPos).getBlock();
-
-				if(block == Blocks.OBSIDIAN) {
-					framePos = checkPos;
-					break;
-				}
-
-				if(block != VEPBlocks.lateral_nether_portal) {
-					break;
-				}
-			}
-		}
-
-		final Frame frame;
-
-		if(framePos == null) {
-			frame = null;
+		if(VEPConfig.netherPortalFrameBlocks.contains(world.getBlockState(framePos).getBlock())) {
+			final BlockPos pos2 = pos;
+			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
+					world, framePos,
+					potentialFrame -> potentialFrame.getInnerBlockPositions().contains(pos2)
+			);
 		} else {
-			frame = NetherPortalFrames.ACTIVATED_FRAMES.detect(world, framePos);
+			frame = BlockNetherPortal.findFrame(world, pos);
 		}
 
 		final EnumFacing entityFacing = entity.getHorizontalFacing();
@@ -335,7 +315,7 @@ public class VEPTeleporter extends Teleporter {
 		}
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
-		final IBlockState obsidian = Blocks.OBSIDIAN.getDefaultState();
+		final IBlockState frameBlock = VEPConfig.netherPortalFrameBlocks.get(0).getDefaultState();
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
@@ -347,7 +327,7 @@ public class VEPTeleporter extends Teleporter {
 								portalX + j * xMultiplier + i * zMultiplier,
 								portalY + yOffset,
 								portalZ + j * zMultiplier - i * xMultiplier
-						), yOffset == -1 ? obsidian : air);
+						), yOffset == -1 ? frameBlock : air);
 					}
 				}
 			}
@@ -358,7 +338,10 @@ public class VEPTeleporter extends Teleporter {
 						BlockPortal.AXIS,
 						xMultiplier == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X
 				).
-				withProperty(BlockNetherPortal.USER_PLACED, false);
+				withProperty(
+						BlockNetherPortal.USER_PLACED,
+						false
+				);
 
 		for(int horzOffset = -1; horzOffset < 3; horzOffset++) {
 			for(int yOffset = -1; yOffset < 4; yOffset++) {
@@ -370,7 +353,7 @@ public class VEPTeleporter extends Teleporter {
 							portalX + horzOffset * xMultiplier,
 							portalY + yOffset,
 							portalZ + horzOffset * zMultiplier
-					), obsidian, 2);
+					), frameBlock, 2);
 				}
 			}
 		}

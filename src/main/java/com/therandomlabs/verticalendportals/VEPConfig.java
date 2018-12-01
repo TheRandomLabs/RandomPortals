@@ -9,7 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
@@ -17,6 +20,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.verticalendportals.api.frame.FrameSize;
+import com.therandomlabs.verticalendportals.util.VEPUtils;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
@@ -68,6 +74,12 @@ public class VEPConfig {
 		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
 		public boolean enabled = true;
 
+		@Config.LangKey("verticalendportals.config.netherPortals.frameBlocks")
+		@Config.Comment("The registry names of the Nether portal frame blocks.")
+		public String[] frameBlocks = new String[] {
+				"minecraft:obsidian"
+		};
+
 		@Config.LangKey("verticalendportals.config.netherPortals.useAllVariantsJson")
 		@Config.Comment(
 				"Whether to read from the all_variants JSON rather than the different JSONs " +
@@ -94,6 +106,9 @@ public class VEPConfig {
 	@Config.Comment("Options related to Nether portals.")
 	public static NetherPortals netherPortals = new NetherPortals();
 
+	@Config.Ignore
+	public static List<Block> netherPortalFrameBlocks;
+
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
 	);
@@ -112,6 +127,17 @@ public class VEPConfig {
 		}
 
 		FrameSize.reload();
+
+		if(netherPortals.frameBlocks.length == 0) {
+			netherPortalFrameBlocks = Collections.singletonList(Blocks.OBSIDIAN);
+			return;
+		}
+
+		netherPortalFrameBlocks = new ArrayList<>(netherPortals.frameBlocks.length);
+
+		for(String block : netherPortals.frameBlocks) {
+			netherPortalFrameBlocks.add(VEPUtils.getBlock(block, Blocks.OBSIDIAN));
+		}
 	}
 
 	public static void reloadFromDisk() {

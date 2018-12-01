@@ -3,9 +3,10 @@ package com.therandomlabs.verticalendportals.api.frame;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import net.minecraft.block.state.BlockWorldState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import static net.minecraft.block.BlockHorizontal.FACING;
-import static net.minecraft.init.Blocks.AIR;
 
 public class BasicVerticalFrameDetector extends FrameDetector {
 	private final FrameType defaultType;
@@ -50,14 +51,15 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 
 	@SuppressWarnings("Duplicates")
 	@Override
-	protected boolean test(FrameType type, BlockWorldState state, FrameSide side, int position) {
+	protected boolean test(World world, FrameType type, BlockWorldState state, FrameSide side,
+			int position) {
 		if(position == CORNER) {
 			if(requiredCorner == RequiredCorner.ANY) {
 				return true;
 			}
 
 			if(requiredCorner == RequiredCorner.ANY_NON_AIR) {
-				return state.getBlockState().getBlock() != AIR;
+				return state.getBlockState().getBlock() != Blocks.AIR;
 			}
 		}
 

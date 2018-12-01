@@ -1,13 +1,13 @@
 package com.therandomlabs.verticalendportals.block;
 
 import java.util.List;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -48,7 +48,7 @@ public class BlockVEPFire extends BlockFire {
 		for(EnumFacing facing : facings) {
 			final BlockPos offset = pos.offset(facing);
 
-			if(world.getBlockState(offset).getBlock() == Blocks.OBSIDIAN) {
+			if(VEPConfig.netherPortalFrameBlocks.contains(world.getBlockState(offset).getBlock())) {
 				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
 						world, offset, potentialFrame -> potentialFrame.isFacingInwards(
 								offset, facing.getOpposite()

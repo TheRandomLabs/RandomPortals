@@ -134,17 +134,22 @@ public abstract class FrameDetector {
 
 	//If the position is unknown, 0 is used
 	//Corners always have position 1 since they're always first on their side
-	protected abstract boolean test(FrameType type, BlockWorldState state, FrameSide side,
-			int position);
+	protected abstract boolean test(World world, FrameType type, BlockWorldState state,
+			FrameSide side, int position);
 
 	protected abstract boolean test(Frame frame);
 
+	protected boolean testInner(World world, BlockWorldState state) {
+		return true;
+	}
+
+	@SuppressWarnings("Duplicates")
 	private Frame detect(FrameType type, EnumFacing[] facings, World world, BlockWorldState state,
 			BlockPos pos, FrameSize size, Predicate<Frame> frameCondition) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
 
-			if(!test(type, state, side, 0)) {
+			if(!test(world, type, state, side, 0)) {
 				continue;
 			}
 
@@ -174,21 +179,24 @@ public abstract class FrameDetector {
 
 				checkPos = checkPos.offset(opposite);
 				checkState = getState(world, checkPos);
+				final BlockWorldState checkState2 =
+						getState(world, checkPos.offset(previousFacing));
 
 				//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 				//we look for the top-left corner (which has position 1)
 				//The length of the previous side is unknown, so we pass in 0 for position
-				if(test(type, checkState, side, 1) &&
-						test(type, getState(
-								world, checkPos.offset(previousFacing)
-						), previousSide, UNKNOWN)) {
+				if(test(world, type, checkState, side, 1) &&
+						test(world, type, checkState2, previousSide, UNKNOWN)) {
 					possibleCorners.add(checkPos);
+				} else if(!testInner(world, checkState2)) {
+					//Then checkState2 is an inner block
+					break;
 				}
 
 				if(length == maxLength) {
 					break;
 				}
-			} while(test(type, checkState, side, UNKNOWN));
+			} while(test(world, type, checkState, side, UNKNOWN));
 
 			if(possibleCorners.isEmpty()) {
 				continue;
@@ -215,6 +223,7 @@ public abstract class FrameDetector {
 		return null;
 	}
 
+	@SuppressWarnings("Duplicates")
 	private Frame detect(HashMap<Integer, Corner> corners, FrameType type, EnumFacing[] facings,
 			World world, BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
 			int startIndex, int index, Predicate<Frame> frameCondition) {
@@ -268,21 +277,24 @@ public abstract class FrameDetector {
 			checkPos = checkPos.offset(facing);
 			checkState = getState(world, checkPos);
 
+			final BlockWorldState checkState2 = getState(world, checkPos.offset(nextFacing));
+
 			//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 			//we look for the top-right corner (which has position 1 on the right side)
 			//We're testing for the second block on the next side (i.e. position 2)
 			if(length >= minLength &&
-					test(type, checkState, nextSide, CORNER) &&
-					test(type, getState(
-							world, checkPos.offset(nextFacing)
-					), nextSide, 2)) {
+					test(world, type, checkState, nextSide, CORNER) &&
+					test(world, type, checkState2, nextSide, 2)) {
 				possibleCorners.add(new AbstractMap.SimpleEntry<>(checkPos, length));
+			} else if(!testInner(world, checkState2)) {
+				//Then checkState2 is an inner block
+				break;
 			}
 
 			if(length == maxLength) {
 				break;
 			}
-		} while(test(type, checkState, side, length));
+		} while(test(world, type, checkState, side, length));
 
 		if(possibleCorners.isEmpty()) {
 			return null;

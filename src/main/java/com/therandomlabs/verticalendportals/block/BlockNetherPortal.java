@@ -2,6 +2,7 @@ package com.therandomlabs.verticalendportals.block;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
@@ -18,7 +19,6 @@ import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -45,6 +45,18 @@ public class BlockNetherPortal extends BlockPortal {
 		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
 
 		private Matcher() {}
+
+		public static BlockStateMatcher ofType(FrameType type) {
+			if(type == FrameType.LATERAL) {
+				return BlockNetherPortal.Matcher.LATERAL;
+			}
+
+			if(type == FrameType.VERTICAL_X) {
+				return BlockNetherPortal.Matcher.VERTICAL_X;
+			}
+
+			return BlockNetherPortal.Matcher.VERTICAL_Z;
+		}
 	}
 
 	public static final PropertyBool USER_PLACED = PropertyBool.create("user_placed");
@@ -110,13 +122,11 @@ public class BlockNetherPortal extends BlockPortal {
 		final EnumFacing.Axis axis = getAxis(state);
 
 		final EnumFacing irrelevantFacing;
-		final EnumFacing frameDirection;
 		final EnumFacing[] relevantFacings;
 
 		switch(axis) {
 		case X:
 			irrelevantFacing = EnumFacing.NORTH;
-			frameDirection = EnumFacing.DOWN;
 			relevantFacings = new EnumFacing[] {
 					EnumFacing.UP,
 					EnumFacing.EAST,
@@ -126,7 +136,6 @@ public class BlockNetherPortal extends BlockPortal {
 			break;
 		case Y:
 			irrelevantFacing = EnumFacing.UP;
-			frameDirection = EnumFacing.NORTH;
 			relevantFacings = new EnumFacing[] {
 					EnumFacing.UP,
 					EnumFacing.NORTH,
@@ -136,7 +145,6 @@ public class BlockNetherPortal extends BlockPortal {
 			break;
 		default:
 			irrelevantFacing = EnumFacing.EAST;
-			frameDirection = EnumFacing.DOWN;
 			relevantFacings = new EnumFacing[] {
 					EnumFacing.NORTH,
 					EnumFacing.EAST,
@@ -150,38 +158,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final FrameType type = FrameType.fromAxis(axis);
-		final int maxWidth = NetherPortalFrames.SIZE.apply(type).maxWidth;
-
-		BlockPos framePos = null;
-		BlockPos checkPos = pos;
-
-		for(int offset = 1; offset < maxWidth - 1; offset++) {
-			checkPos = checkPos.offset(frameDirection, offset);
-			final Block checkBlock = world.getBlockState(checkPos).getBlock();
-
-			if(checkBlock == Blocks.OBSIDIAN) {
-				framePos = checkPos;
-				break;
-			}
-
-			if(checkBlock != this) {
-				break;
-			}
-		}
-
-		final Frame frame;
-
-		if(framePos == null) {
-			frame = null;
-		} else {
-			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
-					world, framePos, type,
-					potentialFrame -> potentialFrame.getInnerBlockPositions().contains(pos)
-			);
-		}
-
-		if(frame != null) {
+		if(findFrame(world, pos) != null) {
 			return;
 		}
 
@@ -347,5 +324,44 @@ public class BlockNetherPortal extends BlockPortal {
 		final Block block = world.getBlockState(pos).getBlock();
 		return block == VEPBlocks.vertical_nether_portal ||
 				block == VEPBlocks.lateral_nether_portal;
+	}
+
+	public static Frame findFrame(World world, BlockPos portalPos) {
+		final IBlockState state = world.getBlockState(portalPos);
+
+		final EnumFacing.Axis axis = ((BlockNetherPortal) state.getBlock()).getAxis(state);
+		final EnumFacing frameDirection = axis == EnumFacing.Axis.Y ?
+				EnumFacing.NORTH : EnumFacing.DOWN;
+
+		final FrameType type = FrameType.fromAxis(axis);
+		final int maxWidth = NetherPortalFrames.SIZE.apply(type).maxWidth;
+
+		final BlockStateMatcher portal = Matcher.ofType(type);
+
+		BlockPos framePos = null;
+		BlockPos checkPos = portalPos;
+
+		for(int offset = 1; offset < maxWidth - 1; offset++) {
+			checkPos = checkPos.offset(frameDirection, offset);
+			final IBlockState checkState = world.getBlockState(checkPos);
+
+			if(VEPConfig.netherPortalFrameBlocks.contains(checkState.getBlock())) {
+				framePos = checkPos;
+				break;
+			}
+
+			if(!portal.apply(checkState)) {
+				break;
+			}
+		}
+
+		if(framePos == null) {
+			return null;
+		}
+
+		return NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
+				world, framePos, type,
+				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
+		);
 	}
 }

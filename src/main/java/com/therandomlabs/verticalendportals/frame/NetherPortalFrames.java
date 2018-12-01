@@ -12,7 +12,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
 public final class NetherPortalFrames {
@@ -22,16 +21,18 @@ public final class NetherPortalFrames {
 
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
 			SIZE,
-			Blocks.OBSIDIAN,
+			() -> VEPConfig.netherPortalFrameBlocks,
 			RequiredCorner.ANY_NON_AIR,
-			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty)
+			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
+			NetherPortalFrames::isEmpty
 	);
 
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
 			SIZE,
-			Blocks.OBSIDIAN,
+			() -> VEPConfig.netherPortalFrameBlocks,
 			RequiredCorner.ANY_NON_AIR,
-			NetherPortalFrames::isActivated
+			NetherPortalFrames::isActivated,
+			(world, state) -> state.getBlockState().getBlock() instanceof BlockNetherPortal
 	);
 
 	private NetherPortalFrames() {}

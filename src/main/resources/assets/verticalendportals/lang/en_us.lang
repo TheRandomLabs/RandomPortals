@@ -15,6 +15,7 @@ verticalendportals.config.misc.vepreloadCommand=/vepreload
 verticalendportals.config.netherPortals=Nether Portals
 verticalendportals.config.netherPortals.tooltip=Options related to Nether portals.
 verticalendportals.config.netherPortals.enabled=Enabled
+verticalendportals.config.netherPortals.frameBlocks=Frame blocks
 verticalendportals.config.netherPortals.useAllVariantsJson=Use all_variants JSON
 
 itemGroup.portals=Portals

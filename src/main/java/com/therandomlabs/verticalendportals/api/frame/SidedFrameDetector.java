@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals.api.frame;
 
 import net.minecraft.block.state.BlockWorldState;
+import net.minecraft.world.World;
 
 public abstract class SidedFrameDetector extends FrameDetector {
 	private final FrameType defaultType;
@@ -15,7 +16,7 @@ public abstract class SidedFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected final boolean test(FrameType type, BlockWorldState state, FrameSide side,
+	protected final boolean test(World world, FrameType type, BlockWorldState state, FrameSide side,
 			int position) {
 		if(position == CORNER) {
 			switch(side) {
