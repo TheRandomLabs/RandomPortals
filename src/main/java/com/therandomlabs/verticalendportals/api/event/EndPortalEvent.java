@@ -3,9 +3,11 @@ package com.therandomlabs.verticalendportals.api.event;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class EndPortalEvent extends Event {
+	@Cancelable
 	public static class Activate extends EndPortalEvent {
 		private final BlockPos activatedFrameBlock;
 
@@ -19,6 +21,7 @@ public class EndPortalEvent extends Event {
 		}
 	}
 
+	@Cancelable
 	public static class Teleport extends EndPortalEvent {
 		private final Entity entity;
 		private final BlockPos portalPos;
@@ -42,11 +45,6 @@ public class EndPortalEvent extends Event {
 
 	public EndPortalEvent(Frame frame) {
 		this.frame = frame;
-	}
-
-	@Override
-	public boolean isCancelable() {
-		return true;
 	}
 
 	public Frame getFrame() {
