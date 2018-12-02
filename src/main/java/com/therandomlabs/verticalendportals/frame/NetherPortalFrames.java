@@ -1,9 +1,7 @@
 package com.therandomlabs.verticalendportals.frame;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
@@ -13,7 +11,10 @@ import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import net.minecraft.block.Block;
+import com.therandomlabs.verticalendportals.config.NetherPortalType;
+import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
+import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
@@ -141,39 +142,15 @@ public final class NetherPortalFrames {
 			return false;
 		}
 
-		boolean shouldTestAmounts = false;
-
-		for(Map.Entry<Block, Integer> blocks : VEPConfig.netherPortalFrameBlocks.entrySet()) {
-			if(blocks.getValue() != 0) {
-				shouldTestAmounts = true;
-				break;
+		for(Map.Entry<String, NetherPortalType> type : NetherPortalTypes.getTypes().entrySet()) {
+			if(type.getValue().test(frame)) {
+				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
+				savedData.getPortals().add(new NetherPortalSavedData.Portal(type.getKey(), frame));
+				savedData.markDirty();
+				return true;
 			}
 		}
 
-		if(!shouldTestAmounts) {
-			return true;
-		}
-
-		final Map<Block, Integer> detectedBlocks = new HashMap<>();
-
-		for(IBlockState state : frame.getFrameBlocks()) {
-			detectedBlocks.merge(state.getBlock(), 1, (a, b) -> a + b);
-		}
-
-		for(Map.Entry<Block, Integer> blocks : VEPConfig.netherPortalFrameBlocks.entrySet()) {
-			final int requiredAmount = blocks.getValue();
-
-			if(requiredAmount == 0) {
-				continue;
-			}
-
-			final Integer detectedAmount = detectedBlocks.get(blocks.getKey());
-
-			if(detectedAmount == null || detectedAmount < requiredAmount) {
-				return false;
-			}
-		}
-
-		return true;
+		return false;
 	}
 }

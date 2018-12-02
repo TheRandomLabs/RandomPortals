@@ -3,20 +3,42 @@ package com.therandomlabs.verticalendportals.config;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.DimensionType;
 
 public final class NetherPortalTypes {
-	private static ImmutableList<NetherPortalType> types;
+	private static ImmutableMap<String, NetherPortalType> types;
 
 	private NetherPortalTypes() {}
 
-	public static ImmutableList<NetherPortalType> getTypes() {
+	public static boolean hasType(String name) {
+		return types.containsKey(name);
+	}
+
+	public static NetherPortalType get(String name) {
+		NetherPortalType type = types.get(name);
+
+		if(type != null) {
+			return type;
+		}
+
+		type = types.get("vanilla_nether_portal");
+
+		if(type != null) {
+			return type;
+		}
+
+		return types.values().asList().get(0);
+	}
+
+	public static ImmutableMap<String, NetherPortalType> getTypes() {
 		return types;
 	}
 
@@ -28,12 +50,13 @@ public final class NetherPortalTypes {
 			paths = pathStream.collect(Collectors.toList());
 		}
 
-		final List<NetherPortalType> types = new ArrayList<>(paths.size());
+		final Map<String, NetherPortalType> types = new HashMap<>(paths.size());
 
 		for(int i = 0; i < paths.size(); i++) {
 			final Path path = paths.get(i);
+			final String fileName = path.getFileName().toString();
 
-			if(!path.getFileName().toString().endsWith(".json")) {
+			if(!fileName.endsWith(".json")) {
 				Files.delete(path);
 				paths.remove(i--);
 				continue;
@@ -48,12 +71,12 @@ public final class NetherPortalTypes {
 
 			type.ensureCorrect();
 			VEPConfig.writeJson(path, type);
-			types.add(type);
+			types.put(fileName.substring(0, fileName.length() - 5), type);
 		}
 
 		if(types.isEmpty()) {
 			final NetherPortalType vanillaNetherPortal = new NetherPortalType(
-					Collections.singletonList(new FrameBlock("minecraft:obsidian", 0)),
+					Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
 					DimensionType.NETHER.getId()
 			);
 
@@ -61,7 +84,7 @@ public final class NetherPortalTypes {
 					directory.resolve("vanilla_nether_portal.json"), vanillaNetherPortal
 			);
 
-			types.add(vanillaNetherPortal);
+			types.put("vanilla_nether_portal", vanillaNetherPortal);
 		}
 	}
 }

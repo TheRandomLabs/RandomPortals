@@ -18,36 +18,6 @@ public abstract class FrameDetector {
 
 	private static final FrameSide[] SIDES = FrameSide.values();
 
-	//Test from West->East (top), then South->North (right), then West->East (bottom),
-	//then South->North (left)
-
-	private static final EnumFacing[] LATERAL = {
-			EnumFacing.EAST,
-			EnumFacing.SOUTH,
-			EnumFacing.WEST,
-			EnumFacing.NORTH
-	};
-
-	//Test from West->East (top), then Down->Up (right), then West->East (bottom),
-	//then Down->Up(left)
-
-	private static final EnumFacing[] VERTICAL_X = {
-			EnumFacing.EAST,
-			EnumFacing.DOWN,
-			EnumFacing.WEST,
-			EnumFacing.UP
-	};
-
-	//Test from South->North (top), then Down->Up (right), then South->North (bottom),
-	//then Down->Up(left)
-
-	private static final EnumFacing[] VERTICAL_Z = {
-			EnumFacing.NORTH,
-			EnumFacing.DOWN,
-			EnumFacing.SOUTH,
-			EnumFacing.UP
-	};
-
 	private final Map<BlockPos, BlockWorldState> posCache = new HashMap<>();
 
 	public final Frame detect(World world, BlockPos pos) {
@@ -88,7 +58,7 @@ public abstract class FrameDetector {
 
 		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.LATERAL, LATERAL, world, state, pos, size.apply(FrameType.LATERAL),
+					FrameType.LATERAL, world, state, pos, size.apply(FrameType.LATERAL),
 					frameCondition
 			);
 
@@ -100,8 +70,8 @@ public abstract class FrameDetector {
 		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_X ||
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.VERTICAL_X, VERTICAL_X, world, state, pos,
-					size.apply(FrameType.VERTICAL_X), frameCondition
+					FrameType.VERTICAL_X, world, state, pos, size.apply(FrameType.VERTICAL_X),
+					frameCondition
 			);
 
 			if(frame != null) {
@@ -112,8 +82,8 @@ public abstract class FrameDetector {
 		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_Z ||
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.VERTICAL_Z, VERTICAL_Z, world, state, pos,
-					size.apply(FrameType.VERTICAL_Z), frameCondition
+					FrameType.VERTICAL_Z, world, state, pos, size.apply(FrameType.VERTICAL_Z),
+					frameCondition
 			);
 
 			if(frame != null) {
@@ -144,8 +114,8 @@ public abstract class FrameDetector {
 	}
 
 	@SuppressWarnings("Duplicates")
-	private Frame detect(FrameType type, EnumFacing[] facings, World world, BlockWorldState state,
-			BlockPos pos, FrameSize size, Predicate<Frame> frameCondition) {
+	private Frame detect(FrameType type, World world, BlockWorldState state, BlockPos pos,
+			FrameSize size, Predicate<Frame> frameCondition) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
 
@@ -155,8 +125,8 @@ public abstract class FrameDetector {
 
 			final int previousIndex = index == 0 ? 3 : index - 1;
 
-			final EnumFacing facing = facings[index];
-			final EnumFacing previousFacing = facings[previousIndex].getOpposite();
+			final EnumFacing facing = type.rightDownLeftUp[index];
+			final EnumFacing previousFacing = type.rightDownLeftUp[previousIndex].getOpposite();
 
 			final EnumFacing opposite = facing.getOpposite();
 
@@ -208,7 +178,7 @@ public abstract class FrameDetector {
 				corners.put(index, new Corner(possibleCorner, 0));
 
 				final Frame frame = detect(
-						corners, type, facings, world, possibleCorner, size.minWidth, size.maxWidth,
+						corners, type, world, possibleCorner, size.minWidth, size.maxWidth,
 						size.minHeight, size.maxHeight, index, index, frameCondition
 				);
 
@@ -224,14 +194,14 @@ public abstract class FrameDetector {
 	}
 
 	@SuppressWarnings("Duplicates")
-	private Frame detect(HashMap<Integer, Corner> corners, FrameType type, EnumFacing[] facings,
-			World world, BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight,
-			int startIndex, int index, Predicate<Frame> frameCondition) {
+	private Frame detect(HashMap<Integer, Corner> corners, FrameType type, World world,
+			BlockPos pos, int minWidth, int maxWidth, int minHeight, int maxHeight, int startIndex,
+			int index, Predicate<Frame> frameCondition) {
 		final int actualIndex = index > 3 ? index - 4 : index;
 		final int nextIndex = actualIndex == 3 ? 0 : actualIndex + 1;
 
-		final EnumFacing facing = facings[actualIndex];
-		final EnumFacing nextFacing = facings[nextIndex];
+		final EnumFacing facing = type.rightDownLeftUp[actualIndex];
+		final EnumFacing nextFacing = type.rightDownLeftUp[nextIndex];
 
 		final FrameSide side = SIDES[actualIndex];
 		final FrameSide nextSide = SIDES[nextIndex];
@@ -304,7 +274,7 @@ public abstract class FrameDetector {
 
 		if(nextIndex == startIndex) {
 			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
-			final Frame frame = new Frame(this, world, type, corners, facings);
+			final Frame frame = new Frame(world, type, corners);
 			return test(frame) && frameCondition.test(frame) ? frame : null;
 		}
 
@@ -315,8 +285,8 @@ public abstract class FrameDetector {
 			corners.put(nextIndex, new Corner(cornerPos, 0));
 
 			final Frame frame = detect(
-					corners, type, facings, world, cornerPos, minWidth, maxWidth, minHeight,
-					maxHeight, startIndex, index + 1, frameCondition
+					corners, type, world, cornerPos, minWidth, maxWidth, minHeight, maxHeight,
+					startIndex, index + 1, frameCondition
 			);
 
 			if(frame != null) {

@@ -1,20 +1,20 @@
 package com.therandomlabs.verticalendportals.config;
 
-import com.therandomlabs.verticalendportals.util.VEPUtils;
+import net.minecraft.block.Block;
 
 public final class FrameBlock {
-	public String registryName;
+	public Block registryName;
 	public int minimumAmount;
 
 	public FrameBlock() {}
 
-	public FrameBlock(String registryName, int minimumAmount) {
-		this.registryName = registryName;
+	public FrameBlock(Block block, int minimumAmount) {
+		registryName = block;
 		this.minimumAmount = minimumAmount;
 	}
 
 	public boolean isValid() {
-		return VEPUtils.getBlock(registryName, null) != null;
+		return registryName != null;
 	}
 
 	public void ensureCorrect() {

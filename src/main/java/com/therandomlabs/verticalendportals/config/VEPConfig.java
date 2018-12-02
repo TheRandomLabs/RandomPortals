@@ -9,19 +9,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSyntaxException;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.util.VEPUtils;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
@@ -32,7 +31,6 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 @Config(modid = VerticalEndPortals.MOD_ID, name = VEPConfig.NAME, category = "")
@@ -74,16 +72,6 @@ public class VEPConfig {
 		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
 		public boolean enabled = true;
 
-		@Config.LangKey("verticalendportals.config.netherPortals.frameBlocks")
-		@Config.Comment({"" +
-				"The registry names and minimum amounts of the Nether portal frame blocks.",
-				"Registry names and amounts should be separated with a comma.",
-				"The amount is optional."
-		})
-		public String[] frameBlocks = new String[] {
-				"minecraft:obsidian"
-		};
-
 		@Config.LangKey("verticalendportals.config.netherPortals.useAllVariantsJson")
 		@Config.Comment(
 				"Whether to read from the all_variants JSON rather than the different JSONs " +
@@ -111,6 +99,17 @@ public class VEPConfig {
 	public static NetherPortals netherPortals = new NetherPortals();
 
 	@Config.Ignore
+	public static final Gson GSON = new GsonBuilder().
+			setPrettyPrinting().
+			disableHtmlEscaping().
+			registerTypeAdapter(
+					Block.class,
+					(JsonDeserializer<Block>) (json, type, context) ->
+							VEPUtils.getBlock(json.getAsString())
+			).
+			create();
+
+	@Config.Ignore
 	public static Map<Block, Integer> netherPortalFrameBlocks;
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
@@ -136,23 +135,6 @@ public class VEPConfig {
 			NetherPortalTypes.reload();
 		} catch(IOException ex) {
 			RPUtils.crashReport("Error while reloading Nether portal types", ex);
-		}
-
-		if(netherPortals.frameBlocks.length == 0) {
-			netherPortalFrameBlocks = Collections.singletonMap(Blocks.OBSIDIAN, 0);
-			return;
-		}
-
-		netherPortalFrameBlocks = new HashMap<>(netherPortals.frameBlocks.length);
-
-		for(String block : netherPortals.frameBlocks) {
-			final String[] split = StringUtils.split(block, ',');
-			final int requiredAmount = split.length == 1 ? 0 : NumberUtils.toInt(split[1], 0);
-
-			netherPortalFrameBlocks.put(
-					VEPUtils.getBlock(split[0], Blocks.OBSIDIAN),
-					requiredAmount < 0 ? 0 : requiredAmount
-			);
 		}
 	}
 
@@ -240,7 +222,7 @@ public class VEPConfig {
 			try {
 				final Jankson jankson = Jankson.builder().build();
 				raw = jankson.load(raw).toJson();
-				return new Gson().fromJson(raw, clazz);
+				return GSON.fromJson(raw, clazz);
 			} catch(SyntaxError | JsonSyntaxException ex) {
 				VerticalEndPortals.LOGGER.error("Failed to read JSON: " + path, ex);
 			}
@@ -254,11 +236,7 @@ public class VEPConfig {
 	}
 
 	public static void writeJson(Path path, Object object) {
-		final String raw = new GsonBuilder().
-				setPrettyPrinting().
-				disableHtmlEscaping().
-				create().
-				toJson(object).replaceAll(" {2}", "\t");
+		final String raw = GSON.toJson(object).replaceAll(" {2}", "\t");
 
 		try {
 			Files.write(path, (raw + System.lineSeparator()).getBytes(StandardCharsets.UTF_8));

@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class Frame {
-	private final FrameDetector detector;
-	private final World world;
+	private World world;
 	private final FrameType type;
 
 	private final int width;
@@ -33,100 +33,46 @@ public class Frame {
 	private final BlockPos bottomLeft;
 	private final BlockPos bottomRight;
 
-	private final ImmutableList<BlockPos> topBlocks;
-	private final ImmutableList<BlockPos> rightBlocks;
-	private final ImmutableList<BlockPos> bottomBlocks;
-	private final ImmutableList<BlockPos> leftBlocks;
-	private final ImmutableList<BlockPos> frameBlocks;
-	private final ImmutableList<BlockPos> innerBlocks;
+	private ImmutableList<BlockPos> topBlocks;
+	private ImmutableList<BlockPos> rightBlocks;
+	private ImmutableList<BlockPos> bottomBlocks;
+	private ImmutableList<BlockPos> leftBlocks;
+	private ImmutableList<BlockPos> frameBlocks;
+	private ImmutableList<BlockPos> innerBlocks;
 
-	Frame(FrameDetector detector, World world, FrameType type, Map<Integer, Corner> corners,
-			EnumFacing[] facings) {
-		this.detector = detector;
+	public Frame(World world, FrameType type, BlockPos topLeft, int width, int height) {
+		this(world, type, topLeft, null, null, null, width, height);
+	}
+
+	Frame(World world, FrameType type, Map<Integer, Corner> corners) {
+		this(
+				world, type, corners.get(0).pos, corners.get(1).pos, corners.get(2).pos,
+				corners.get(3).pos, corners.get(0).sideLength, corners.get(1).sideLength
+		);
+	}
+
+	private Frame(World world, FrameType type, BlockPos topLeft, BlockPos topRight,
+			BlockPos bottomLeft, BlockPos bottomRight, int width, int height) {
 		this.world = world;
 		this.type = type;
 
-		final Corner topLeftCorner = corners.get(0);
-		final Corner rightCorner = corners.get(1);
+		this.width = width;
+		this.height = height;
 
-		width = topLeftCorner.sideLength;
-		height = rightCorner.sideLength;
+		widthDirection = type.rightDownLeftUp[0];
+		heightDirection = type.rightDownLeftUp[1];
 
-		widthDirection = facings[0];
-		heightDirection = facings[1];
+		this.topLeft = topLeft;
 
-		topLeft = topLeftCorner.pos;
-		topRight = rightCorner.pos;
-		bottomLeft = corners.get(3).pos;
-		bottomRight = corners.get(2).pos;
-
-		final List<BlockPos> topBlocks = new ArrayList<>(width);
-
-		for(int width = 0; width < this.width; width++) {
-			topBlocks.add(
-					topLeft.offset(widthDirection, width)
-			);
+		if(topRight == null) {
+			this.topRight = topLeft.offset(widthDirection, width - 1);
+			this.bottomLeft = topLeft.offset(heightDirection, height - 1);
+			this.bottomRight = this.bottomLeft.offset(widthDirection, width - 1);
+		} else {
+			this.topRight = topRight;
+			this.bottomLeft = bottomLeft;
+			this.bottomRight = bottomRight;
 		}
-
-		this.topBlocks = ImmutableList.copyOf(topBlocks);
-
-		final List<BlockPos> rightBlocks = new ArrayList<>(height);
-
-		for(int height = 0; height < this.height; height++) {
-			rightBlocks.add(
-					topLeft.offset(widthDirection, width - 1).
-							offset(heightDirection, height)
-			);
-		}
-
-		this.rightBlocks = ImmutableList.copyOf(rightBlocks);
-
-		final List<BlockPos> bottomBlocks = new ArrayList<>(width);
-
-		for(int width = 0; width < this.width; width++) {
-			bottomBlocks.add(
-					topLeft.offset(widthDirection, width).
-							offset(heightDirection, height - 1)
-			);
-		}
-
-		this.bottomBlocks = ImmutableList.copyOf(bottomBlocks);
-
-		final List<BlockPos> leftBlocks = new ArrayList<>(height);
-
-		for(int height = 0; height < this.height; height++) {
-			leftBlocks.add(
-					topLeft.offset(heightDirection, height)
-			);
-		}
-
-		this.leftBlocks = ImmutableList.copyOf(leftBlocks);
-
-		//Each corner is in two lists, so we use a set to remove duplicates
-
-		final Set<BlockPos> frameBlocks = new HashSet<>(
-				topBlocks.size() + rightBlocks.size() + bottomBlocks.size() + leftBlocks.size()
-		);
-
-		frameBlocks.addAll(topBlocks);
-		frameBlocks.addAll(rightBlocks);
-		frameBlocks.addAll(bottomBlocks);
-		frameBlocks.addAll(leftBlocks);
-
-		this.frameBlocks = ImmutableList.copyOf(frameBlocks);
-
-		final List<BlockPos> innerBlocks = new ArrayList<>((width - 2) * (height - 2));
-
-		for(int width = 1; width < this.width - 1; width++) {
-			for(int height = 1; height < this.height - 1; height++) {
-				innerBlocks.add(
-						topLeft.offset(widthDirection, width).
-								offset(heightDirection, height)
-				);
-			}
-		}
-
-		this.innerBlocks = ImmutableList.copyOf(innerBlocks);
 	}
 
 	@Override
@@ -134,12 +80,12 @@ public class Frame {
 		return "Frame[topLeft=" + topLeft + ",type=" + type + "]";
 	}
 
-	public FrameDetector getDetector() {
-		return detector;
-	}
-
 	public World getWorld() {
 		return world;
+	}
+
+	public void setWorld(World world) {
+		this.world = world;
 	}
 
 	public FrameType getType() {
@@ -172,6 +118,10 @@ public class Frame {
 	}
 
 	public List<IBlockState> getCornerBlocks() {
+		if(world == null) {
+			return Collections.emptyList();
+		}
+
 		return Lists.newArrayList(
 				world.getBlockState(topLeft),
 				world.getBlockState(topRight),
@@ -200,12 +150,30 @@ public class Frame {
 		return isBetween(pos, topLeft, topRight);
 	}
 
+	@SuppressWarnings("Duplicates")
 	public ImmutableList<BlockPos> getTopBlockPositions() {
+		if(topBlocks == null) {
+			final List<BlockPos> topBlocks = new ArrayList<>(width);
+
+			for(int offset = 0; offset < width; offset++) {
+				topBlocks.add(
+						topLeft.offset(widthDirection, offset)
+				);
+			}
+
+			this.topBlocks = ImmutableList.copyOf(topBlocks);
+		}
+
 		return topBlocks;
 	}
 
 	public List<IBlockState> getTopBlocks() {
-		return topBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+		if(world == null) {
+			return Collections.emptyList();
+		}
+
+		return getTopBlockPositions().stream().map(world::getBlockState).
+				collect(Collectors.toList());
 	}
 
 	public boolean isRightBlock(BlockPos pos) {
@@ -213,11 +181,29 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getRightBlockPositions() {
+		if(rightBlocks == null) {
+			final List<BlockPos> rightBlocks = new ArrayList<>(height);
+
+			for(int offset = 0; offset < height; offset++) {
+				rightBlocks.add(
+						topLeft.offset(widthDirection, width - 1).
+								offset(heightDirection, offset)
+				);
+			}
+
+			this.rightBlocks = ImmutableList.copyOf(rightBlocks);
+		}
+
 		return rightBlocks;
 	}
 
 	public List<IBlockState> getRightBlocks() {
-		return rightBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+		if(world == null) {
+			return Collections.emptyList();
+		}
+
+		return getRightBlockPositions().stream().map(world::getBlockState).
+				collect(Collectors.toList());
 	}
 
 	public boolean isBottomBlock(BlockPos pos) {
@@ -225,23 +211,59 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getBottomBlockPositions() {
+		if(bottomBlocks == null) {
+			final List<BlockPos> bottomBlocks = new ArrayList<>(width);
+
+			for(int offset = 0; offset < width; offset++) {
+				bottomBlocks.add(
+						topLeft.offset(widthDirection, offset).
+								offset(heightDirection, height - 1)
+				);
+			}
+
+			this.bottomBlocks = ImmutableList.copyOf(bottomBlocks);
+		}
+
 		return bottomBlocks;
 	}
 
 	public List<IBlockState> getBottomBlocks() {
-		return bottomBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+		if(world == null) {
+			return Collections.emptyList();
+		}
+
+		return getBottomBlockPositions().stream().map(world::getBlockState).
+				collect(Collectors.toList());
 	}
 
 	public boolean isLeftBlock(BlockPos pos) {
 		return isBetween(pos, bottomLeft, topLeft);
 	}
 
+	@SuppressWarnings("Duplicates")
 	public ImmutableList<BlockPos> getLeftBlockPositions() {
+		if(leftBlocks == null) {
+			final List<BlockPos> leftBlocks = new ArrayList<>(height);
+
+			for(int offset = 0; offset < height; offset++) {
+				leftBlocks.add(
+						topLeft.offset(heightDirection, offset)
+				);
+			}
+
+			this.leftBlocks = ImmutableList.copyOf(leftBlocks);
+		}
+
 		return leftBlocks;
 	}
 
-	public List<IBlockState> getLeftBlocks() {
-		return leftBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+	public List<IBlockState> getLeftBlocks() {if(world == null) {
+		return Collections.emptyList();
+	}
+
+
+		return getLeftBlockPositions().stream().map(world::getBlockState).
+				collect(Collectors.toList());
 	}
 
 	public boolean isFrameBlock(BlockPos pos) {
@@ -249,11 +271,30 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getFrameBlockPositions() {
+		if(frameBlocks == null) {
+			//Each corner is in two lists, so we use a set to remove duplicates
+			final Set<BlockPos> frameBlocks = new HashSet<>(
+					topBlocks.size() + rightBlocks.size() + bottomBlocks.size() + leftBlocks.size()
+			);
+
+			frameBlocks.addAll(topBlocks);
+			frameBlocks.addAll(rightBlocks);
+			frameBlocks.addAll(bottomBlocks);
+			frameBlocks.addAll(leftBlocks);
+
+			this.frameBlocks = ImmutableList.copyOf(frameBlocks);
+		}
+
 		return frameBlocks;
 	}
 
 	public List<IBlockState> getFrameBlocks() {
-		return frameBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+		if(world == null) {
+			return Collections.emptyList();
+		}
+
+		return getFrameBlockPositions().stream().map(world::getBlockState).
+				collect(Collectors.toList());
 	}
 
 	public boolean isInnerBlock(BlockPos pos) {
@@ -261,11 +302,31 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getInnerBlockPositions() {
+		if(innerBlocks == null) {
+			final List<BlockPos> innerBlocks = new ArrayList<>((width - 2) * (height - 2));
+
+			for(int widthOffset = 1; widthOffset < width - 1; widthOffset++) {
+				for(int heightOffset = 1; heightOffset < height - 1; heightOffset++) {
+					innerBlocks.add(
+							topLeft.offset(widthDirection, widthOffset).
+									offset(heightDirection, heightOffset)
+					);
+				}
+			}
+
+			this.innerBlocks = ImmutableList.copyOf(innerBlocks);
+		}
+
 		return innerBlocks;
 	}
 
 	public List<IBlockState> getInnerBlocks() {
-		return innerBlocks.stream().map(world::getBlockState).collect(Collectors.toList());
+		if(world == null) {
+			return Collections.emptyList();
+		}
+
+		return getInnerBlockPositions().stream().map(world::getBlockState).
+				collect(Collectors.toList());
 	}
 
 	public FrameSide getSide(BlockPos pos) {
@@ -316,6 +377,10 @@ public class Frame {
 	}
 
 	public boolean isEmpty() {
+		if(world == null) {
+			return false;
+		}
+
 		for(BlockPos innerPos : innerBlocks) {
 			final IBlockState state = world.getBlockState(innerPos);
 
@@ -334,6 +399,10 @@ public class Frame {
 	}
 
 	public boolean testInnerBlocks(BiPredicate<World, BlockWorldState> predicate) {
+		if(world == null) {
+			return false;
+		}
+
 		for(BlockPos innerPos : innerBlocks) {
 			final BlockWorldState state = new BlockWorldState(world, innerPos, true);
 

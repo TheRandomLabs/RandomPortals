@@ -11,8 +11,7 @@ public class VEPUtils {
 
 	private VEPUtils() {}
 
-	public static Block getBlock(String blockName, Block defaultBlock) {
-		final Block block = BLOCK_REGISTRY.getValue(new ResourceLocation(blockName));
-		return block == null ? defaultBlock : block;
+	public static Block getBlock(String blockName) {
+		return BLOCK_REGISTRY.getValue(new ResourceLocation(blockName));
 	}
 }
