@@ -31,7 +31,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-//TODO - find out why portals can't be used as portal frames
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
 	public static final class Matcher {
