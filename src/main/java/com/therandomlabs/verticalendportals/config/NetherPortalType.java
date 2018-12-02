@@ -18,36 +18,51 @@ public final class NetherPortalType {
 		this.dimensionID = dimensionID;
 	}
 
-	public void ensureCorrect() {
+	@Override
+	public String toString() {
+		return "NetherPortalType[frameBlocks=" + frameBlocks + "],dimensionID=" + dimensionID +
+				"]";
+	}
+
+	public boolean ensureCorrect() {
+		boolean modified = false;
+
 		for(int i = 0; i < frameBlocks.size(); i++) {
 			final FrameBlock frameBlock = frameBlocks.get(i);
 
 			if(!frameBlock.isValid()) {
 				frameBlocks.remove(i--);
+				modified = true;
+				continue;
 			}
 
-			frameBlock.ensureCorrect();
+			if(frameBlock.ensureCorrect()) {
+				modified = true;
+			}
 		}
+
+		return modified;
 	}
 
 	public boolean test(Frame frame) {
-		boolean shouldTestAmounts = false;
-
-		for(FrameBlock frameBlock : frameBlocks) {
-			if(frameBlock.minimumAmount != 0) {
-				shouldTestAmounts = true;
-				break;
-			}
-		}
-
-		if(!shouldTestAmounts) {
-			return true;
-		}
-
 		final Map<Block, Integer> detectedBlocks = new HashMap<>();
 
 		for(IBlockState state : frame.getFrameBlocks()) {
-			detectedBlocks.merge(state.getBlock(), 1, (a, b) -> a + b);
+			final Block block = state.getBlock();
+			boolean found = false;
+
+			for(FrameBlock frameBlock : frameBlocks) {
+				if(block == frameBlock.getBlock()) {
+					found = true;
+					break;
+				}
+			}
+
+			if(!found) {
+				return false;
+			}
+
+			detectedBlocks.merge(block, 1, (a, b) -> a + b);
 		}
 
 		for(FrameBlock frameBlock : frameBlocks) {
@@ -55,7 +70,7 @@ public final class NetherPortalType {
 				continue;
 			}
 
-			final Integer detectedAmount = detectedBlocks.get(frameBlock.registryName);
+			final Integer detectedAmount = detectedBlocks.get(frameBlock.getBlock());
 
 			if(detectedAmount == null || detectedAmount < frameBlock.minimumAmount) {
 				return false;

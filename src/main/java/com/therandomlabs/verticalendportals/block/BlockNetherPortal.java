@@ -2,12 +2,12 @@ package com.therandomlabs.verticalendportals.block;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
@@ -386,7 +386,7 @@ public class BlockNetherPortal extends BlockPortal {
 			final Block checkBlock = checkState.getBlock();
 
 			//If the frame block is a portal, the portal must be user-placed
-			if(VEPConfig.netherPortalFrameBlocks.containsKey(checkBlock) &&
+			if(NetherPortalTypes.getValidBlocks().contains(checkBlock) &&
 					(!(checkBlock instanceof BlockNetherPortal) ||
 							checkState.getValue(USER_PLACED))) {
 				framePos = checkPos;

@@ -31,7 +31,7 @@ public final class NetherPortalFrames {
 
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
 			SIZE,
-			() -> VEPConfig.netherPortalFrameBlocks.keySet(),
+			NetherPortalTypes::getValidBlocks,
 			RequiredCorner.ANY_NON_AIR,
 			frame -> true,
 			(world, state) -> true
@@ -39,7 +39,7 @@ public final class NetherPortalFrames {
 
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
 			SIZE,
-			() -> VEPConfig.netherPortalFrameBlocks.keySet(),
+			NetherPortalTypes::getValidBlocks,
 			RequiredCorner.ANY_NON_AIR,
 			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
 			NetherPortalFrames::isEmpty
@@ -47,7 +47,7 @@ public final class NetherPortalFrames {
 
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
 			SIZE,
-			() -> VEPConfig.netherPortalFrameBlocks.keySet(),
+			NetherPortalTypes::getValidBlocks,
 			RequiredCorner.ANY_NON_AIR,
 			NetherPortalFrames::isActivated,
 			(world, state) -> state.getBlockState().getBlock() instanceof BlockNetherPortal
@@ -95,7 +95,7 @@ public final class NetherPortalFrames {
 			final BlockPos offset = pos.offset(facing);
 			final IBlockState state = world.getBlockState(offset);
 
-			if(VEPConfig.netherPortalFrameBlocks.containsKey(state.getBlock())) {
+			if(NetherPortalTypes.getValidBlocks().contains(state.getBlock())) {
 				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
 						world, offset,
 						potentialFrame -> testFrame(potentialFrame, offset, facing.getOpposite())
@@ -145,7 +145,7 @@ public final class NetherPortalFrames {
 		for(Map.Entry<String, NetherPortalType> type : NetherPortalTypes.getTypes().entrySet()) {
 			if(type.getValue().test(frame)) {
 				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-				savedData.getPortals().add(new NetherPortalSavedData.Portal(type.getKey(), frame));
+				savedData.addPortal(new NetherPortalSavedData.Portal(type.getKey(), frame));
 				savedData.markDirty();
 				return true;
 			}

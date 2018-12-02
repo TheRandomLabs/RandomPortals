@@ -5,16 +5,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.DimensionType;
 
 public final class NetherPortalTypes {
 	private static ImmutableMap<String, NetherPortalType> types;
+	private static ImmutableList<Block> validBlocks;
 
 	private NetherPortalTypes() {}
 
@@ -40,6 +45,10 @@ public final class NetherPortalTypes {
 
 	public static ImmutableMap<String, NetherPortalType> getTypes() {
 		return types;
+	}
+
+	public static ImmutableList<Block> getValidBlocks() {
+		return validBlocks;
 	}
 
 	public static void reload() throws IOException {
@@ -69,8 +78,10 @@ public final class NetherPortalTypes {
 				paths.remove(i--);
 			}
 
-			type.ensureCorrect();
-			VEPConfig.writeJson(path, type);
+			if(type.ensureCorrect()) {
+				VEPConfig.writeJson(path, type);
+			}
+
 			types.put(fileName.substring(0, fileName.length() - 5), type);
 		}
 
@@ -86,5 +97,17 @@ public final class NetherPortalTypes {
 
 			types.put("vanilla_nether_portal", vanillaNetherPortal);
 		}
+
+		NetherPortalTypes.types = ImmutableMap.copyOf(types);
+
+		final Set<Block> blocks = new HashSet<>();
+
+		for(NetherPortalType type : types.values()) {
+			for(FrameBlock frameBlock : type.frameBlocks) {
+				blocks.add(frameBlock.getBlock());
+			}
+		}
+
+		validBlocks = ImmutableList.copyOf(blocks);
 	}
 }

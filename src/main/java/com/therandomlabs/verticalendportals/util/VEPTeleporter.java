@@ -1,10 +1,12 @@
 package com.therandomlabs.verticalendportals.util;
 
+import java.util.List;
 import com.therandomlabs.randompatches.util.RPTeleporter;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.config.VEPConfig;
+import com.therandomlabs.verticalendportals.config.NetherPortalType;
+import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
@@ -93,7 +95,7 @@ public class VEPTeleporter extends Teleporter {
 		BlockPos framePos = pos.down();
 		final IBlockState frameState = world.getBlockState(framePos);
 
-		if(VEPConfig.netherPortalFrameBlocks.containsKey(frameState.getBlock())) {
+		if(NetherPortalTypes.getValidBlocks().contains(frameState.getBlock())) {
 			final BlockPos pos2 = pos;
 			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
 					world, framePos,
@@ -319,10 +321,8 @@ public class VEPTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		final Block[] frameBlocks = VEPConfig.netherPortalFrameBlocks.keySet().
-				toArray(new Block[0]);
-		final Block randomFrameBlock = frameBlocks[random.nextInt(frameBlocks.length)];
-		final IBlockState frameBlock = randomFrameBlock.getDefaultState();
+		final List<NetherPortalType> portalTypes = NetherPortalTypes.getTypes().values().asList();
+		final NetherPortalType portalType = portalTypes.get(random.nextInt(portalTypes.size()));
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
@@ -330,11 +330,20 @@ public class VEPTeleporter extends Teleporter {
 			for(int i = -1; i <= 1; i++) {
 				for(int j = 0; j < 2; j++) {
 					for(int yOffset = -1; yOffset < 3; yOffset++) {
+						final IBlockState state;
+
+						if(yOffset == -1) {
+							final int index = random.nextInt(portalType.frameBlocks.size());
+							state = portalType.frameBlocks.get(index).getBlock().getDefaultState();
+						} else {
+							state = air;
+						}
+
 						world.setBlockState(new BlockPos(
 								portalX + j * xMultiplier + i * zMultiplier,
 								portalY + yOffset,
 								portalZ + j * zMultiplier - i * xMultiplier
-						), yOffset == -1 ? frameBlock : air);
+						), state);
 					}
 				}
 			}
@@ -356,11 +365,14 @@ public class VEPTeleporter extends Teleporter {
 						horzOffset == -1 || horzOffset == 2 || yOffset == -1 || yOffset == 3;
 
 				if(frame) {
+					final int index = random.nextInt(portalType.frameBlocks.size());
+					final Block block = portalType.frameBlocks.get(index).getBlock();
+
 					world.setBlockState(new BlockPos(
 							portalX + horzOffset * xMultiplier,
 							portalY + yOffset,
 							portalZ + horzOffset * zMultiplier
-					), frameBlock, 2);
+					), block.getDefaultState(), 2);
 				}
 			}
 		}

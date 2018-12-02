@@ -1,7 +1,7 @@
 package com.therandomlabs.verticalendportals.world.storage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
@@ -27,7 +27,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 	private static final FrameType[] TYPES = FrameType.values();
 
-	private final List<Portal> portals = new ArrayList<>();
+	private final Map<BlockPos, Portal> portals = new HashMap<>();
 
 	public static final class Portal {
 		private final String type;
@@ -70,7 +70,9 @@ public class NetherPortalSavedData extends WorldSavedData {
 			final int width = compound.getInteger(WIDTH_KEY);
 			final int height = compound.getInteger(HEIGHT_KEY);
 
-			portals.add(new Portal(type, new Frame(null, frameType, topLeft, width, height)));
+			portals.put(
+					topLeft, new Portal(type, new Frame(null, frameType, topLeft, width, height))
+			);
 		}
 	}
 
@@ -78,7 +80,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		final NBTTagList tagList = new NBTTagList();
 
-		for(Portal portal : portals) {
+		for(Portal portal : portals.values()) {
 			final NBTTagCompound compound = new NBTTagCompound();
 
 			compound.setString(PORTAL_TYPE_KEY, portal.type);
@@ -87,15 +89,33 @@ public class NetherPortalSavedData extends WorldSavedData {
 			compound.setInteger(WIDTH_KEY, portal.frame.getWidth());
 			compound.setInteger(HEIGHT_KEY, portal.frame.getHeight());
 
-			tagList.appendTag(tagList);
+			tagList.appendTag(compound);
 		}
 
 		nbt.setTag(TAG_KEY, tagList);
 		return nbt;
 	}
 
-	public List<Portal> getPortals() {
+	public Map<BlockPos, Portal> getPortals() {
 		return portals;
+	}
+
+	public Portal getPortal(BlockPos portalPos) {
+		for(Portal portal : portals.values()) {
+			if(portal.frame.isInnerBlock(portalPos)) {
+				return portal;
+			}
+		}
+
+		return null;
+	}
+
+	public Portal getPortalByTopLeft(BlockPos topLeft) {
+		return portals.get(topLeft);
+	}
+
+	public void addPortal(Portal portal) {
+		portals.put(portal.frame.getTopLeft(), portal);
 	}
 
 	public static NetherPortalSavedData get(World world) {

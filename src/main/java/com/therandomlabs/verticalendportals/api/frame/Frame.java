@@ -272,6 +272,11 @@ public class Frame {
 
 	public ImmutableList<BlockPos> getFrameBlockPositions() {
 		if(frameBlocks == null) {
+			getTopBlockPositions();
+			getRightBlockPositions();
+			getBottomBlockPositions();
+			getLeftBlockPositions();
+
 			//Each corner is in two lists, so we use a set to remove duplicates
 			final Set<BlockPos> frameBlocks = new HashSet<>(
 					topBlocks.size() + rightBlocks.size() + bottomBlocks.size() + leftBlocks.size()
@@ -381,7 +386,7 @@ public class Frame {
 			return false;
 		}
 
-		for(BlockPos innerPos : innerBlocks) {
+		for(BlockPos innerPos : getInnerBlockPositions()) {
 			final IBlockState state = world.getBlockState(innerPos);
 
 			if(state.getMaterial() == Material.FIRE) {
@@ -403,7 +408,7 @@ public class Frame {
 			return false;
 		}
 
-		for(BlockPos innerPos : innerBlocks) {
+		for(BlockPos innerPos : getInnerBlockPositions()) {
 			final BlockWorldState state = new BlockWorldState(world, innerPos, true);
 
 			if(!predicate.test(world, state)) {
@@ -443,6 +448,15 @@ public class Frame {
 			return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
 		}
 
-		return x > minX && y > minY && z > minZ && x < maxX && y < maxY && z < maxZ;
+		//Because the frame is only on one axis
+
+		switch(type.getAxis()) {
+		case X:
+			return x > minX && y > minY && x < maxX && y < maxY && z == minZ;
+		case Y:
+			return x > minX && z > minZ && x < maxX && z < maxZ && y == minY;
+		default:
+			return y > minY && z > minZ && y < maxY && z < maxZ && x == minX;
+		}
 	}
 }

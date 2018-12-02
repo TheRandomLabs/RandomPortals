@@ -26,14 +26,19 @@ public final class FrameSizes {
 	public static void reload() {
 		for(String name : names) {
 			FrameSize size = VEPConfig.readJson(name, FrameSize.class);
+			final boolean modified;
 
 			if(size == null) {
 				size = new FrameSize();
+				modified = true;
 			} else {
-				size.ensureCorrect();
+				modified = size.ensureCorrect();
 			}
 
-			VEPConfig.writeJson(name, size);
+			if(modified) {
+				VEPConfig.writeJson(name, size);
+			}
+
 			frameSizes.put(name, size);
 		}
 	}

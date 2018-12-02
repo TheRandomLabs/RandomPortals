@@ -15,12 +15,9 @@ import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSyntaxException;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
-import com.therandomlabs.verticalendportals.util.VEPUtils;
-import net.minecraft.block.Block;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
@@ -102,15 +99,8 @@ public class VEPConfig {
 	public static final Gson GSON = new GsonBuilder().
 			setPrettyPrinting().
 			disableHtmlEscaping().
-			registerTypeAdapter(
-					Block.class,
-					(JsonDeserializer<Block>) (json, type, context) ->
-							VEPUtils.getBlock(json.getAsString())
-			).
 			create();
 
-	@Config.Ignore
-	public static Map<Block, Integer> netherPortalFrameBlocks;
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
