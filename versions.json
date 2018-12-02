@@ -1,10 +1,11 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/vertical-end-portals",
 	"1.12.2": {
+		"1.12.2-0.2.0.0": "Implemented Nether portal types.\nBug fixes and improvements.",
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-0.1.0.0",
-		"1.12.2-recommended": "1.12.2-0.1.0.0"
+		"1.12.2-latest": "1.12.2-0.2.0.0",
+		"1.12.2-recommended": "1.12.2-0.2.0.0"
 	}
 }
