@@ -1,6 +1,8 @@
 package com.therandomlabs.verticalendportals.util;
 
+import com.therandomlabs.randompatches.api.TeleporterSetEvent;
 import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
@@ -17,7 +19,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class VEPTeleporter extends Teleporter {
 	public VEPTeleporter(WorldServer world) {
 		super(world);
@@ -380,5 +385,10 @@ public class VEPTeleporter extends Teleporter {
 		}
 
 		return true;
+	}
+
+	@SubscribeEvent
+	public static void onTeleporterSet(TeleporterSetEvent event) {
+		event.setTeleporter(new VEPTeleporter(event.getWorld()));
 	}
 }
