@@ -2,9 +2,9 @@ package com.therandomlabs.verticalendportals.item;
 
 import java.lang.reflect.Field;
 import com.therandomlabs.randompatches.util.RPUtils;
-import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;

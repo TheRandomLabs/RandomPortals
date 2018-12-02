@@ -17,19 +17,6 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
 public class NetherPortalSavedData extends WorldSavedData {
-	public static final String ID = "nether_portals";
-	public static final String TAG_KEY = "Portals";
-	public static final String PORTAL_TYPE_KEY = "PortalType";
-	public static final String FRAME_TYPE_KEY = "FrameType";
-	public static final String TOP_LEFT_KEY = "TopLeft";
-	public static final String WIDTH_KEY = "Width";
-	public static final String HEIGHT_KEY = "Height";
-
-	private static final FrameType[] TYPES = FrameType.values();
-
-	private final Map<BlockPos, Portal> portals = new HashMap<>();
-	private final Map<BlockPos, Portal> portalCache = new HashMap<>();
-
 	public static final class Portal {
 		private final String type;
 		private final Frame frame;
@@ -52,6 +39,19 @@ public class NetherPortalSavedData extends WorldSavedData {
 			return frame;
 		}
 	}
+
+	public static final String ID = "nether_portals";
+	public static final String TAG_KEY = "Portals";
+	public static final String PORTAL_TYPE_KEY = "PortalType";
+	public static final String FRAME_TYPE_KEY = "FrameType";
+	public static final String TOP_LEFT_KEY = "TopLeft";
+	public static final String WIDTH_KEY = "Width";
+	public static final String HEIGHT_KEY = "Height";
+
+	private static final FrameType[] TYPES = FrameType.values();
+
+	private final Map<BlockPos, Portal> portals = new HashMap<>();
+	private final Map<BlockPos, Portal> portalCache = new HashMap<>();
 
 	public NetherPortalSavedData() {
 		super(ID);
@@ -140,6 +140,20 @@ public class NetherPortalSavedData extends WorldSavedData {
 				}
 
 				portalCache.put(portalPos, portal);
+				return portal;
+			}
+		}
+
+		return null;
+	}
+
+	public Portal removePortal(BlockPos pos) {
+		for(Map.Entry<BlockPos, Portal> entry : portals.entrySet()) {
+			final Portal portal = entry.getValue();
+
+			if(portal.frame.isInnerBlock(pos)) {
+				portals.remove(entry.getKey());
+				markDirty();
 				return portal;
 			}
 		}

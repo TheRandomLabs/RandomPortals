@@ -21,6 +21,7 @@ import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -221,6 +222,8 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		removing.clear();
+
+		NetherPortalSavedData.get(world).removePortal(pos);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -343,6 +346,19 @@ public class BlockNetherPortal extends BlockPortal {
 				AXIS,
 				axis == EnumFacing.Axis.X ? EnumFacing.Axis.Z : EnumFacing.Axis.X
 		);
+	}
+
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
+			EntityPlayer player, boolean willHarvest) {
+		final boolean actuallyRemoved =
+				super.removedByPlayer(state, world, pos, player, willHarvest);
+
+		if(actuallyRemoved) {
+			NetherPortalSavedData.get(world).removePortal(pos);
+		}
+
+		return actuallyRemoved;
 	}
 
 	public EnumFacing.Axis getAxis(IBlockState state) {

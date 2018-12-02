@@ -19,20 +19,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class Frame {
-	private World world;
 	private final FrameType type;
-
 	private final int width;
 	private final int height;
-
 	private final EnumFacing widthDirection;
 	private final EnumFacing heightDirection;
-
 	private final BlockPos topLeft;
 	private final BlockPos topRight;
 	private final BlockPos bottomLeft;
 	private final BlockPos bottomRight;
-
+	private World world;
 	private ImmutableList<BlockPos> topBlocks;
 	private ImmutableList<BlockPos> rightBlocks;
 	private ImmutableList<BlockPos> bottomBlocks;
@@ -258,10 +254,10 @@ public class Frame {
 		return leftBlocks;
 	}
 
-	public List<IBlockState> getLeftBlocks() {if(world == null) {
-		return Collections.emptyList();
-	}
-
+	public List<IBlockState> getLeftBlocks() {
+		if(world == null) {
+			return Collections.emptyList();
+		}
 
 		return getLeftBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());

@@ -18,10 +18,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 @Mod.EventBusSubscriber
 public final class NetherPortalTeleportHandler {
-	private static final Map<WeakReference<Entity>, TeleportData> entities =
-			new HashMap<>();
-	private static final Map<WeakReference<Entity>, NetherPortalType> types = new HashMap<>();
-
 	public static class TeleportData {
 		private NetherPortalSavedData.Portal portal;
 		private BlockPos pos;
@@ -43,6 +39,9 @@ public final class NetherPortalTeleportHandler {
 			return pos;
 		}
 	}
+	private static final Map<WeakReference<Entity>, TeleportData> entities =
+			new HashMap<>();
+	private static final Map<WeakReference<Entity>, NetherPortalType> types = new HashMap<>();
 
 	public static TeleportData getTeleportData(Entity entity) {
 		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : entities.entrySet()) {

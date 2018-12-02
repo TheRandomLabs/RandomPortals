@@ -78,6 +78,11 @@ public class VEPConfig {
 
 	@Config.Ignore
 	public static final String NAME = VerticalEndPortals.MOD_ID + "/" + VerticalEndPortals.MOD_ID;
+	@Config.Ignore
+	public static final Gson GSON = new GsonBuilder().
+			setPrettyPrinting().
+			disableHtmlEscaping().
+			create();
 
 	@Config.LangKey("verticalendportals.config.client")
 	@Config.Comment("Options related to features that only work client-side.")
@@ -94,13 +99,6 @@ public class VEPConfig {
 	@Config.LangKey("verticalendportals.config.netherPortals")
 	@Config.Comment("Options related to Nether portals.")
 	public static NetherPortals netherPortals = new NetherPortals();
-
-	@Config.Ignore
-	public static final Gson GSON = new GsonBuilder().
-			setPrettyPrinting().
-			disableHtmlEscaping().
-			create();
-
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
