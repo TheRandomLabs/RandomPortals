@@ -158,7 +158,7 @@ public class VEPTeleporter extends Teleporter {
 		final EnumFacing entityFacing = entity.getHorizontalFacing();
 
 		final EnumFacing offsetDirection;
-		final int offset;
+		final double offset;
 		final EnumFacing forwards;
 		final BlockPos bottomLeft;
 
@@ -169,21 +169,21 @@ public class VEPTeleporter extends Teleporter {
 			bottomLeft = pos;
 		} else if(frame.getType().isVertical()) {
 			offsetDirection = frame.getWidthDirection();
-			offset = frame.getWidth() / 2 + 1;
+			offset = frame.getWidth() / 2.0;
 			forwards = offsetDirection.rotateY();
 			bottomLeft = frame.getBottomLeft();
 		} else {
 			offsetDirection = EnumFacing.EAST;
-			offset = frame.getWidth() / 2 + 1;
+			offset = frame.getWidth() / 2.0;
 			forwards = entityFacing;
 			bottomLeft = frame.getBottomLeft();
 		}
 
-		pos = bottomLeft.offset(forwards).offset(offsetDirection, offset);
+		pos = bottomLeft.offset(forwards);
 
-		final double x = pos.getX();
+		final double x = pos.getX() + (offsetDirection == EnumFacing.EAST ? offset : 0);
 		final double y = pos.getY() + 1.0;
-		final double z = pos.getZ();
+		final double z = pos.getZ() + (offsetDirection == EnumFacing.NORTH ? offset : 0);
 
 		float newYaw = Math.abs(entityFacing.getHorizontalIndex() * 90.0F - yaw) +
 				forwards.getHorizontalIndex() * 90.0F;
