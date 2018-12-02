@@ -1,9 +1,10 @@
 package com.therandomlabs.verticalendportals.handler;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public final class NetherPortalTeleportHandler {
 	private static final Map<WeakReference<Entity>, TeleportData> entities =
 			new HashMap<>();
+	private static final Map<WeakReference<Entity>, NetherPortalType> types = new HashMap<>();
 
 	public static class TeleportData {
 		private NetherPortalSavedData.Portal portal;
@@ -42,12 +44,20 @@ public final class NetherPortalTeleportHandler {
 		}
 	}
 
+	public static TeleportData getTeleportData(Entity entity) {
+		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : entities.entrySet()) {
+			if(entry.getKey().get() == entity) {
+				return entry.getValue();
+			}
+		}
+
+		return null;
+	}
+
 	public static void setPortal(Entity entity, NetherPortalSavedData.Portal portal, BlockPos pos) {
 		if(!entity.getEntityWorld().getMinecraftServer().getAllowNether()) {
 			return;
 		}
-
-		VerticalEndPortals.LOGGER.error(entity.timeUntilPortal);
 
 		if(entity.timeUntilPortal > 0) {
 			entity.timeUntilPortal = entity.getPortalCooldown();
@@ -77,19 +87,44 @@ public final class NetherPortalTeleportHandler {
 		}
 	}
 
-	public static TeleportData getTeleportData(Entity entity) {
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : entities.entrySet()) {
-			if(entry.getKey().get() == entity) {
-				return entry.getValue();
+	public static NetherPortalType getPortalType(Entity entity) {
+		final List<WeakReference<Entity>> toRemove = new ArrayList<>();
+		NetherPortalType type = null;
+
+		for(Map.Entry<WeakReference<Entity>, NetherPortalType> entry : types.entrySet()) {
+			final WeakReference<Entity> entityReference = entry.getKey();
+			final Entity referencedEntity = entityReference.get();
+
+			if(referencedEntity == null) {
+				toRemove.add(entityReference);
+			} else if(referencedEntity == entity) {
+				type = entry.getValue();
 			}
 		}
 
-		return null;
+		types.keySet().removeAll(toRemove);
+
+		return type;
+	}
+
+	public static void clearPortalType(Entity entity) {
+		final List<WeakReference<Entity>> toRemove = new ArrayList<>();
+
+		for(Map.Entry<WeakReference<Entity>, NetherPortalType> entry : types.entrySet()) {
+			final WeakReference<Entity> entityReference = entry.getKey();
+			final Entity referencedEntity = entityReference.get();
+
+			if(referencedEntity == null || referencedEntity == entity) {
+				toRemove.add(entityReference);
+			}
+		}
+
+		types.keySet().removeAll(toRemove);
 	}
 
 	@SubscribeEvent
-	public static void onWorldTick(TickEvent.WorldTickEvent event) {
-		if(event.world.isRemote) {
+	public static void onWorldTick(TickEvent.ServerTickEvent event) {
+		if(event.phase != TickEvent.Phase.END) {
 			return;
 		}
 
@@ -97,7 +132,7 @@ public final class NetherPortalTeleportHandler {
 			final Entity entity = entry.getKey().get();
 
 			if(entity != null) {
-				handle(entity, entry.getValue(), event.world.provider.getDimension());
+				handle(entity, entry.getValue(), entity.getEntityWorld().provider.getDimension());
 			}
 		}
 
@@ -111,6 +146,9 @@ public final class NetherPortalTeleportHandler {
 
 		final int maxInPortalTime = entity.getMaxInPortalTime();
 
+		//Entity decrements this by 4 every tick because inPortal is false
+		entity.portalCounter += 5;
+
 		if(entity.portalCounter++ < maxInPortalTime) {
 			return;
 		}
@@ -119,7 +157,7 @@ public final class NetherPortalTeleportHandler {
 		entity.timeUntilPortal = entity.getPortalCooldown();
 
 		final NetherPortalEvent.Teleport event = new NetherPortalEvent.Teleport(
-				data.portal.getFrame(), entity, data.pos
+				data.portal == null ? null : data.portal.getFrame(), entity, data.pos
 		);
 
 		if(MinecraftForge.EVENT_BUS.post(event)) {
@@ -127,6 +165,7 @@ public final class NetherPortalTeleportHandler {
 		}
 
 		final NetherPortalType type = data.getPortalType();
+		types.put(new WeakReference<>(entity), type);
 		entity.changeDimension(dimension == type.dimensionID ? 0 : type.dimensionID);
 	}
 }

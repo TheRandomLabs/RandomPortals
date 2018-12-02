@@ -1,6 +1,5 @@
 package com.therandomlabs.verticalendportals.util;
 
-import java.util.List;
 import com.therandomlabs.randompatches.util.RPTeleporter;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
@@ -8,6 +7,7 @@ import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
+import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
@@ -18,12 +18,62 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.Teleporter;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 public class VEPTeleporter extends Teleporter {
 	public VEPTeleporter(WorldServer world) {
 		super(world);
+	}
+
+	@Override
+	public void placeInPortal(Entity entity, float yaw) {
+		final boolean placePortal;
+
+		if(world.provider.getDimension() == DimensionType.THE_END.getId()) {
+			final NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
+			placePortal = portalType != null && portalType.forcePortal;
+		} else {
+			placePortal = true;
+		}
+
+		if(placePortal) {
+			if(!placeInExistingPortal(entity, yaw)) {
+				makePortal(entity);
+				placeInExistingPortal(entity, yaw);
+			}
+
+			return;
+		}
+
+		final IBlockState obsidian = Blocks.OBSIDIAN.getDefaultState();
+		final IBlockState air = Blocks.AIR.getDefaultState();
+
+		final int x = MathHelper.floor(entity.posX);
+		final int y = MathHelper.floor(entity.posY) - 1;
+		final int z = MathHelper.floor(entity.posZ);
+
+		for(int zOffset = -2; zOffset < 3; zOffset++) {
+			for(int xOffset = -2; xOffset < 3; xOffset++) {
+				for(int yOffset = -1; yOffset < 3; yOffset++) {
+					world.setBlockState(
+							new BlockPos(
+									x + xOffset,
+									y + yOffset,
+									z - zOffset
+							),
+							yOffset < 0 ? obsidian : air
+					);
+				}
+			}
+		}
+
+		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, 0.0F);
+		entity.motionX = 0.0;
+		entity.motionY = 0.0;
+		entity.motionZ = 0.0;
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -321,8 +371,7 @@ public class VEPTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		final List<NetherPortalType> portalTypes = NetherPortalTypes.getTypes().values().asList();
-		final NetherPortalType portalType = portalTypes.get(random.nextInt(portalTypes.size()));
+		final NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
@@ -393,6 +442,12 @@ public class VEPTeleporter extends Teleporter {
 		}
 
 		return true;
+	}
+
+	@Override
+	public void placeEntity(World world, Entity entity, float yaw) {
+		super.placeEntity(world, entity, yaw);
+		NetherPortalTeleportHandler.clearPortalType(entity);
 	}
 
 	public static void register() {

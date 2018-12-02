@@ -33,12 +33,9 @@ public final class FrameBlock {
 		return registryName != null;
 	}
 
-	public boolean ensureCorrect() {
+	public void ensureCorrect() {
 		if(minimumAmount < 0) {
 			minimumAmount = 0;
-			return true;
 		}
-
-		return false;
 	}
 }

@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 public final class NetherPortalType {
 	public List<FrameBlock> frameBlocks;
 	public int dimensionID;
+	public boolean forcePortal; //In the End
 
 	public NetherPortalType() {}
 
@@ -24,24 +25,17 @@ public final class NetherPortalType {
 				"]";
 	}
 
-	public boolean ensureCorrect() {
-		boolean modified = false;
-
+	public void ensureCorrect() {
 		for(int i = 0; i < frameBlocks.size(); i++) {
 			final FrameBlock frameBlock = frameBlocks.get(i);
 
 			if(!frameBlock.isValid()) {
 				frameBlocks.remove(i--);
-				modified = true;
 				continue;
 			}
 
-			if(frameBlock.ensureCorrect()) {
-				modified = true;
-			}
+			frameBlock.ensureCorrect();
 		}
-
-		return modified;
 	}
 
 	public boolean test(Frame frame) {

@@ -5,6 +5,7 @@ public enum FrameSide {
 	RIGHT,
 	BOTTOM,
 	LEFT,
+	CORNER,
 	INNER,
 	NONE
 }

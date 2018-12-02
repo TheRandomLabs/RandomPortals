@@ -77,10 +77,8 @@ public final class NetherPortalTypes {
 				paths.remove(i--);
 			}
 
-			if(type.ensureCorrect()) {
-				VEPConfig.writeJson(path, type);
-			}
-
+			type.ensureCorrect();
+			VEPConfig.writeJson(path, type);
 			types.put(fileName.substring(0, fileName.length() - 5), type);
 		}
 

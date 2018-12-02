@@ -15,29 +15,21 @@ public class FrameSize {
 		this.maxHeight = maxHeight;
 	}
 
-	public boolean ensureCorrect() {
-		boolean modified = false;
-
+	public void ensureCorrect() {
 		if(minWidth < 3) {
 			minWidth = 3;
-			modified = true;
 		}
 
 		if(minHeight < 3) {
 			minHeight = 3;
-			modified = true;
 		}
 
 		if(maxWidth < minWidth) {
 			maxWidth = minWidth;
-			modified = true;
 		}
 
 		if(maxHeight < minHeight) {
 			maxHeight = minHeight;
-			modified = true;
 		}
-
-		return modified;
 	}
 }

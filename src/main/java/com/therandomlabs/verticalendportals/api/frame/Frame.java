@@ -46,8 +46,8 @@ public class Frame {
 
 	Frame(World world, FrameType type, Map<Integer, Corner> corners) {
 		this(
-				world, type, corners.get(0).pos, corners.get(1).pos, corners.get(2).pos,
-				corners.get(3).pos, corners.get(0).sideLength, corners.get(1).sideLength
+				world, type, corners.get(0).pos, corners.get(1).pos, corners.get(3).pos,
+				corners.get(2).pos, corners.get(0).sideLength, corners.get(1).sideLength
 		);
 	}
 
@@ -77,7 +77,8 @@ public class Frame {
 
 	@Override
 	public String toString() {
-		return "Frame[topLeft=" + topLeft + ",type=" + type + "]";
+		return "Frame[topLeft=" + topLeft + ",topRight=" + topRight + ",bottomLeft=" + bottomLeft +
+				",bottomRight=" + bottomRight + ",type=" + type + "]";
 	}
 
 	public World getWorld() {
@@ -335,6 +336,10 @@ public class Frame {
 	}
 
 	public FrameSide getSide(BlockPos pos) {
+		if(isCorner(pos)) {
+			return FrameSide.CORNER;
+		}
+
 		if(isTopBlock(pos)) {
 			return FrameSide.TOP;
 		}
@@ -363,10 +368,6 @@ public class Frame {
 	}
 
 	public boolean isFacingInwards(BlockPos pos, EnumFacing facing) {
-		if(isCorner(pos)) {
-			return false;
-		}
-
 		switch(getSide(pos)) {
 		case TOP:
 			return facing == heightDirection;
