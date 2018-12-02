@@ -2,6 +2,7 @@ package com.therandomlabs.verticalendportals.util;
 
 import com.therandomlabs.randompatches.util.RPTeleporter;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
@@ -167,33 +168,35 @@ public class VEPTeleporter extends Teleporter {
 
 		final EnumFacing entityFacing = entity.getHorizontalFacing();
 
-		final EnumFacing offsetDirection;
-		final double offset;
+		final double xOffset;
 		final double zOffset;
 		final EnumFacing forwards;
 
 		if(frame == null) {
-			offsetDirection = EnumFacing.NORTH;
-			offset = 0;
-			zOffset = 0;
+			xOffset = 0.0;
+			zOffset = 0.0;
 			forwards = EnumFacing.NORTH;
 		} else if(frame.getType().isVertical()) {
-			offsetDirection = frame.getWidthDirection();
-			offset = frame.getWidth() / 2.0 - 0.5;
-			zOffset = 0;
-			forwards = offsetDirection.rotateY();
+			if(frame.getType() == FrameType.VERTICAL_X) {
+				xOffset = frame.getWidth() / 2.0 - 1.0;
+				zOffset = 0.0;
+			} else {
+				xOffset = 0.0;
+				zOffset = -frame.getWidth() / 2.0 + 1.0;
+			}
+
+			forwards = frame.getWidthDirection().rotateY();
 			pos = frame.getBottomLeft().offset(forwards);
 		} else {
-			offsetDirection = EnumFacing.EAST;
-			offset = frame.getWidth() / 2.0 - 0.5;
+			xOffset = frame.getWidth() / 2.0;
 			zOffset = -0.5;
 			forwards = entityFacing;
 			pos = frame.getBottomLeft().offset(EnumFacing.SOUTH);
 		}
 
-		final double x = pos.getX() + (offsetDirection == EnumFacing.EAST ? offset : 0);
+		final double x = pos.getX() + xOffset;
 		final double y = pos.getY() + 1.0;
-		final double z = pos.getZ() + (offsetDirection == EnumFacing.NORTH ? -offset : 0) + zOffset;
+		final double z = pos.getZ() + zOffset;
 
 		float newYaw = Math.abs(entityFacing.getHorizontalIndex() * 90.0F - yaw) +
 				forwards.getHorizontalIndex() * 90.0F;
