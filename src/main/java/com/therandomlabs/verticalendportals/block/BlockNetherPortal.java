@@ -7,6 +7,7 @@ import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
@@ -274,7 +275,7 @@ public class BlockNetherPortal extends BlockPortal {
 	@SuppressWarnings("Duplicates")
 	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(world.isRemote || entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
+		if(entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
 			return;
 		}
 
@@ -288,13 +289,17 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		entity.setPortal(pos);
+		if(world.isRemote) {
+			//Use vanilla Minecraft logic
+			entity.setPortal(pos);
+			return;
+		}
 
 		final NetherPortalSavedData.Portal portal = NetherPortalSavedData.get(world).getPortal(pos);
+		final NetherPortalType type = portal == null ?
+				NetherPortalTypes.getDefault() : portal.getType();
 
-		if(portal != null) {
-			NetherPortalTeleportHandler.setPortalType(entity, portal.getType());
-		}
+		NetherPortalTeleportHandler.setPortal(entity, pos, type);
 	}
 
 	@Override
