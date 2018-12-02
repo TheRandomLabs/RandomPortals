@@ -9,6 +9,8 @@ import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
+import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
+import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
@@ -287,6 +289,12 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		entity.setPortal(pos);
+
+		final NetherPortalSavedData.Portal portal = NetherPortalSavedData.get(world).getPortal(pos);
+
+		if(portal != null) {
+			NetherPortalTeleportHandler.setPortalType(entity, portal.getType());
+		}
 	}
 
 	@Override

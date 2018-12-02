@@ -28,13 +28,12 @@ public final class NetherPortalTypes {
 	}
 
 	public static NetherPortalType get(String name) {
-		NetherPortalType type = types.get(name);
+		final NetherPortalType type = types.get(name);
+		return type == null ? getDefault() : type;
+	}
 
-		if(type != null) {
-			return type;
-		}
-
-		type = types.get("vanilla_nether_portal");
+	public static NetherPortalType getDefault() {
+		final NetherPortalType type = types.get("vanilla_nether_portal");
 
 		if(type != null) {
 			return type;
