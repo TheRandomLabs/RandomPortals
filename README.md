@@ -1,5 +1,6 @@
 # Vertical End Portals
 
-Adds vertical End portals and improves on vanilla End portals.
+Adds vertical End portals and lateral Nether portals.
 
-For more information, go [here](https://minecraft.curseforge.com/projects/vertical-end-portals).
+For more information and a full list of features, go to the
+[CurseForge project page](https://minecraft.curseforge.com/projects/vertical-end-portals).
