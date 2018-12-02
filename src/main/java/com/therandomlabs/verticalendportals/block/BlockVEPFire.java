@@ -20,7 +20,7 @@ public class BlockVEPFire extends BlockFire {
 
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if(NetherPortalFrames.trySpawn(world, pos)) {
+		if(NetherPortalFrames.trySpawn(world, pos, null)) {
 			return;
 		}
 

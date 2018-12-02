@@ -87,7 +87,7 @@ public final class NetherPortalFrames {
 		return true;
 	}
 
-	public static boolean trySpawn(World world, BlockPos pos) {
+	public static boolean trySpawn(World world, BlockPos pos, NetherPortalType forcePortalType) {
 		Frame frame = null;
 		BlockPos framePos = null;
 
@@ -98,7 +98,9 @@ public final class NetherPortalFrames {
 			if(NetherPortalTypes.getValidBlocks().contains(state.getBlock())) {
 				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
 						world, offset,
-						potentialFrame -> testFrame(potentialFrame, offset, facing.getOpposite())
+						potentialFrame -> testFrame(
+								potentialFrame, offset, facing.getOpposite(), forcePortalType
+						)
 				);
 
 				if(frame != null) {
@@ -137,9 +139,17 @@ public final class NetherPortalFrames {
 		return true;
 	}
 
-	private static boolean testFrame(Frame frame, BlockPos framePos, EnumFacing inwards) {
+	private static boolean testFrame(Frame frame, BlockPos framePos, EnumFacing inwards,
+			NetherPortalType forcePortalType) {
 		if(!frame.isFacingInwards(framePos, inwards)) {
 			return false;
+		}
+
+		if(forcePortalType != null) {
+			final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
+			savedData.addPortal(new NetherPortalSavedData.Portal(forcePortalType.getName(), frame));
+			savedData.markDirty();
+			return true;
 		}
 
 		for(Map.Entry<String, NetherPortalType> type : NetherPortalTypes.getTypes().entrySet()) {

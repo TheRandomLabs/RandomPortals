@@ -39,6 +39,11 @@ public class NetherPortalSavedData extends WorldSavedData {
 			this.frame = frame;
 		}
 
+		@Override
+		public String toString() {
+			return "Portal[type=" + type + ",frame=" + frame + "]";
+		}
+
 		public NetherPortalType getType() {
 			return NetherPortalTypes.get(type);
 		}
@@ -107,7 +112,21 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return portals;
 	}
 
-	public Portal getPortal(BlockPos portalPos) {
+	public Map<BlockPos, Portal> getPortals(World world) {
+		if(world != null) {
+			for(Portal portal : portals.values()) {
+				portal.frame.setWorld(world);
+			}
+		}
+
+		return portals;
+	}
+
+	public Portal getPortal(BlockPos pos) {
+		return getPortal(null, pos);
+	}
+
+	public Portal getPortal(World world, BlockPos portalPos) {
 		final Portal cachedPortal = portalCache.get(portalPos);
 
 		if(cachedPortal != null) {
@@ -116,7 +135,11 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 		for(Portal portal : portals.values()) {
 			if(portal.frame.isInnerBlock(portalPos)) {
-				portals.put(portalPos, portal);
+				if(world != null) {
+					portal.frame.setWorld(world);
+				}
+
+				portalCache.put(portalPos, portal);
 				return portal;
 			}
 		}
@@ -134,7 +157,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 	}
 
 	public static NetherPortalSavedData get(World world) {
-		final MapStorage storage = world.getMapStorage();
+		final MapStorage storage = world.getPerWorldStorage();
 		NetherPortalSavedData instance =
 				(NetherPortalSavedData) storage.getOrLoadData(NetherPortalSavedData.class, ID);
 

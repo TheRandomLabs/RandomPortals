@@ -25,8 +25,8 @@ public final class NetherPortalType {
 
 	@Override
 	public String toString() {
-		return "NetherPortalType[frameBlocks=" + frameBlocks + "],dimensionID=" + dimensionID +
-				"]";
+		return "NetherPortalType[name=" + getName() + ",frameBlocks=" + frameBlocks +
+				"],dimensionID=" + dimensionID + "]";
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -57,6 +57,16 @@ public final class NetherPortalType {
 		if(maxHeight < minHeight) {
 			maxHeight = minHeight;
 		}
+	}
+
+	public String getName() {
+		for(Map.Entry<String, NetherPortalType> entry : NetherPortalTypes.getTypes().entrySet()) {
+			if(entry.getValue() == this) {
+				return entry.getKey();
+			}
+		}
+
+		return "unknown_type";
 	}
 
 	public boolean test(Frame frame) {

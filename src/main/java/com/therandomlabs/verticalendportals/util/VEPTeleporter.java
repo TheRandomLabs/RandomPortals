@@ -3,13 +3,12 @@ package com.therandomlabs.verticalendportals.util;
 import com.therandomlabs.randompatches.util.RPTeleporter;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
-import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
+import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -97,6 +96,12 @@ public class VEPTeleporter extends Teleporter {
 			portalPos.lastUpdateTime = world.getTotalWorldTime();
 			shouldCache = false;
 		} else {
+			NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
+
+			if(portalType == null) {
+				portalType = NetherPortalTypes.getDefault();
+			}
+
 			BlockPos pos3 = new BlockPos(entity);
 
 			for(int xOffset = -128; xOffset <= 128; ++xOffset) {
@@ -113,16 +118,21 @@ public class VEPTeleporter extends Teleporter {
 						pos2 = pos1.down();
 
 						if(BlockNetherPortal.isPortal(world, pos1)) {
-							for(pos2 = pos1.down(); BlockNetherPortal.isPortal(world, pos2);
-								pos2 = pos2.down()) {
-								pos1 = pos2;
-							}
+							final NetherPortalSavedData.Portal portal =
+									NetherPortalSavedData.get(world).getPortal(pos1);
 
-							final double newDistance = pos1.distanceSq(pos3);
+							if(portal != null && portal.getType() == portalType) {
+								for(pos2 = pos1.down(); BlockNetherPortal.isPortal(world, pos2);
+									pos2 = pos2.down()) {
+									pos1 = pos2;
+								}
 
-							if(distance < 0.0 || newDistance < distance) {
-								distance = newDistance;
-								pos = pos1;
+								final double newDistance = pos1.distanceSq(pos3);
+
+								if(distance < 0.0 || newDistance < distance) {
+									distance = newDistance;
+									pos = pos1;
+								}
 							}
 						}
 					}
@@ -183,7 +193,7 @@ public class VEPTeleporter extends Teleporter {
 
 		final double x = pos.getX() + (offsetDirection == EnumFacing.EAST ? offset : 0);
 		final double y = pos.getY() + 1.0;
-		final double z = pos.getZ() + (offsetDirection == EnumFacing.NORTH ? offset : 0);
+		final double z = pos.getZ() + (offsetDirection == EnumFacing.NORTH ? -offset : 0);
 
 		float newYaw = Math.abs(entityFacing.getHorizontalIndex() * 90.0F - yaw) +
 				forwards.getHorizontalIndex() * 90.0F;
@@ -371,7 +381,11 @@ public class VEPTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		final NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
+		NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
+
+		if(portalType == null) {
+			portalType = NetherPortalTypes.getDefault();
+		}
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
@@ -398,16 +412,6 @@ public class VEPTeleporter extends Teleporter {
 			}
 		}
 
-		final IBlockState portal = VEPBlocks.vertical_nether_portal.getDefaultState().
-				withProperty(
-						BlockPortal.AXIS,
-						xMultiplier == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X
-				).
-				withProperty(
-						BlockNetherPortal.USER_PLACED,
-						false
-				);
-
 		for(int horzOffset = -1; horzOffset < 3; horzOffset++) {
 			for(int yOffset = -1; yOffset < 4; yOffset++) {
 				final boolean frame =
@@ -426,20 +430,7 @@ public class VEPTeleporter extends Teleporter {
 			}
 		}
 
-		for(int horzOffset = -1; horzOffset < 3; horzOffset++) {
-			for(int yOffset = -1; yOffset < 4; yOffset++) {
-				final boolean frame =
-						horzOffset == -1 || horzOffset == 2 || yOffset == -1 || yOffset == 3;
-
-				if(!frame) {
-					world.setBlockState(new BlockPos(
-							portalX + horzOffset * xMultiplier,
-							portalY + yOffset,
-							portalZ + horzOffset * zMultiplier
-					), portal, 2);
-				}
-			}
-		}
+		NetherPortalFrames.trySpawn(world, new BlockPos(portalX, portalY, portalZ), portalType);
 
 		return true;
 	}
