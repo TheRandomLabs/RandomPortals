@@ -3,11 +3,9 @@ package com.therandomlabs.verticalendportals.block;
 import java.util.ArrayList;
 import java.util.List;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
-import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
-import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
@@ -29,7 +27,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -285,10 +282,6 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport(null, entity, pos))) {
-			return;
-		}
-
 		if(world.isRemote) {
 			//Use vanilla Minecraft logic
 			entity.setPortal(pos);
@@ -296,10 +289,7 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		final NetherPortalSavedData.Portal portal = NetherPortalSavedData.get(world).getPortal(pos);
-		final NetherPortalType type = portal == null ?
-				NetherPortalTypes.getDefault() : portal.getType();
-
-		NetherPortalTeleportHandler.setPortal(entity, pos, type);
+		NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 	}
 
 	@Override

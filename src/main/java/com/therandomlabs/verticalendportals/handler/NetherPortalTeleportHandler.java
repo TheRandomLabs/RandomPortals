@@ -3,9 +3,14 @@ package com.therandomlabs.verticalendportals.handler;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
+import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
+import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -16,18 +21,34 @@ public final class NetherPortalTeleportHandler {
 			new HashMap<>();
 
 	public static class TeleportData {
-		private NetherPortalType type;
+		private NetherPortalSavedData.Portal portal;
+		private BlockPos pos;
 
-		private TeleportData(NetherPortalType type) {
-			this.type = type;
+		private TeleportData(NetherPortalSavedData.Portal portal, BlockPos pos) {
+			this.portal = portal;
+			this.pos = pos;
 		}
 
-		public NetherPortalType getType() {
-			return type;
+		public NetherPortalSavedData.Portal getPortal() {
+			return portal;
+		}
+
+		public NetherPortalType getPortalType() {
+			return portal == null ? NetherPortalTypes.getDefault() : portal.getType();
+		}
+
+		public BlockPos getPos() {
+			return pos;
 		}
 	}
 
-	public static void setPortal(Entity entity, BlockPos pos, NetherPortalType type) {
+	public static void setPortal(Entity entity, NetherPortalSavedData.Portal portal, BlockPos pos) {
+		if(!entity.getEntityWorld().getMinecraftServer().getAllowNether()) {
+			return;
+		}
+
+		VerticalEndPortals.LOGGER.error(entity.timeUntilPortal);
+
 		if(entity.timeUntilPortal > 0) {
 			entity.timeUntilPortal = entity.getPortalCooldown();
 			return;
@@ -35,11 +56,15 @@ public final class NetherPortalTeleportHandler {
 
 		boolean found = false;
 
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entityReference : entities.entrySet()) {
-			final Entity referencedEntity = entityReference.getKey().get();
+		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : entities.entrySet()) {
+			final Entity referencedEntity = entry.getKey().get();
 
 			if(referencedEntity == entity) {
-				entityReference.getValue().type = type;
+				final TeleportData data = entry.getValue();
+
+				data.portal = portal;
+				data.pos = pos;
+
 				found = true;
 				break;
 			}
@@ -48,7 +73,7 @@ public final class NetherPortalTeleportHandler {
 		entity.lastPortalPos = pos;
 
 		if(!found) {
-			entities.put(new WeakReference<>(entity), new TeleportData(type));
+			entities.put(new WeakReference<>(entity), new TeleportData(portal, pos));
 		}
 	}
 
@@ -64,7 +89,7 @@ public final class NetherPortalTeleportHandler {
 
 	@SubscribeEvent
 	public static void onWorldTick(TickEvent.WorldTickEvent event) {
-		if(event.world.isRemote || !event.world.getMinecraftServer().getAllowNether()) {
+		if(event.world.isRemote) {
 			return;
 		}
 
@@ -72,14 +97,14 @@ public final class NetherPortalTeleportHandler {
 			final Entity entity = entry.getKey().get();
 
 			if(entity != null) {
-				handle(entity, entry.getValue());
+				handle(entity, entry.getValue(), event.world.provider.getDimension());
 			}
 		}
 
 		entities.clear();
 	}
 
-	private static void handle(Entity entity, TeleportData data) {
+	private static void handle(Entity entity, TeleportData data, int dimension) {
 		if(entity.isRiding()) {
 			return;
 		}
@@ -93,7 +118,15 @@ public final class NetherPortalTeleportHandler {
 		entity.portalCounter = maxInPortalTime;
 		entity.timeUntilPortal = entity.getPortalCooldown();
 
-		final int dimension = entity.getEntityWorld().provider.getDimension();
-		entity.changeDimension(dimension == data.type.dimensionID ? 0 : data.type.dimensionID);
+		final NetherPortalEvent.Teleport event = new NetherPortalEvent.Teleport(
+				data.portal.getFrame(), entity, data.pos
+		);
+
+		if(MinecraftForge.EVENT_BUS.post(event)) {
+			return;
+		}
+
+		final NetherPortalType type = data.getPortalType();
+		entity.changeDimension(dimension == type.dimensionID ? 0 : type.dimensionID);
 	}
 }

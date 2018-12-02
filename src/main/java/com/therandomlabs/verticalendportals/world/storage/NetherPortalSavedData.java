@@ -28,6 +28,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 	private static final FrameType[] TYPES = FrameType.values();
 
 	private final Map<BlockPos, Portal> portals = new HashMap<>();
+	private final Map<BlockPos, Portal> portalCache = new HashMap<>();
 
 	public static final class Portal {
 		private final String type;
@@ -96,13 +97,26 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return nbt;
 	}
 
+	@Override
+	public void markDirty() {
+		super.markDirty();
+		portalCache.clear();
+	}
+
 	public Map<BlockPos, Portal> getPortals() {
 		return portals;
 	}
 
 	public Portal getPortal(BlockPos portalPos) {
+		final Portal cachedPortal = portalCache.get(portalPos);
+
+		if(cachedPortal != null) {
+			return cachedPortal;
+		}
+
 		for(Portal portal : portals.values()) {
 			if(portal.frame.isInnerBlock(portalPos)) {
+				portals.put(portalPos, portal);
 				return portal;
 			}
 		}
@@ -116,6 +130,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 	public void addPortal(Portal portal) {
 		portals.put(portal.frame.getTopLeft(), portal);
+		markDirty();
 	}
 
 	public static NetherPortalSavedData get(World world) {
