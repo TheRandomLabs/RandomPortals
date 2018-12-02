@@ -119,13 +119,13 @@ public class VEPConfig {
 			RPUtils.crashReport("Error while modifying config", ex);
 		}
 
-		FrameSizes.reload();
-
 		try {
 			NetherPortalTypes.reload();
 		} catch(IOException ex) {
 			RPUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
+
+		FrameSizes.reload();
 	}
 
 	public static void reloadFromDisk() {

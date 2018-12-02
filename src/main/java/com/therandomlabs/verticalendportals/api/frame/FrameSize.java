@@ -15,6 +15,7 @@ public class FrameSize {
 		this.maxHeight = maxHeight;
 	}
 
+	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		if(minWidth < 3) {
 			minWidth = 3;

@@ -11,6 +11,10 @@ public final class NetherPortalType {
 	public List<FrameBlock> frameBlocks;
 	public int dimensionID;
 	public boolean forcePortal; //In the End
+	public int minWidth = 3;
+	public int maxWidth = 9000;
+	public int minHeight = 3;
+	public int maxHeight = 9000;
 
 	public NetherPortalType() {}
 
@@ -25,6 +29,7 @@ public final class NetherPortalType {
 				"]";
 	}
 
+	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		for(int i = 0; i < frameBlocks.size(); i++) {
 			final FrameBlock frameBlock = frameBlocks.get(i);
@@ -36,9 +41,32 @@ public final class NetherPortalType {
 
 			frameBlock.ensureCorrect();
 		}
+
+		if(minWidth < 3) {
+			minWidth = 3;
+		}
+
+		if(minHeight < 3) {
+			minHeight = 3;
+		}
+
+		if(maxWidth < minWidth) {
+			maxWidth = minWidth;
+		}
+
+		if(maxHeight < minHeight) {
+			maxHeight = minHeight;
+		}
 	}
 
 	public boolean test(Frame frame) {
+		final int width = frame.getWidth();
+		final int height = frame.getHeight();
+
+		if(width < minWidth || width > maxWidth || height < minHeight || height > maxHeight) {
+			return false;
+		}
+
 		final Map<Block, Integer> detectedBlocks = new HashMap<>();
 
 		for(IBlockState state : frame.getFrameBlocks()) {
