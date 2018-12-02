@@ -74,10 +74,13 @@ public class VEPConfig {
 		public boolean enabled = true;
 
 		@Config.LangKey("verticalendportals.config.netherPortals.frameBlocks")
-		@Config.Comment("The registry names and minimum amounts of the Nether portal frame " +
-				"blocks. Registry names and amounts should be separated with a comma.")
+		@Config.Comment({"" +
+				"The registry names and minimum amounts of the Nether portal frame blocks.",
+				"Registry names and amounts should be separated with a comma.",
+				"The amount is optional."
+		})
 		public String[] frameBlocks = new String[] {
-				"minecraft:obsidian,0"
+				"minecraft:obsidian"
 		};
 
 		@Config.LangKey("verticalendportals.config.netherPortals.useAllVariantsJson")
