@@ -2,6 +2,7 @@ package com.therandomlabs.verticalendportals;
 
 import com.therandomlabs.randompatches.client.TileEntityEndPortalRenderer;
 import com.therandomlabs.verticalendportals.command.CommandVEPReload;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.item.CreativeTabPortals;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityUpsideDownEndPortal;
 import com.therandomlabs.verticalendportals.tileentity.TileEntityVerticalEndPortal;

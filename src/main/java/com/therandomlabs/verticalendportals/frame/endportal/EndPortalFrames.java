@@ -3,7 +3,8 @@ package com.therandomlabs.verticalendportals.frame.endportal;
 import java.util.EnumMap;
 import java.util.function.Function;
 import com.google.common.collect.ImmutableMap;
-import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.config.FrameSizes;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.api.frame.BasicVerticalFrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameSize;
@@ -23,10 +24,10 @@ public final class EndPortalFrames {
 	);
 
 	public static final Function<FrameType, FrameSize> LATERAL_WITH_VERTICAL_FRAMES_SIZE =
-			type -> FrameSize.get("end_portal", "lateral_with_vertical_frames");
+			type -> FrameSizes.get("end_portal", "lateral_with_vertical_frames");
 
 	public static final Function<FrameType, FrameSize> UPSIDE_DOWN_SIZE =
-			type -> FrameSize.get("end_portal", "upside_down");
+			type -> FrameSizes.get("end_portal", "upside_down");
 
 	public static final FrameSizeFunction VERTICAL_INWARDS_FACING_SIZE =
 			FrameSizeFunction.fromJSONsVertical(

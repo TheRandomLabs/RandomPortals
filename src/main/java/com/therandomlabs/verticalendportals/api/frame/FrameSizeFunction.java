@@ -2,6 +2,7 @@ package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import com.therandomlabs.verticalendportals.config.FrameSizes;
 
 public abstract class FrameSizeFunction implements Function<FrameType, FrameSize> {
 	@Override
@@ -28,24 +29,24 @@ public abstract class FrameSizeFunction implements Function<FrameType, FrameSize
 			@Override
 			public FrameSize getLateral() {
 				final FrameSize all = getAllVariants();
-				return all == null ? FrameSize.get(species, "lateral") : all;
+				return all == null ? FrameSizes.get(species, "lateral") : all;
 			}
 
 			@Override
 			public FrameSize getVerticalX() {
 				final FrameSize all = getAllVariants();
-				return all == null ? FrameSize.get(species, "vertical_x") : all;
+				return all == null ? FrameSizes.get(species, "vertical_x") : all;
 			}
 
 			@Override
 			public FrameSize getVerticalZ() {
 				final FrameSize all = getAllVariants();
-				return all == null ? FrameSize.get(species, "vertical_z") : all;
+				return all == null ? FrameSizes.get(species, "vertical_z") : all;
 			}
 
 			private FrameSize getAllVariants() {
 				return useAllVariants.getAsBoolean() ?
-						FrameSize.get(species, "all_variants") : null;
+						FrameSizes.get(species, "all_variants") : null;
 			}
 		};
 	}
@@ -61,18 +62,18 @@ public abstract class FrameSizeFunction implements Function<FrameType, FrameSize
 			@Override
 			public FrameSize getVerticalX() {
 				final FrameSize all = getAllVariants();
-				return all == null ? FrameSize.get(species, "vertical_x") : all;
+				return all == null ? FrameSizes.get(species, "vertical_x") : all;
 			}
 
 			@Override
 			public FrameSize getVerticalZ() {
 				final FrameSize all = getAllVariants();
-				return all == null ? FrameSize.get(species, "vertical_z") : all;
+				return all == null ? FrameSizes.get(species, "vertical_z") : all;
 			}
 
 			private FrameSize getAllVariants() {
 				return useAllVariants.getAsBoolean() ?
-						FrameSize.get(species, "all_variants") : null;
+						FrameSizes.get(species, "all_variants") : null;
 			}
 		};
 	}

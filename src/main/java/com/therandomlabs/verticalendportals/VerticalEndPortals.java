@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals;
 
 import com.therandomlabs.verticalendportals.command.CommandVEPReload;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;

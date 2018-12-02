@@ -2,7 +2,7 @@ package com.therandomlabs.verticalendportals.block;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;

@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals;
+package com.therandomlabs.verticalendportals.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +16,9 @@ import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.therandomlabs.randompatches.util.RPUtils;
-import com.therandomlabs.verticalendportals.api.frame.FrameSize;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.util.VEPUtils;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -129,7 +130,13 @@ public class VEPConfig {
 			RPUtils.crashReport("Error while modifying config", ex);
 		}
 
-		FrameSize.reload();
+		FrameSizes.reload();
+
+		try {
+			NetherPortalTypes.reload();
+		} catch(IOException ex) {
+			RPUtils.crashReport("Error while reloading Nether portal types", ex);
+		}
 
 		if(netherPortals.frameBlocks.length == 0) {
 			netherPortalFrameBlocks = Collections.singletonMap(Blocks.OBSIDIAN, 0);
@@ -166,8 +173,12 @@ public class VEPConfig {
 		}
 	}
 
+	public static Path getConfigPath(String name) {
+		return Paths.get("config", VerticalEndPortals.MOD_ID, name);
+	}
+
 	public static Path getConfig(String name) {
-		final Path path = Paths.get("config", VerticalEndPortals.MOD_ID, name);
+		final Path path = getConfigPath(name);
 		final Path parent = path.getParent();
 
 		try {
@@ -185,6 +196,25 @@ public class VEPConfig {
 		return path;
 	}
 
+	public static Path getDirectory(String name) {
+		final Path path = getConfig(name);
+
+		try {
+			if(Files.exists(path)) {
+				if(Files.isRegularFile(path)) {
+					Files.delete(path);
+					Files.createDirectory(path);
+				}
+			} else {
+				Files.createDirectory(path);
+			}
+		} catch(IOException ex) {
+			RPUtils.crashReport("Failed to create directory " + path, ex);
+		}
+
+		return path;
+	}
+
 	public static String read(Path path) {
 		try {
 			return StringUtils.join(Files.readAllLines(path), System.lineSeparator());
@@ -196,8 +226,10 @@ public class VEPConfig {
 	}
 
 	public static <T> T readJson(String jsonName, Class<T> clazz) {
-		final Path path = getConfig(jsonName + ".json");
+		return readJson(getConfig(jsonName + ".json"), clazz);
+	}
 
+	public static <T> T readJson(Path path, Class<T> clazz) {
 		if(!Files.exists(path)) {
 			return null;
 		}
@@ -209,8 +241,8 @@ public class VEPConfig {
 				final Jankson jankson = Jankson.builder().build();
 				raw = jankson.load(raw).toJson();
 				return new Gson().fromJson(raw, clazz);
-			} catch(SyntaxError ex) {
-				RPUtils.crashReport("Failed to read JSON: " + path, ex);
+			} catch(SyntaxError | JsonSyntaxException ex) {
+				VerticalEndPortals.LOGGER.error("Failed to read JSON: " + path, ex);
 			}
 		}
 
@@ -218,8 +250,10 @@ public class VEPConfig {
 	}
 
 	public static void writeJson(String jsonName, Object object) {
-		final Path path = getConfig(jsonName + ".json");
+		writeJson(getConfig(jsonName + ".json"), object);
+	}
 
+	public static void writeJson(Path path, Object object) {
 		final String raw = new GsonBuilder().
 				setPrettyPrinting().
 				disableHtmlEscaping().

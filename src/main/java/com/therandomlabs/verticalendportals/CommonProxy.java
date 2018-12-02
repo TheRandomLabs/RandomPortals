@@ -1,5 +1,6 @@
 package com.therandomlabs.verticalendportals;
 
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.handler.EndPortalActivationHandler;
 import net.minecraftforge.common.MinecraftForge;
 

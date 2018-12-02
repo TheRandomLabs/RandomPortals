@@ -1,7 +1,7 @@
 package com.therandomlabs.verticalendportals.util;
 
 import com.therandomlabs.randompatches.api.TeleporterSetEvent;
-import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;

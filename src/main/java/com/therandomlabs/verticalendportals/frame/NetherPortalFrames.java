@@ -3,7 +3,7 @@ package com.therandomlabs.verticalendportals.frame;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.therandomlabs.verticalendportals.VEPConfig;
+import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
