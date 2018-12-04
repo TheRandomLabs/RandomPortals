@@ -39,8 +39,8 @@ public final class NetherPortalTeleportHandler {
 			return pos;
 		}
 	}
-	private static final Map<WeakReference<Entity>, TeleportData> entities =
-			new HashMap<>();
+
+	private static final Map<WeakReference<Entity>, TeleportData> entities = new HashMap<>();
 	private static final Map<WeakReference<Entity>, NetherPortalType> types = new HashMap<>();
 
 	public static TeleportData getTeleportData(Entity entity) {

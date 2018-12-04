@@ -29,6 +29,12 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		return getDefaultState();
+	}
+
+	@Override
 	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
 		return EnumFacing.Axis.Y;
 	}
@@ -36,12 +42,6 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	@SuppressWarnings("deprecation")
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
-		return getDefaultState();
-	}
-
-	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		return getDefaultState();
 	}
 }
