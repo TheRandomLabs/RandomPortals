@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals.block;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
@@ -23,23 +24,24 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState();
-	}
-
-	@Override
 	public int getMetaFromState(IBlockState state) {
-		return 1;
+		return state.getValue(USER_PLACED) ? 4 : 1;
 	}
 
 	@Override
-	public EnumFacing.Axis getAxis(IBlockState state) {
+	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
 		return EnumFacing.Axis.Y;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
+		return getDefaultState();
+	}
+
+	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		return getDefaultState();
 	}
 }

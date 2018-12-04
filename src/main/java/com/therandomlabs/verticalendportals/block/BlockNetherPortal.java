@@ -100,14 +100,14 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public BlockNetherPortal() {
 		this(true);
-		setDefaultState(blockState.getBaseState().
-				withProperty(AXIS, EnumFacing.Axis.X).
-				withProperty(USER_PLACED, true));
 		setTranslationKey("netherPortalVertical");
 		setRegistryName("minecraft:portal");
 	}
 
 	protected BlockNetherPortal(boolean flag) {
+		setDefaultState(blockState.getBaseState().
+				withProperty(AXIS, EnumFacing.Axis.X).
+				withProperty(USER_PLACED, true));
 		setTickRandomly(true);
 		setHardness(-1.0F);
 		setSoundType(SoundType.GLASS);
@@ -118,7 +118,7 @@ public class BlockNetherPortal extends BlockPortal {
 	@SuppressWarnings("deprecation")
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		switch(getAxis(state)) {
+		switch(getEffectiveAxis(state)) {
 		case X:
 			return AABB_X;
 		case Y:
@@ -136,11 +136,11 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final EnumFacing.Axis axis = getAxis(state);
+		final EnumFacing.Axis axis = getEffectiveAxis(state);
 		final IBlockState fromState = world.getBlockState(fromPos);
 
 		if(fromState.getBlock() == this && !fromState.getValue(USER_PLACED) &&
-				getAxis(fromState) == axis) {
+				getEffectiveAxis(fromState) == axis) {
 			return;
 		}
 
@@ -172,39 +172,32 @@ public class BlockNetherPortal extends BlockPortal {
 				final IBlockState innerState = world.getBlockState(innerPos);
 
 				if(innerState.getBlock() == this && !state.getValue(USER_PLACED) &&
-						getAxis(innerState) == axis) {
+						getEffectiveAxis(innerState) == axis) {
 					removing.add(innerPos);
 				}
 			}
+		} else {
+			removing.add(pos);
 
-			for(BlockPos removingPos : removing) {
-				world.setBlockToAir(removingPos);
-			}
+			int previousSize = -1;
 
-			removing.clear();
-			return;
-		}
+			for(int i = 0; i < removing.size() || removing.size() != previousSize; i++) {
+				previousSize = removing.size();
+				final BlockPos removingPos = removing.get(i);
 
-		removing.add(pos);
+				for(EnumFacing facing : relevantFacings) {
+					final BlockPos neighbor = removingPos.offset(facing);
 
-		int previousSize = -1;
+					if(removing.contains(neighbor)) {
+						continue;
+					}
 
-		for(int i = 0; i < removing.size() || removing.size() != previousSize; i++) {
-			previousSize = removing.size();
-			final BlockPos removingPos = removing.get(i);
+					final IBlockState neighborState = world.getBlockState(neighbor);
 
-			for(EnumFacing facing : relevantFacings) {
-				final BlockPos neighbor = removingPos.offset(facing);
-
-				if(removing.contains(neighbor)) {
-					continue;
-				}
-
-				final IBlockState neighborState = world.getBlockState(neighbor);
-
-				if(neighborState.getBlock() == this && !neighborState.getValue(USER_PLACED) &&
-						getAxis(neighborState) == axis) {
-					removing.add(neighbor);
+					if(neighborState.getBlock() == this && !neighborState.getValue(USER_PLACED) &&
+							getEffectiveAxis(neighborState) == axis) {
+						removing.add(neighbor);
+					}
 				}
 			}
 		}
@@ -214,7 +207,6 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		removing.clear();
-
 		NetherPortalSavedData.get(world).removePortal(pos);
 	}
 
@@ -227,7 +219,7 @@ public class BlockNetherPortal extends BlockPortal {
 		EnumFacing.Axis axis = null;
 
 		if(state.getBlock() == this) {
-			axis = getAxis(state);
+			axis = getEffectiveAxis(state);
 
 			if(axis == null) {
 				return false;
@@ -298,7 +290,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		if(meta > 2) {
 			userPlaced = true;
-			meta -= 3;
+			meta %= 3;
 		} else {
 			userPlaced = false;
 		}
@@ -320,8 +312,8 @@ public class BlockNetherPortal extends BlockPortal {
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(USER_PLACED) ?
-				super.getMetaFromState(state) + 3 : super.getMetaFromState(state);
+		final int toAdd = state.getValue(USER_PLACED) ? 3 : 0;
+		return super.getMetaFromState(state) + toAdd;
 	}
 
 	@Override
@@ -346,18 +338,22 @@ public class BlockNetherPortal extends BlockPortal {
 		final boolean actuallyRemoved =
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
+		if(world.isRemote) {
+			return actuallyRemoved;
+		}
+
 		if(actuallyRemoved) {
 			//If there are neighboring portal blocks, neighborChanged uses the saved data
 			//to find neighboring portal blocks faster
 
-			final EnumFacing.Axis axis = getAxis(state);
+			final EnumFacing.Axis axis = getEffectiveAxis(state);
 
 			for(EnumFacing facing : getRelevantFacings(axis)) {
 				final IBlockState neighbor = world.getBlockState(pos.offset(facing));
 				final Block neighborBlock = neighbor.getBlock();
 
 				if(neighborBlock == this && !neighbor.getValue(USER_PLACED) &&
-						((BlockNetherPortal) neighborBlock).getAxis(state) == axis) {
+						((BlockNetherPortal) neighborBlock).getEffectiveAxis(neighbor) == axis) {
 					return actuallyRemoved;
 				}
 			}
@@ -368,7 +364,7 @@ public class BlockNetherPortal extends BlockPortal {
 		return actuallyRemoved;
 	}
 
-	public EnumFacing.Axis getAxis(IBlockState state) {
+	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
 		return state.getValue(AXIS);
 	}
 
@@ -400,7 +396,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final IBlockState state = world.getBlockState(portalPos);
 
-		final EnumFacing.Axis axis = ((BlockNetherPortal) state.getBlock()).getAxis(state);
+		final EnumFacing.Axis axis = ((BlockNetherPortal) state.getBlock()).getEffectiveAxis(state);
 		final EnumFacing frameDirection = axis == EnumFacing.Axis.Y ?
 				EnumFacing.NORTH : EnumFacing.DOWN;
 
