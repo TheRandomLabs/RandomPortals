@@ -338,26 +338,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final boolean actuallyRemoved =
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
-		if(world.isRemote) {
-			return actuallyRemoved;
-		}
-
-		if(actuallyRemoved) {
-			//If there are neighboring portal blocks, neighborChanged uses the saved data
-			//to find neighboring portal blocks faster
-
-			final EnumFacing.Axis axis = getEffectiveAxis(state);
-
-			for(EnumFacing facing : getRelevantFacings(axis)) {
-				final IBlockState neighbor = world.getBlockState(pos.offset(facing));
-				final Block neighborBlock = neighbor.getBlock();
-
-				if(neighborBlock == this && !neighbor.getValue(USER_PLACED) &&
-						((BlockNetherPortal) neighborBlock).getEffectiveAxis(neighbor) == axis) {
-					return actuallyRemoved;
-				}
-			}
-
+		if(!world.isRemote) {
 			NetherPortalSavedData.get(world).removePortal(pos);
 		}
 
