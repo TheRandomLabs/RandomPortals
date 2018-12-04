@@ -1,9 +1,12 @@
 package com.therandomlabs.verticalendportals.frame.endportal;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.function.Function;
 import com.google.common.collect.ImmutableMap;
+import com.therandomlabs.verticalendportals.api.event.EndPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.BasicVerticalFrameDetector;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameSize;
 import com.therandomlabs.verticalendportals.api.frame.FrameSizeFunction;
@@ -12,11 +15,19 @@ import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.config.FrameSizes;
 import com.therandomlabs.verticalendportals.config.VEPConfig;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockWorldState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import static net.minecraft.block.BlockEndPortalFrame.EYE;
+import static net.minecraft.block.BlockHorizontal.FACING;
 
 public final class EndPortalFrames {
 	public static final FrameSizeFunction NORMAL_SIZE = FrameSizeFunction.fromJSONs(
@@ -105,5 +116,81 @@ public final class EndPortalFrames {
 
 	private EndPortalFrames() {}
 
-	//TODO trySpawnPortal
+	//pos must be an activated portal frame block position
+	public static boolean trySpawn(World world, BlockPos pos) {
+		final IBlockState state = world.getBlockState(pos);
+		final Block block = state.getBlock();
+
+		world.playSound(
+				null, pos, SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F
+		);
+
+		Frame frame = null;
+
+		if(block == Blocks.END_PORTAL_FRAME) {
+			frame = LATERAL.detect(world, pos);
+		} else if(block == VEPBlocks.vertical_end_portal_frame) {
+			frame = LATERAL_WITH_VERTICAL_FRAMES.detect(world, pos);
+		} else if(block == VEPBlocks.upside_down_end_portal_frame) {
+			frame = UPSIDE_DOWN.detect(world, pos);
+		}
+
+		if(frame != null && !frame.isCorner(pos)) {
+			if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Activate(frame, pos))) {
+				return false;
+			}
+
+			final IBlockState portalState;
+
+			if(block == VEPBlocks.upside_down_end_portal_frame) {
+				portalState = VEPBlocks.upside_down_end_portal.getDefaultState();
+			} else {
+				portalState = VEPBlocks.lateral_end_portal.getDefaultState();
+			}
+
+			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+				world.setBlockState(innerPos, portalState, 2);
+			}
+
+			world.playBroadcastSound(1038, frame.getTopLeft().add(1, 0, 1), 0);
+
+			return true;
+		}
+
+		final EnumFacing facing = state.getValue(FACING);
+		EnumFacing portalFacing = null;
+
+		if(block == VEPBlocks.vertical_end_portal_frame) {
+			frame = VERTICAL.get(facing).detect(world, pos);
+			portalFacing = facing;
+		}
+
+		if(frame == null) {
+			frame = VERTICAL_INWARDS_FACING.detect(world, pos);
+
+			if(frame != null) {
+				portalFacing = frame.getType() == FrameType.VERTICAL_X ?
+						EnumFacing.NORTH : EnumFacing.EAST;
+			}
+		}
+
+		if(frame == null || frame.isCorner(pos) ||
+				MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Activate(frame, pos))) {
+			return false;
+		}
+
+		final List<BlockPos> innerBlockPositions = frame.getInnerBlockPositions();
+
+		for(BlockPos innerPos : innerBlockPositions) {
+			world.setBlockState(
+					innerPos, VEPBlocks.vertical_end_portal.getDefaultState().withProperty(
+							FACING, portalFacing
+					), 2
+			);
+		}
+
+		world.playBroadcastSound(1038, innerBlockPositions.get(0), 0);
+
+		return true;
+	}
 }

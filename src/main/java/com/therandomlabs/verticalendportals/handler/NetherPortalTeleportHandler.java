@@ -145,12 +145,13 @@ public final class NetherPortalTeleportHandler {
 
 		final int maxInPortalTime = entity.getMaxInPortalTime();
 
-		//Entity decrements this by 4 every tick because inPortal is false
-		entity.portalCounter += 5;
-
 		if(entity.portalCounter++ < maxInPortalTime) {
+			//Entity decrements this by 4 every tick because inPortal is false
+			entity.portalCounter += 4;
 			return;
 		}
+
+		entity.portalCounter += 4;
 
 		entity.portalCounter = maxInPortalTime;
 		entity.timeUntilPortal = entity.getPortalCooldown();

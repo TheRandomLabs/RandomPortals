@@ -87,6 +87,7 @@ public final class NetherPortalFrames {
 		return true;
 	}
 
+	//pos must be an inner portal position adjacent to a frame position
 	public static boolean trySpawn(World world, BlockPos pos, NetherPortalType forcePortalType) {
 		Frame frame = null;
 		BlockPos framePos = null;

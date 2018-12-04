@@ -75,6 +75,27 @@ public class BlockNetherPortal extends BlockPortal {
 			0.375, 0.0, 0.0, 0.625, 1.0, 1.0
 	);
 
+	private static final EnumFacing[] xRelevantFacings = {
+			EnumFacing.UP,
+			EnumFacing.EAST,
+			EnumFacing.DOWN,
+			EnumFacing.WEST
+	};
+
+	private static final EnumFacing[] yRelevantFacings = {
+			EnumFacing.NORTH,
+			EnumFacing.EAST,
+			EnumFacing.SOUTH,
+			EnumFacing.WEST
+	};
+
+	private static final EnumFacing[] zRelevantFacings = {
+			EnumFacing.UP,
+			EnumFacing.NORTH,
+			EnumFacing.DOWN,
+			EnumFacing.SOUTH
+	};
+
 	private static final List<BlockPos> removing = new ArrayList<>();
 
 	public BlockNetherPortal() {
@@ -123,37 +144,8 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final EnumFacing irrelevantFacing;
-		final EnumFacing[] relevantFacings;
-
-		switch(axis) {
-		case X:
-			irrelevantFacing = EnumFacing.NORTH;
-			relevantFacings = new EnumFacing[] {
-					EnumFacing.UP,
-					EnumFacing.EAST,
-					EnumFacing.DOWN,
-					EnumFacing.WEST
-			};
-			break;
-		case Y:
-			irrelevantFacing = EnumFacing.UP;
-			relevantFacings = new EnumFacing[] {
-					EnumFacing.NORTH,
-					EnumFacing.EAST,
-					EnumFacing.SOUTH,
-					EnumFacing.WEST
-			};
-			break;
-		default:
-			irrelevantFacing = EnumFacing.EAST;
-			relevantFacings = new EnumFacing[] {
-					EnumFacing.UP,
-					EnumFacing.NORTH,
-					EnumFacing.DOWN,
-					EnumFacing.SOUTH
-			};
-		}
+		final EnumFacing irrelevantFacing = getIrrelevantFacing(axis);
+		final EnumFacing[] relevantFacings = getRelevantFacings(axis);
 
 		if(pos.offset(irrelevantFacing).equals(fromPos) ||
 				pos.offset(irrelevantFacing.getOpposite()).equals(fromPos)) {
@@ -355,6 +347,21 @@ public class BlockNetherPortal extends BlockPortal {
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
 		if(actuallyRemoved) {
+			//If there are neighboring portal blocks, neighborChanged uses the saved data
+			//to find neighboring portal blocks faster
+
+			final EnumFacing.Axis axis = getAxis(state);
+
+			for(EnumFacing facing : getRelevantFacings(axis)) {
+				final IBlockState neighbor = world.getBlockState(pos.offset(facing));
+				final Block neighborBlock = neighbor.getBlock();
+
+				if(neighborBlock == this && !neighbor.getValue(USER_PLACED) &&
+						((BlockNetherPortal) neighborBlock).getAxis(state) == axis) {
+					return actuallyRemoved;
+				}
+			}
+
 			NetherPortalSavedData.get(world).removePortal(pos);
 		}
 
@@ -384,6 +391,13 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	public static Frame findFrame(FrameDetector detector, World world, BlockPos portalPos) {
+		final NetherPortalSavedData.Portal portal =
+				NetherPortalSavedData.get(world).getPortal(portalPos);
+
+		if(portal != null) {
+			return portal.getFrame();
+		}
+
 		final IBlockState state = world.getBlockState(portalPos);
 
 		final EnumFacing.Axis axis = ((BlockNetherPortal) state.getBlock()).getAxis(state);
@@ -393,7 +407,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final FrameType type = FrameType.fromAxis(axis);
 		final int maxWidth = NetherPortalFrames.SIZE.apply(type).maxWidth;
 
-		final BlockStateMatcher portal = Matcher.ofType(type);
+		final BlockStateMatcher portalMatcher = Matcher.ofType(type);
 
 		BlockPos framePos = null;
 		BlockPos checkPos = portalPos;
@@ -412,7 +426,7 @@ public class BlockNetherPortal extends BlockPortal {
 				break;
 			}
 
-			if(!portal.apply(checkState)) {
+			if(!portalMatcher.apply(checkState)) {
 				break;
 			}
 		}
@@ -425,5 +439,29 @@ public class BlockNetherPortal extends BlockPortal {
 				world, framePos, type,
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
 		);
+	}
+
+	private static EnumFacing getIrrelevantFacing(EnumFacing.Axis axis) {
+		if(axis == EnumFacing.Axis.X) {
+			return EnumFacing.NORTH;
+		}
+
+		if(axis == EnumFacing.Axis.Y) {
+			return EnumFacing.UP;
+		}
+
+		return EnumFacing.EAST;
+	}
+
+	private static EnumFacing[] getRelevantFacings(EnumFacing.Axis axis) {
+		if(axis == EnumFacing.Axis.X) {
+			return xRelevantFacings;
+		}
+
+		if(axis == EnumFacing.Axis.Y) {
+			return yRelevantFacings;
+		}
+
+		return zRelevantFacings;
 	}
 }

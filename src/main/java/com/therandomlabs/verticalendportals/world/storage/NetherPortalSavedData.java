@@ -1,6 +1,8 @@
 package com.therandomlabs.verticalendportals.world.storage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
@@ -153,6 +155,15 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 			if(portal.frame.isInnerBlock(pos)) {
 				portals.remove(entry.getKey());
+
+				final List<BlockPos> toRemove = new ArrayList<>();
+
+				for(Map.Entry<BlockPos, Portal> cache : portalCache.entrySet()) {
+					toRemove.add(cache.getKey());
+				}
+
+				portalCache.keySet().removeAll(toRemove);
+
 				markDirty();
 				return portal;
 			}

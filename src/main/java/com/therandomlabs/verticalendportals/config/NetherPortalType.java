@@ -16,6 +16,8 @@ public final class NetherPortalType {
 	public int minHeight = 3;
 	public int maxHeight = 9000;
 
+	private transient List<FrameBlock> actualFrameBlocks;
+
 	public NetherPortalType() {}
 
 	public NetherPortalType(List<FrameBlock> frameBlocks, int dimensionID) {
