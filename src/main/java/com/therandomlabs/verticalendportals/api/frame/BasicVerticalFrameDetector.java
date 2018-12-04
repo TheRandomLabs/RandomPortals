@@ -2,29 +2,30 @@ package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
-import net.minecraft.block.state.BlockWorldState;
-import net.minecraft.init.Blocks;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
 public class BasicVerticalFrameDetector extends FrameDetector {
 	private final FrameType defaultType;
 	private final Function<FrameType, FrameSize> defaultSize;
-	private final Predicate<BlockWorldState> predicate;
+	private final StatePredicate blockMatcher;
+	private final StatePredicate requiredCorner;
 	private final EnumFacing facing;
-	private final RequiredCorner requiredCorner;
 	private final Predicate<Frame> framePredicate;
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			Predicate<BlockWorldState> predicate, RequiredCorner requiredCorner,
+			StatePredicate blockMatcher, StatePredicate requiredCorner,
 			Predicate<Frame> framePredicate) {
-		this(defaultSize, predicate, null, requiredCorner, framePredicate);
+		this(defaultSize, blockMatcher, requiredCorner, null, framePredicate);
 	}
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			Predicate<BlockWorldState> predicate, EnumFacing facing, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate) {
+			StatePredicate blockMatcher, StatePredicate requiredCorner,
+			EnumFacing facing, Predicate<Frame> framePredicate) {
 		if(facing == null) {
 			defaultType = FrameType.VERTICAL;
 		} else {
@@ -33,9 +34,9 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 		}
 
 		this.defaultSize = defaultSize;
-		this.predicate = predicate;
-		this.facing = facing;
+		this.blockMatcher = blockMatcher;
 		this.requiredCorner = requiredCorner;
+		this.facing = facing;
 		this.framePredicate = framePredicate;
 	}
 
@@ -51,23 +52,17 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 
 	@SuppressWarnings("Duplicates")
 	@Override
-	protected boolean test(World world, FrameType type, BlockWorldState state, FrameSide side,
-			int position) {
-		if(position == CORNER) {
-			if(requiredCorner == RequiredCorner.ANY) {
-				return true;
-			}
-
-			if(requiredCorner == RequiredCorner.ANY_NON_AIR) {
-				return state.getBlockState().getBlock() != Blocks.AIR;
-			}
+	protected boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
+			FrameSide side, int position) {
+		if(position == CORNER && requiredCorner != RequiredCorner.SAME) {
+			return requiredCorner.test(world, pos, state);
 		}
 
 		if(facing == null) {
-			return predicate.test(state);
+			return blockMatcher.test(world, pos, state);
 		}
 
-		return predicate.test(state) && state.getBlockState().getValue(FACING) == facing;
+		return blockMatcher.test(world, pos, state) && state.getValue(FACING) == facing;
 	}
 
 	@Override

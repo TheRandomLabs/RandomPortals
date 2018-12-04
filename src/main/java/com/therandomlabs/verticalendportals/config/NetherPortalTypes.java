@@ -3,23 +3,24 @@ package com.therandomlabs.verticalendportals.config;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.Block;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.DimensionType;
 
 public final class NetherPortalTypes {
 	private static ImmutableMap<String, NetherPortalType> types;
-	private static ImmutableList<Block> validBlocks;
+	private static StatePredicate validBlocks;
 
 	private NetherPortalTypes() {}
 
@@ -46,7 +47,7 @@ public final class NetherPortalTypes {
 		return types;
 	}
 
-	public static ImmutableList<Block> getValidBlocks() {
+	public static StatePredicate getValidBlocks() {
 		return validBlocks;
 	}
 
@@ -82,7 +83,8 @@ public final class NetherPortalTypes {
 			types.put(fileName.substring(0, fileName.length() - 5), type);
 		}
 
-		if(types.isEmpty()) {
+		if(types.isEmpty() || (VEPConfig.netherPortals.forceCreateVanillaType &&
+				!types.containsKey("vanilla_nether_portal"))) {
 			final NetherPortalType vanillaNetherPortal = new NetherPortalType(
 					Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
 					DimensionType.NETHER.getId()
@@ -97,14 +99,24 @@ public final class NetherPortalTypes {
 
 		NetherPortalTypes.types = ImmutableMap.copyOf(types);
 
-		final Set<Block> blocks = new HashSet<>();
+		final List<Predicate<IBlockState>> matchers = new ArrayList<>();
 
 		for(NetherPortalType type : types.values()) {
 			for(FrameBlock frameBlock : type.frameBlocks) {
-				blocks.add(frameBlock.getBlock());
+				matchers.add(frameBlock::test);
 			}
 		}
 
-		validBlocks = ImmutableList.copyOf(blocks);
+		validBlocks = (world, pos, state) -> {
+			for(Predicate<IBlockState> matcher : matchers) {
+				if(matcher.test(state)) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		VerticalEndPortals.LOGGER.error(types);
 	}
 }

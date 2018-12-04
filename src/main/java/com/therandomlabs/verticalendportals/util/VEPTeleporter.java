@@ -4,12 +4,12 @@ import com.therandomlabs.randompatches.util.RPTeleporter;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
+import com.therandomlabs.verticalendportals.config.FrameBlock;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -156,7 +156,7 @@ public class VEPTeleporter extends Teleporter {
 		BlockPos framePos = pos.down();
 		final IBlockState frameState = world.getBlockState(framePos);
 
-		if(NetherPortalTypes.getValidBlocks().contains(frameState.getBlock())) {
+		if(NetherPortalTypes.getValidBlocks().test(world, framePos, frameState)) {
 			final BlockPos pos2 = pos;
 			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
 					world, framePos,
@@ -217,7 +217,7 @@ public class VEPTeleporter extends Teleporter {
 	}
 
 	//My attempt to decipher the black magic that is Teleporter.makePortal
-	@SuppressWarnings("Duplicates")
+	@SuppressWarnings({"Duplicates", "deprecation"})
 	@Override
 	public boolean makePortal(Entity entity) {
 		double distance = -1.0;
@@ -400,7 +400,9 @@ public class VEPTeleporter extends Teleporter {
 
 						if(yOffset == -1) {
 							final int index = random.nextInt(portalType.frameBlocks.size());
-							state = portalType.frameBlocks.get(index).getBlock().getDefaultState();
+							final FrameBlock frameBlock =
+									portalType.frameBlocks.get(index).getActualBlock();
+							state = frameBlock.getBlock().getStateFromMeta(frameBlock.meta);
 						} else {
 							state = air;
 						}
@@ -422,13 +424,14 @@ public class VEPTeleporter extends Teleporter {
 
 				if(frame) {
 					final int index = random.nextInt(portalType.frameBlocks.size());
-					final Block block = portalType.frameBlocks.get(index).getBlock();
+					final FrameBlock frameBlock =
+							portalType.frameBlocks.get(index).getActualBlock();
 
 					world.setBlockState(new BlockPos(
 							portalX + horzOffset * xMultiplier,
 							portalY + yOffset,
 							portalZ + horzOffset * zMultiplier
-					), block.getDefaultState(), 2);
+					), frameBlock.getBlock().getStateFromMeta(frameBlock.meta), 2);
 				}
 			}
 		}

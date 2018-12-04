@@ -1,47 +1,44 @@
 package com.therandomlabs.verticalendportals.api.frame;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockWorldState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class BasicFrameDetector extends FrameDetector {
 	private final Function<FrameType, FrameSize> defaultSize;
-	private final Supplier<Collection<Block>> blocks;
-	private final RequiredCorner requiredCorner;
+	private final StatePredicate blockMatcher;
+	private final StatePredicate requiredCorner;
 	private final Predicate<Frame> framePredicate;
-	private final BiPredicate<World, BlockWorldState> innerPredicate;
+	private final StatePredicate innerPredicate;
 
-	public BasicFrameDetector(Block block, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, BiPredicate<World, BlockWorldState> innerPredicate) {
-		this(() -> Collections.singleton(block), requiredCorner, framePredicate, innerPredicate);
+	public BasicFrameDetector(Block block, StatePredicate requiredCorner,
+			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
+		this(StatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(Supplier<Collection<Block>> blocks, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, BiPredicate<World, BlockWorldState> innerPredicate) {
-		this(null, blocks, requiredCorner, framePredicate, innerPredicate);
+	public BasicFrameDetector(StatePredicate blockMatcher, StatePredicate requiredCorner,
+			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
+		this(null, blockMatcher, requiredCorner, framePredicate, innerPredicate);
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize, Block block,
-			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
-			BiPredicate<World, BlockWorldState> innerPredicate) {
+			StatePredicate requiredCorner, Predicate<Frame> framePredicate,
+			StatePredicate innerPredicate) {
 		this(
-				defaultSize, () -> Collections.singleton(block), requiredCorner, framePredicate,
+				defaultSize, StatePredicate.of(block), requiredCorner, framePredicate,
 				innerPredicate
 		);
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			Supplier<Collection<Block>> blocks, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, BiPredicate<World, BlockWorldState> innerPredicate) {
+			StatePredicate blockMatcher, StatePredicate requiredCorner,
+			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
 		this.defaultSize = defaultSize;
-		this.blocks = blocks;
+		this.blockMatcher = blockMatcher;
 		this.requiredCorner = requiredCorner;
 		this.framePredicate = framePredicate;
 		this.innerPredicate = innerPredicate;
@@ -59,21 +56,13 @@ public class BasicFrameDetector extends FrameDetector {
 
 	@SuppressWarnings("Duplicates")
 	@Override
-	protected boolean test(World world, FrameType type, BlockWorldState state, FrameSide side,
-			int position) {
-		final Block block = state.getBlockState().getBlock();
-
-		if(position == CORNER) {
-			if(requiredCorner == RequiredCorner.ANY) {
-				return true;
-			}
-
-			if(requiredCorner == RequiredCorner.ANY_NON_AIR) {
-				return state.getBlockState().getBlock() != Blocks.AIR;
-			}
+	protected boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
+			FrameSide side, int position) {
+		if(position == CORNER && requiredCorner != RequiredCorner.SAME) {
+			return requiredCorner.test(world, pos, state);
 		}
 
-		return this.blocks.get().contains(block);
+		return blockMatcher.test(world, pos, state);
 	}
 
 	@Override
@@ -82,11 +71,7 @@ public class BasicFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected boolean testInner(World world, BlockWorldState state) {
-		return innerPredicate.test(world, state);
-	}
-
-	public Collection<Block> getBlocks() {
-		return blocks.get();
+	protected boolean testInner(World world, BlockPos pos, IBlockState state) {
+		return innerPredicate.test(world, pos, state);
 	}
 }

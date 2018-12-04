@@ -69,6 +69,12 @@ public class VEPConfig {
 		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
 		public boolean enabled = true;
 
+		@Config.RequiresMcRestart
+		@Config.LangKey("verticalendportals.config.netherPortals.forceCreateVanillaType")
+		@Config.Comment("Whether to always create the \"vanilla_nether_portal\" Nether portal " +
+				"type when it doesn't exist.")
+		public boolean forceCreateVanillaType = true;
+
 		@Config.LangKey("verticalendportals.config.netherPortals.useAllVariantsJson")
 		@Config.Comment(
 				"Whether to read from the all_variants JSON rather than the different JSONs " +

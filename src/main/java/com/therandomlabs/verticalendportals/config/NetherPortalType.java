@@ -1,22 +1,22 @@
 package com.therandomlabs.verticalendportals.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 
 public final class NetherPortalType {
 	public List<FrameBlock> frameBlocks;
+	public boolean whitelist; //Whether dimensions is a whitelist or a blacklist
+	public List<Integer> dimensions = new ArrayList<>();
 	public int dimensionID;
 	public boolean forcePortal; //In the End
 	public int minWidth = 3;
 	public int maxWidth = 9000;
 	public int minHeight = 3;
 	public int maxHeight = 9000;
-
-	private transient List<FrameBlock> actualFrameBlocks;
 
 	public NetherPortalType() {}
 
@@ -72,6 +72,18 @@ public final class NetherPortalType {
 	}
 
 	public boolean test(Frame frame) {
+		final int dimension = frame.getWorld().provider.getDimension();
+
+		if(whitelist) {
+			if(!dimensions.contains(dimension)) {
+				return false;
+			}
+		} else {
+			if(dimensions.contains(dimension)) {
+				return false;
+			}
+		}
+
 		final int width = frame.getWidth();
 		final int height = frame.getHeight();
 
@@ -79,14 +91,14 @@ public final class NetherPortalType {
 			return false;
 		}
 
-		final Map<Block, Integer> detectedBlocks = new HashMap<>();
+		final Map<FrameBlock, Integer> detectedBlocks = new HashMap<>();
 
 		for(IBlockState state : frame.getFrameBlocks()) {
-			final Block block = state.getBlock();
 			boolean found = false;
 
-			for(FrameBlock frameBlock : frameBlocks) {
-				if(block == frameBlock.getBlock()) {
+			for(FrameBlock block : frameBlocks) {
+				if(block.test(state)) {
+					detectedBlocks.merge(block, 1, (a, b) -> a + b);
 					found = true;
 					break;
 				}
@@ -95,18 +107,16 @@ public final class NetherPortalType {
 			if(!found) {
 				return false;
 			}
-
-			detectedBlocks.merge(block, 1, (a, b) -> a + b);
 		}
 
-		for(FrameBlock frameBlock : frameBlocks) {
-			if(frameBlock.minimumAmount == 0) {
+		for(FrameBlock block : frameBlocks) {
+			if(block.minimumAmount == 0) {
 				continue;
 			}
 
-			final Integer detectedAmount = detectedBlocks.get(frameBlock.getBlock());
+			final Integer detectedAmount = detectedBlocks.get(block);
 
-			if(detectedAmount == null || detectedAmount < frameBlock.minimumAmount) {
+			if(detectedAmount == null || detectedAmount < block.minimumAmount) {
 				return false;
 			}
 		}

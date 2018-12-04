@@ -396,7 +396,7 @@ public class BlockNetherPortal extends BlockPortal {
 			final Block checkBlock = checkState.getBlock();
 
 			//If the frame block is a portal, the portal must be user-placed
-			if(NetherPortalTypes.getValidBlocks().contains(checkBlock) &&
+			if(NetherPortalTypes.getValidBlocks().test(world, checkPos, state) &&
 					(!(checkBlock instanceof BlockNetherPortal) ||
 							checkState.getValue(USER_PLACED))) {
 				framePos = checkPos;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import net.minecraft.block.state.BlockWorldState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -18,7 +18,7 @@ public abstract class FrameDetector {
 
 	private static final FrameSide[] SIDES = FrameSide.values();
 
-	private final Map<BlockPos, BlockWorldState> posCache = new HashMap<>();
+	private final Map<BlockPos, IBlockState> posCache = new HashMap<>();
 
 	public final Frame detect(World world, BlockPos pos) {
 		return detect(world, pos, getDefaultType());
@@ -54,11 +54,11 @@ public abstract class FrameDetector {
 
 	public final Frame detectWithCondition(World world, BlockPos pos, FrameType type,
 			Function<FrameType, FrameSize> size, Predicate<Frame> frameCondition) {
-		final BlockWorldState state = getState(world, pos);
+		final IBlockState state = getState(world, pos);
 
 		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.LATERAL, world, state, pos, size.apply(FrameType.LATERAL),
+					FrameType.LATERAL, world, pos, state, size.apply(FrameType.LATERAL),
 					frameCondition
 			);
 
@@ -70,7 +70,7 @@ public abstract class FrameDetector {
 		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_X ||
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.VERTICAL_X, world, state, pos, size.apply(FrameType.VERTICAL_X),
+					FrameType.VERTICAL_X, world, pos, state, size.apply(FrameType.VERTICAL_X),
 					frameCondition
 			);
 
@@ -82,7 +82,7 @@ public abstract class FrameDetector {
 		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_Z ||
 				type == FrameType.LATERAL_OR_VERTICAL) {
 			final Frame frame = detect(
-					FrameType.VERTICAL_Z, world, state, pos, size.apply(FrameType.VERTICAL_Z),
+					FrameType.VERTICAL_Z, world, pos, state, size.apply(FrameType.VERTICAL_Z),
 					frameCondition
 			);
 
@@ -104,22 +104,22 @@ public abstract class FrameDetector {
 
 	//If the position is unknown, 0 is used
 	//Corners always have position 1 since they're always first on their side
-	protected abstract boolean test(World world, FrameType type, BlockWorldState state,
+	protected abstract boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
 			FrameSide side, int position);
 
 	protected abstract boolean test(Frame frame);
 
-	protected boolean testInner(World world, BlockWorldState state) {
+	protected boolean testInner(World world, BlockPos pos, IBlockState state) {
 		return true;
 	}
 
 	@SuppressWarnings("Duplicates")
-	private Frame detect(FrameType type, World world, BlockWorldState state, BlockPos pos,
+	private Frame detect(FrameType type, World world, BlockPos pos, IBlockState state,
 			FrameSize size, Predicate<Frame> frameCondition) {
 		for(int index = 0; index < 4; index++) {
 			final FrameSide side = SIDES[index];
 
-			if(!test(world, type, state, side, 0)) {
+			if(!test(world, type, pos, state, side, 0)) {
 				continue;
 			}
 
@@ -140,7 +140,7 @@ public abstract class FrameDetector {
 
 			final List<BlockPos> possibleCorners = new ArrayList<>();
 			BlockPos checkPos = pos;
-			BlockWorldState checkState;
+			IBlockState checkState;
 
 			int length = 1;
 
@@ -149,16 +149,16 @@ public abstract class FrameDetector {
 
 				checkPos = checkPos.offset(opposite);
 				checkState = getState(world, checkPos);
-				final BlockWorldState checkState2 =
+				final IBlockState checkState2 =
 						getState(world, checkPos.offset(previousFacing));
 
 				//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 				//we look for the top-left corner (which has position 1)
 				//The length of the previous side is unknown, so we pass in 0 for position
-				if(test(world, type, checkState, side, 1) &&
-						test(world, type, checkState2, previousSide, UNKNOWN)) {
+				if(test(world, type, pos, checkState, side, 1) &&
+						test(world, type, pos, checkState2, previousSide, UNKNOWN)) {
 					possibleCorners.add(checkPos);
-				} else if(!testInner(world, checkState2)) {
+				} else if(!testInner(world, pos, checkState2)) {
 					//Then checkState2 is an inner block
 					break;
 				}
@@ -166,7 +166,7 @@ public abstract class FrameDetector {
 				if(length == maxLength) {
 					break;
 				}
-			} while(test(world, type, checkState, side, UNKNOWN));
+			} while(test(world, type, pos, checkState, side, UNKNOWN));
 
 			if(possibleCorners.isEmpty()) {
 				continue;
@@ -230,7 +230,7 @@ public abstract class FrameDetector {
 		//Possible corner, current side length if corner is valid
 		final List<Map.Entry<BlockPos, Integer>> possibleCorners = new ArrayList<>();
 		BlockPos checkPos = pos;
-		BlockWorldState checkState;
+		IBlockState checkState;
 
 		int length = 1;
 
@@ -247,16 +247,16 @@ public abstract class FrameDetector {
 			checkPos = checkPos.offset(facing);
 			checkState = getState(world, checkPos);
 
-			final BlockWorldState checkState2 = getState(world, checkPos.offset(nextFacing));
+			final IBlockState checkState2 = getState(world, checkPos.offset(nextFacing));
 
 			//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 			//we look for the top-right corner (which has position 1 on the right side)
 			//We're testing for the second block on the next side (i.e. position 2)
 			if(length >= minLength &&
-					test(world, type, checkState, nextSide, CORNER) &&
-					test(world, type, checkState2, nextSide, 2)) {
+					test(world, type, pos, checkState, nextSide, CORNER) &&
+					test(world, type, pos, checkState2, nextSide, 2)) {
 				possibleCorners.add(new AbstractMap.SimpleEntry<>(checkPos, length));
-			} else if(!testInner(world, checkState2)) {
+			} else if(!testInner(world, pos, checkState2)) {
 				//Then checkState2 is an inner block
 				break;
 			}
@@ -264,7 +264,7 @@ public abstract class FrameDetector {
 			if(length == maxLength) {
 				break;
 			}
-		} while(test(world, type, checkState, side, length));
+		} while(test(world, type, pos, checkState, side, length));
 
 		if(possibleCorners.isEmpty()) {
 			return null;
@@ -297,7 +297,7 @@ public abstract class FrameDetector {
 		return null;
 	}
 
-	private BlockWorldState getState(World world, BlockPos pos) {
-		return posCache.computeIfAbsent(pos, key -> new BlockWorldState(world, key, true));
+	private IBlockState getState(World world, BlockPos pos) {
+		return posCache.computeIfAbsent(pos, world::getBlockState);
 	}
 }

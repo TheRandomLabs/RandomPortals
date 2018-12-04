@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals.api.frame;
 
-import net.minecraft.block.state.BlockWorldState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class SidedFrameDetector extends FrameDetector {
@@ -16,54 +17,58 @@ public abstract class SidedFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected final boolean test(World world, FrameType type, BlockWorldState state, FrameSide side,
-			int position) {
+	protected final boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
+			FrameSide side, int position) {
 		if(position == CORNER) {
 			switch(side) {
 			case TOP:
-				return testTopLeftCorner(type, state);
+				return testTopLeftCorner(type, pos, state);
 			case RIGHT:
-				return testTopRightCorner(type, state);
+				return testTopRightCorner(type, pos, state);
 			case BOTTOM:
-				return testBottomRightCorner(type, state);
+				return testBottomRightCorner(type, pos, state);
 			default:
-				return testBottomLeftCorner(type, state);
+				return testBottomLeftCorner(type, pos, state);
 			}
 		}
 
 		switch(side) {
 		case TOP:
-			return testTop(type, state, position);
+			return testTop(type, pos, state, position);
 		case RIGHT:
-			return testRight(type, state, position);
+			return testRight(type, pos, state, position);
 		case BOTTOM:
-			return testBottom(type, state, position);
+			return testBottom(type, pos, state, position);
 		default:
-			return testLeft(type, state, position);
+			return testLeft(type, pos, state, position);
 		}
 	}
 
-	protected boolean testTopRightCorner(FrameType type, BlockWorldState state) {
+	protected boolean testTopRightCorner(FrameType type, BlockPos pos, IBlockState state) {
 		return true;
 	}
 
-	protected boolean testTopLeftCorner(FrameType type, BlockWorldState state) {
+	protected boolean testTopLeftCorner(FrameType type, BlockPos pos, IBlockState state) {
 		return true;
 	}
 
-	protected boolean testBottomRightCorner(FrameType type, BlockWorldState state) {
+	protected boolean testBottomRightCorner(FrameType type, BlockPos pos, IBlockState state) {
 		return true;
 	}
 
-	protected boolean testBottomLeftCorner(FrameType type, BlockWorldState state) {
+	protected boolean testBottomLeftCorner(FrameType type, BlockPos pos, IBlockState state) {
 		return true;
 	}
 
-	protected abstract boolean testTop(FrameType type, BlockWorldState state, int position);
+	protected abstract boolean testTop(FrameType type, BlockPos pos, IBlockState state,
+			int position);
 
-	protected abstract boolean testRight(FrameType type, BlockWorldState state, int position);
+	protected abstract boolean testRight(FrameType type, BlockPos pos, IBlockState state,
+			int position);
 
-	protected abstract boolean testBottom(FrameType type, BlockWorldState state, int position);
+	protected abstract boolean testBottom(FrameType type, BlockPos pos, IBlockState state,
+			int position);
 
-	protected abstract boolean testLeft(FrameType type, BlockWorldState state, int position);
+	protected abstract boolean testLeft(FrameType type, BlockPos pos, IBlockState state,
+			int position);
 }

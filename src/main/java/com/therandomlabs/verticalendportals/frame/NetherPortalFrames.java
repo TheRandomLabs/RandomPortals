@@ -16,7 +16,6 @@ import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.config.VEPConfig;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.util.EnumFacing;
@@ -31,15 +30,15 @@ public final class NetherPortalFrames {
 
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
 			SIZE,
-			NetherPortalTypes::getValidBlocks,
+			NetherPortalTypes.getValidBlocks(),
 			RequiredCorner.ANY_NON_AIR,
 			frame -> true,
-			(world, state) -> true
+			(world, pos, state) -> true
 	);
 
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
 			SIZE,
-			NetherPortalTypes::getValidBlocks,
+			NetherPortalTypes.getValidBlocks(),
 			RequiredCorner.ANY_NON_AIR,
 			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
 			NetherPortalFrames::isEmpty
@@ -47,23 +46,22 @@ public final class NetherPortalFrames {
 
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
 			SIZE,
-			NetherPortalTypes::getValidBlocks,
+			NetherPortalTypes.getValidBlocks(),
 			RequiredCorner.ANY_NON_AIR,
 			NetherPortalFrames::isActivated,
-			(world, state) -> state.getBlockState().getBlock() instanceof BlockNetherPortal
+			(world, pos, state) -> state.getBlock() instanceof BlockNetherPortal
 	);
 
 	private NetherPortalFrames() {}
 
-	public static boolean isEmpty(World world, BlockWorldState state) {
-		final IBlockState blockState = state.getBlockState();
-		final Material material = blockState.getMaterial();
+	public static boolean isEmpty(World world, BlockPos pos, IBlockState state) {
+		final Material material = state.getMaterial();
 
 		if(material == Material.AIR || material == Material.FIRE || material == Material.PORTAL) {
 			return true;
 		}
 
-		return blockState.getBlock().isReplaceable(world, state.getPos());
+		return state.getBlock().isReplaceable(world, pos);
 	}
 
 	public static boolean isActivated(Frame frame) {
@@ -96,7 +94,7 @@ public final class NetherPortalFrames {
 			final BlockPos offset = pos.offset(facing);
 			final IBlockState state = world.getBlockState(offset);
 
-			if(NetherPortalTypes.getValidBlocks().contains(state.getBlock())) {
+			if(NetherPortalTypes.getValidBlocks().test(world, pos, state)) {
 				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
 						world, offset,
 						potentialFrame -> testFrame(

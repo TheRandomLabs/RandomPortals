@@ -12,11 +12,11 @@ import com.therandomlabs.verticalendportals.api.frame.FrameSize;
 import com.therandomlabs.verticalendportals.api.frame.FrameSizeFunction;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.config.FrameSizes;
 import com.therandomlabs.verticalendportals.config.VEPConfig;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.init.Blocks;
@@ -69,45 +69,46 @@ public final class EndPortalFrames {
 
 		vertical.put(EnumFacing.NORTH, new BasicVerticalFrameDetector(
 				NORMAL_SIZE,
-				BlockWorldState.hasState(
+				StatePredicate.of(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
-				EnumFacing.NORTH,
 				RequiredCorner.ANY,
+				EnumFacing.NORTH,
 				frame -> true
 		));
 
 		vertical.put(EnumFacing.EAST, new BasicVerticalFrameDetector(
 				NORMAL_SIZE,
-				BlockWorldState.hasState(
+				StatePredicate.of(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
-				EnumFacing.EAST,
 				RequiredCorner.ANY,
+				EnumFacing.EAST,
 				frame -> true
 		));
 
 		vertical.put(EnumFacing.SOUTH, new BasicVerticalFrameDetector(
 				NORMAL_SIZE,
-				BlockWorldState.hasState(
+				StatePredicate.of(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
-				EnumFacing.SOUTH,
 				RequiredCorner.ANY,
+				EnumFacing.SOUTH,
+
 				frame -> true
 		));
 
 		vertical.put(EnumFacing.WEST, new BasicVerticalFrameDetector(
 				NORMAL_SIZE,
-				BlockWorldState.hasState(
+				StatePredicate.of(
 						BlockStateMatcher.forBlock(VEPBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
-				EnumFacing.WEST,
 				RequiredCorner.ANY,
+				EnumFacing.WEST,
 				frame -> true
 		));
 

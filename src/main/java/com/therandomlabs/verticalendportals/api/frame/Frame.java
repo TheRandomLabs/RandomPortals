@@ -6,13 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -400,15 +399,13 @@ public class Frame {
 		return true;
 	}
 
-	public boolean testInnerBlocks(BiPredicate<World, BlockWorldState> predicate) {
+	public boolean testInnerBlocks(StatePredicate predicate) {
 		if(world == null) {
 			return false;
 		}
 
 		for(BlockPos innerPos : getInnerBlockPositions()) {
-			final BlockWorldState state = new BlockWorldState(world, innerPos, true);
-
-			if(!predicate.test(world, state)) {
+			if(!predicate.test(world, innerPos, world.getBlockState(innerPos))) {
 				return false;
 			}
 		}
