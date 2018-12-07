@@ -1,0 +1,38 @@
+{
+	"frameBlocks": [
+		{
+			"registryName": "minecraft:sponge",
+			//32767 is the wildcard value
+			"meta": 32767,
+			"minimumAmount": 1
+		},
+		{
+			"registryName": "minecraft:diamond_block",
+			"meta": 32767,
+			"minimumAmount": 2
+		},
+		{
+			"registryName": "ore:stairWood",
+			"meta": 32767,
+			"minimumAmount": 1
+		},
+		{
+			"registryName": "minecraft:sponge",
+			"meta": 32767,
+			"minimumAmount": 0
+		}
+	],
+	//If true, "dimensions" is a whitelist rather than a blacklist
+	"whitelist": false,
+	//Whitelist or blacklist of dimensions this portal type can be activated in
+	"dimensions": [],
+	//The destination dimension ID
+	"dimensionID": 1,
+	//If the destination dimension is the End (ID 1), whether to force spawn a portal rather than an obsidian platform
+	"forcePortal": true,
+	//The values in verticalendportals/nether_portal are checked first, and these are checked second
+	"minWidth": 4,
+	"maxWidth": 4,
+	"minHeight": 5,
+	"maxHeight": 5
+}
