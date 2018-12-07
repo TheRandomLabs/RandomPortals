@@ -12,6 +12,7 @@
 			"minimumAmount": 2
 		},
 		{
+			//To specify ore dictionary names, use the format ore:<name>
 			"registryName": "ore:stairWood",
 			"meta": 32767,
 			"minimumAmount": 1
