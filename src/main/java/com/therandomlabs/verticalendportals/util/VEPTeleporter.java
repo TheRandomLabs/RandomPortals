@@ -163,7 +163,8 @@ public class VEPTeleporter extends Teleporter {
 					potentialFrame -> potentialFrame.getInnerBlockPositions().contains(pos2)
 			);
 		} else {
-			frame = BlockNetherPortal.findFrame(NetherPortalFrames.ACTIVATED_FRAMES, world, pos);
+			frame = BlockNetherPortal.findFrame(NetherPortalFrames.ACTIVATED_FRAMES, world, pos).
+					getValue().getFrame();
 		}
 
 		final EnumFacing entityFacing = entity.getHorizontalFacing();

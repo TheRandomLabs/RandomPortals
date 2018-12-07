@@ -27,6 +27,10 @@ public final class FrameBlock {
 
 	public FrameBlock() {}
 
+	public FrameBlock(Block block) {
+		this(block, 0);
+	}
+
 	public FrameBlock(Block block, int minimumAmount) {
 		this(block, OreDictionary.WILDCARD_VALUE, minimumAmount);
 	}
@@ -35,15 +39,21 @@ public final class FrameBlock {
 		registryName = block.getRegistryName().toString();
 		this.meta = meta;
 		this.minimumAmount = minimumAmount;
+		blockRetrieved = true;
+		this.block = block;
+		this.blocks = new FrameBlock[] {
+				this
+		};
 	}
 
 	@Override
 	public String toString() {
-		return "FrameBlock[registryName=" + registryName + ",minimumAmount=" + minimumAmount + "]";
+		return "FrameBlock[registryName=" + registryName + ",meta=" + meta +
+				",minimumAmount=" + minimumAmount + "]";
 	}
 
 	public Block getBlock() {
-		if(!blockRetrieved) {
+		if(!blockRetrieved && !registryName.startsWith("ore:")) {
 			block = BLOCK_REGISTRY.getValue(new ResourceLocation(registryName));
 
 			if(block == Blocks.AIR) {
@@ -58,6 +68,30 @@ public final class FrameBlock {
 
 	public FrameBlock getActualBlock() {
 		return getBlocks().length == 0 ? null : blocks[0];
+	}
+
+	public boolean isValid() {
+		return getBlocks() != null;
+	}
+
+	public void ensureCorrect() {
+		if(minimumAmount < 0) {
+			minimumAmount = 0;
+		}
+	}
+
+	public boolean test(IBlockState state) {
+		final Block block = state.getBlock();
+		final int meta = block.getMetaFromState(state);
+
+		for(FrameBlock frameBlock : getBlocks()) {
+			if(frameBlock.getBlock() == block && (frameBlock.meta == OreDictionary.WILDCARD_VALUE ||
+					frameBlock.meta == meta)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private FrameBlock[] getBlocks() {
@@ -96,29 +130,5 @@ public final class FrameBlock {
 
 		this.blocks = blocks.toArray(new FrameBlock[0]);
 		return this.blocks;
-	}
-
-	public boolean isValid() {
-		return getBlocks() != null;
-	}
-
-	public void ensureCorrect() {
-		if(minimumAmount < 0) {
-			minimumAmount = 0;
-		}
-	}
-
-	public boolean test(IBlockState state) {
-		final Block block = state.getBlock();
-		final int meta = block.getMetaFromState(state);
-
-		for(FrameBlock frameBlock : blocks) {
-			if(frameBlock.getBlock() == block && (frameBlock.meta == OreDictionary.WILDCARD_VALUE ||
-					frameBlock.meta == meta)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

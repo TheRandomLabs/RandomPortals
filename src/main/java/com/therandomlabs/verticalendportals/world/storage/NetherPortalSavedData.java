@@ -20,21 +20,21 @@ import net.minecraftforge.common.util.Constants;
 
 public class NetherPortalSavedData extends WorldSavedData {
 	public static final class Portal {
-		private final String type;
+		private final NetherPortalType type;
 		private final Frame frame;
 
-		public Portal(String type, Frame frame) {
+		public Portal(NetherPortalType type, Frame frame) {
 			this.type = type;
 			this.frame = frame;
 		}
 
 		@Override
 		public String toString() {
-			return "Portal[type=" + type + ",frame=" + frame + "]";
+			return "Portal[type=" + type.getName() + ",frame=" + frame + "]";
 		}
 
 		public NetherPortalType getType() {
-			return NetherPortalTypes.get(type);
+			return type;
 		}
 
 		public Frame getFrame() {
@@ -72,7 +72,8 @@ public class NetherPortalSavedData extends WorldSavedData {
 		for(NBTBase tag : list) {
 			final NBTTagCompound compound = (NBTTagCompound) tag;
 
-			final String type = compound.getString(PORTAL_TYPE_KEY);
+			final NetherPortalType type =
+					NetherPortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
 			final FrameType frameType = TYPES[compound.getInteger(FRAME_TYPE_KEY)];
 			final BlockPos topLeft = NBTUtil.getPosFromTag(compound.getCompoundTag(TOP_LEFT_KEY));
 			final int width = compound.getInteger(WIDTH_KEY);
@@ -91,7 +92,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 		for(Portal portal : portals.values()) {
 			final NBTTagCompound compound = new NBTTagCompound();
 
-			compound.setString(PORTAL_TYPE_KEY, portal.type);
+			compound.setString(PORTAL_TYPE_KEY, portal.type.getName());
 			compound.setInteger(FRAME_TYPE_KEY, portal.frame.getType().ordinal());
 			compound.setTag(TOP_LEFT_KEY, NBTUtil.createPosTag(portal.frame.getTopLeft()));
 			compound.setInteger(WIDTH_KEY, portal.frame.getWidth());

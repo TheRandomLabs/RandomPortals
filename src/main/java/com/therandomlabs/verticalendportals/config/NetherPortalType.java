@@ -18,6 +18,8 @@ public final class NetherPortalType {
 	public int minHeight = 3;
 	public int maxHeight = 9000;
 
+	transient String name;
+
 	public NetherPortalType() {}
 
 	public NetherPortalType(List<FrameBlock> frameBlocks, int dimensionID) {
@@ -62,13 +64,7 @@ public final class NetherPortalType {
 	}
 
 	public String getName() {
-		for(Map.Entry<String, NetherPortalType> entry : NetherPortalTypes.getTypes().entrySet()) {
-			if(entry.getValue() == this) {
-				return entry.getKey();
-			}
-		}
-
-		return "unknown_type";
+		return name == null ? "unknown_type" : name;
 	}
 
 	public boolean test(Frame frame) {

@@ -272,6 +272,7 @@ public abstract class FrameDetector {
 
 		//There should only be one possible corner by this time since the length is already known
 
+		//TODO why is this being called twice for the same Frame?
 		if(nextIndex == startIndex) {
 			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
 			final Frame frame = new Frame(world, type, corners);

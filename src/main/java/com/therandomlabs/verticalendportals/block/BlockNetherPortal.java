@@ -1,7 +1,9 @@
 package com.therandomlabs.verticalendportals.block;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
@@ -15,7 +17,6 @@ import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
@@ -152,27 +153,40 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final Frame frame = findFrame(NetherPortalFrames.FRAMES, world, pos);
+		final Map.Entry<Boolean, NetherPortalSavedData.Portal> entry =
+				findFrame(NetherPortalFrames.FRAMES, world, pos);
 
-		if(frame != null) {
-			boolean nonPortalFound = false;
+		if(entry != null) {
+			final NetherPortalSavedData.Portal portal = entry.getValue();
+			final Frame frame = portal.getFrame();
 
-			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-				if(!isPortal(world, innerPos)) {
-					nonPortalFound = true;
-					break;
+			//entry.getKey() returns whether the frame was retrieved from saved data
+			//If ture, the frame is not guaranteed to still exist, so we call NetherPortalType.test
+			boolean shouldBreak = entry.getKey() && !portal.getType().test(frame);
+
+			if(!shouldBreak) {
+				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+					final IBlockState innerState = world.getBlockState(innerPos);
+					final Block innerBlock = innerState.getBlock();
+
+					if(innerBlock != this || innerState.getValue(USER_PLACED) ||
+							((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
+						shouldBreak = true;
+						break;
+					}
 				}
 			}
 
-			if(!nonPortalFound) {
+			if(!shouldBreak) {
 				return;
 			}
 
 			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 				final IBlockState innerState = world.getBlockState(innerPos);
+				final Block innerBlock = innerState.getBlock();
 
-				if(innerState.getBlock() == this && !state.getValue(USER_PLACED) &&
-						getEffectiveAxis(innerState) == axis) {
+				if(innerBlock == this && !innerState.getValue(USER_PLACED) &&
+						((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) == axis) {
 					removing.add(innerPos);
 				}
 			}
@@ -349,14 +363,6 @@ public class BlockNetherPortal extends BlockPortal {
 		return state.getValue(AXIS);
 	}
 
-	public static boolean isPortal(IBlockState state) {
-		return isPortal(state.getBlock());
-	}
-
-	public static boolean isPortal(World world, BlockWorldState state) {
-		return isPortal(world, state.getPos());
-	}
-
 	public static boolean isPortal(World world, BlockPos pos) {
 		return isPortal(world.getBlockState(pos).getBlock());
 	}
@@ -367,12 +373,13 @@ public class BlockNetherPortal extends BlockPortal {
 				block == VEPBlocks.lateral_nether_portal;
 	}
 
-	public static Frame findFrame(FrameDetector detector, World world, BlockPos portalPos) {
+	public static Map.Entry<Boolean, NetherPortalSavedData.Portal> findFrame(FrameDetector detector,
+			World world, BlockPos portalPos) {
 		final NetherPortalSavedData.Portal portal =
-				NetherPortalSavedData.get(world).getPortal(portalPos);
+				NetherPortalSavedData.get(world).getPortal(world, portalPos);
 
 		if(portal != null) {
-			return portal.getFrame();
+			return new AbstractMap.SimpleEntry<>(true, portal);
 		}
 
 		final IBlockState state = world.getBlockState(portalPos);
@@ -412,10 +419,14 @@ public class BlockNetherPortal extends BlockPortal {
 			return null;
 		}
 
-		return detector.detectWithCondition(
+		final Frame frame = detector.detectWithCondition(
 				world, framePos, type,
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
 		);
+
+		return new AbstractMap.SimpleEntry<>(false, new NetherPortalSavedData.Portal(
+				NetherPortalTypes.get(frame), frame
+		));
 	}
 
 	private static EnumFacing getIrrelevantFacing(EnumFacing.Axis axis) {

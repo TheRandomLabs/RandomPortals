@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.collect.ImmutableMap;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -51,6 +51,16 @@ public final class NetherPortalTypes {
 		return validBlocks;
 	}
 
+	public static NetherPortalType get(Frame frame) {
+		for(NetherPortalType type : types.values()) {
+			if(type.test(frame)) {
+				return type;
+			}
+		}
+
+		return getDefault();
+	}
+
 	public static void reload() throws IOException {
 		final Path directory = VEPConfig.getDirectory("nether_portal_types");
 		List<Path> paths;
@@ -80,7 +90,10 @@ public final class NetherPortalTypes {
 
 			type.ensureCorrect();
 			VEPConfig.writeJson(path, type);
-			types.put(fileName.substring(0, fileName.length() - 5), type);
+
+			final String name = fileName.substring(0, fileName.length() - 5);
+			type.name = name;
+			types.put(name, type);
 		}
 
 		if(types.isEmpty() || (VEPConfig.netherPortals.forceCreateVanillaType &&
@@ -89,6 +102,8 @@ public final class NetherPortalTypes {
 					Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
 					DimensionType.NETHER.getId()
 			);
+
+			vanillaNetherPortal.name = "vanilla_nether_portal";
 
 			VEPConfig.writeJson(
 					directory.resolve("vanilla_nether_portal.json"), vanillaNetherPortal
@@ -116,7 +131,5 @@ public final class NetherPortalTypes {
 
 			return false;
 		};
-
-		VerticalEndPortals.LOGGER.error(types);
 	}
 }

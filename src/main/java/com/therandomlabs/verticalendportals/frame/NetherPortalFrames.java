@@ -1,7 +1,6 @@
 package com.therandomlabs.verticalendportals.frame;
 
 import java.util.List;
-import java.util.Map;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
@@ -146,16 +145,14 @@ public final class NetherPortalFrames {
 
 		if(forcePortalType != null) {
 			final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-			savedData.addPortal(new NetherPortalSavedData.Portal(forcePortalType.getName(), frame));
-			savedData.markDirty();
+			savedData.addPortal(new NetherPortalSavedData.Portal(forcePortalType, frame));
 			return true;
 		}
 
-		for(Map.Entry<String, NetherPortalType> type : NetherPortalTypes.getTypes().entrySet()) {
-			if(type.getValue().test(frame)) {
+		for(NetherPortalType type : NetherPortalTypes.getTypes().values()) {
+			if(type.test(frame)) {
 				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-				savedData.addPortal(new NetherPortalSavedData.Portal(type.getKey(), frame));
-				savedData.markDirty();
+				savedData.addPortal(new NetherPortalSavedData.Portal(type, frame));
 				return true;
 			}
 		}
