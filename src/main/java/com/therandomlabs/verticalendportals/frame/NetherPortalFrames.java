@@ -152,14 +152,14 @@ public final class NetherPortalFrames {
 
 		if(forcePortalType != null) {
 			final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-			savedData.addPortal(new PortalData(forcePortalType, frame, userCreated));
+			savedData.addPortal(forcePortalType, frame, userCreated);
 			return true;
 		}
 
 		for(NetherPortalType type : NetherPortalTypes.getTypes().values()) {
 			if(type.test(frame)) {
 				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-				savedData.addPortal(new PortalData(type, frame, userCreated));
+				savedData.addPortal(type, frame, userCreated);
 				return true;
 			}
 		}

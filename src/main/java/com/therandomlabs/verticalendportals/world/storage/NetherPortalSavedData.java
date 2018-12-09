@@ -122,6 +122,10 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return portal == null ? generatedPortals.get(topLeft) : portal;
 	}
 
+	public void addPortal(NetherPortalType type, Frame frame, boolean userCreated) {
+		addPortal(new PortalData(type, frame, userCreated));
+	}
+
 	public void addPortal(PortalData portal) {
 		if(portal.isUserCreated()) {
 			addPortal(userCreatedPortals, portal);
