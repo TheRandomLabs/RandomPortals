@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -39,7 +40,15 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 			return;
 		}
 
-		entity.changeDimension(1);
+		final int dimension;
+
+		if(world.provider.getDimensionType() == DimensionType.THE_END) {
+			dimension = DimensionType.OVERWORLD.getId();
+		} else {
+			dimension = DimensionType.THE_END.getId();
+		}
+
+		entity.changeDimension(dimension);
 	}
 
 	@Override

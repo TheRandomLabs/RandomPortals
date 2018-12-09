@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 
 public final class NetherPortalType {
 	public List<FrameBlock> frameBlocks;
-	public RequiredCorner requiredCorner;
+	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount;
 
 	public boolean doGeneratedFramesDrop;
@@ -101,7 +101,7 @@ public final class NetherPortalType {
 
 		final Map<FrameBlock, Integer> detectedBlocks = new HashMap<>();
 
-		for(BlockPos pos : frame.getInnerBlockPositions()) {
+		for(BlockPos pos : frame.getFrameBlockPositions()) {
 			final IBlockState state = world.getBlockState(pos);
 			final boolean corner = frame.isCorner(pos);
 			boolean found = false;
@@ -109,8 +109,14 @@ public final class NetherPortalType {
 			if(corner) {
 				found = requiredCorner.test(world, pos, state);
 
-				if(found && !cornerBlocksContributeToMinimumAmount) {
-					continue;
+				if(found) {
+					if(!cornerBlocksContributeToMinimumAmount) {
+						continue;
+					}
+				} else {
+					if(requiredCorner != RequiredCorner.SAME) {
+						return false;
+					}
 				}
 			}
 
