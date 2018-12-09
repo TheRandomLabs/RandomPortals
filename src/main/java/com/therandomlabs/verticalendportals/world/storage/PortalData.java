@@ -16,7 +16,7 @@ public final class PortalData {
 
 	@Override
 	public String toString() {
-		return "Portal[type=" + type.getName() + ",frame=" + frame + ",userCreated=" +
+		return "PortalData[type=" + type.getName() + ",frame=" + frame + ",userCreated=" +
 				userCreated + "]";
 	}
 
