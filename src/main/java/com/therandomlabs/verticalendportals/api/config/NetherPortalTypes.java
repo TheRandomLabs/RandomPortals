@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.config;
+package com.therandomlabs.verticalendportals.api.config;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,12 +12,14 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.collect.ImmutableMap;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.DimensionType;
 
+//TODO default types, so addons can add their own portal types
 public final class NetherPortalTypes {
 	private static ImmutableMap<String, NetherPortalType> types;
 	private static StatePredicate validBlocks;

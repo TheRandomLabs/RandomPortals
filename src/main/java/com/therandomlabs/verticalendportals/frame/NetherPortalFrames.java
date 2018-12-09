@@ -1,18 +1,19 @@
 package com.therandomlabs.verticalendportals.frame;
 
 import java.util.List;
+import java.util.function.Function;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
-import com.therandomlabs.verticalendportals.api.frame.BasicFrameDetector;
+import com.therandomlabs.verticalendportals.api.config.FrameSize;
+import com.therandomlabs.verticalendportals.api.frame.detector.BasicFrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
-import com.therandomlabs.verticalendportals.api.frame.FrameSizeFunction;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.config.NetherPortalType;
-import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
-import com.therandomlabs.verticalendportals.config.VEPConfig;
+import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
+import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,7 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public final class NetherPortalFrames {
-	public static final FrameSizeFunction SIZE = FrameSizeFunction.fromJSONs(
+	public static final Function<FrameType, FrameSize> SIZE = FrameSize.fromJSONs(
 			"nether_portal", () -> VEPConfig.netherPortals.useAllVariantsJson
 	);
 
@@ -94,20 +95,23 @@ public final class NetherPortalFrames {
 			final BlockPos offset = pos.offset(facing);
 			final IBlockState state = world.getBlockState(offset);
 
-			if(NetherPortalTypes.getValidBlocks().test(world, pos, state)) {
-				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
-						world, offset,
-						potentialFrame -> testFrame(
-								potentialFrame, offset, facing.getOpposite(), forcePortalType,
-								userCreated
-						)
-				);
-
-				if(frame != null) {
-					framePos = offset;
-					break;
-				}
+			if(!NetherPortalTypes.getValidBlocks().test(world, pos, state)) {
+				continue;
 			}
+
+			frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
+					world, offset,
+					potentialFrame -> testFrame(
+							potentialFrame, offset, facing.getOpposite(), forcePortalType,
+							userCreated
+					)
+			);
+
+			if(frame != null) {
+				framePos = offset;
+			}
+
+			break;
 		}
 
 		if(frame == null) {

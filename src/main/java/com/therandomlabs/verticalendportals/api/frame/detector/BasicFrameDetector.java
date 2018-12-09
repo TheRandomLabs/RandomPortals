@@ -1,8 +1,14 @@
-package com.therandomlabs.verticalendportals.api.frame;
+package com.therandomlabs.verticalendportals.api.frame.detector;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.api.frame.FrameSide;
+import com.therandomlabs.verticalendportals.api.config.FrameSize;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

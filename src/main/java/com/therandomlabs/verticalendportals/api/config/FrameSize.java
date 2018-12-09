@@ -1,4 +1,9 @@
-package com.therandomlabs.verticalendportals.api.frame;
+package com.therandomlabs.verticalendportals.api.config;
+
+import java.util.Locale;
+import java.util.function.BooleanSupplier;
+import java.util.function.Function;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
 
 public class FrameSize {
 	public int minWidth = 3;
@@ -32,5 +37,16 @@ public class FrameSize {
 		if(maxHeight < minHeight) {
 			maxHeight = minHeight;
 		}
+	}
+
+	public static Function<FrameType, FrameSize> fromJSONs(String species,
+			BooleanSupplier useAllVariants) {
+		return type -> {
+			if(useAllVariants.getAsBoolean()) {
+				return FrameSizes.get(species, "all_variants");
+			}
+
+			return FrameSizes.get(species, type.toString().toLowerCase(Locale.ENGLISH));
+		};
 	}
 }

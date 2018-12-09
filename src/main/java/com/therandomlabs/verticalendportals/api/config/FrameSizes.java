@@ -1,10 +1,10 @@
-package com.therandomlabs.verticalendportals.config;
+package com.therandomlabs.verticalendportals.api.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.therandomlabs.verticalendportals.api.frame.FrameSize;
+import com.therandomlabs.verticalendportals.VEPConfig;
 
 public final class FrameSizes {
 	private static final List<String> names = new ArrayList<>();

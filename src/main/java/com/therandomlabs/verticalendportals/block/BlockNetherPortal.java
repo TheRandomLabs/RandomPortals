@@ -8,7 +8,7 @@ import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
-import com.therandomlabs.verticalendportals.config.NetherPortalTypes;
+import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;

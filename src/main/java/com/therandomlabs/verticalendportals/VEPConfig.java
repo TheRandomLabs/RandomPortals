@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.config;
+package com.therandomlabs.verticalendportals;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.therandomlabs.randompatches.util.RPUtils;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.api.config.FrameSizes;
+import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
@@ -31,8 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 @Config(modid = VerticalEndPortals.MOD_ID, name = VEPConfig.NAME, category = "")
-public class VEPConfig {
-	public static class Client {
+public final class VEPConfig {
+	public static final class Client {
 		@Config.LangKey("verticalendportals.config.client.portalsCreativeTab")
 		@Config.Comment("Enables the Portals creative tab.")
 		public boolean portalsCreativeTab = true;
@@ -43,7 +44,7 @@ public class VEPConfig {
 		public boolean vepreloadclientCommand = true;
 	}
 
-	public static class EndPortals {
+	public static final class EndPortals {
 		@Config.RequiresMcRestart
 		@Config.LangKey("verticalendportals.config.endPortals.enabled")
 		@Config.Comment("Enables vertical End portals and a variety of End portal tweaks.")
@@ -56,14 +57,14 @@ public class VEPConfig {
 		public boolean useAllVariantsJson = true;
 	}
 
-	public static class Misc {
+	public static final class Misc {
 		@Config.RequiresWorldRestart
 		@Config.LangKey("verticalendportals.config.misc.vepreloadCommand")
 		@Config.Comment("Enables the /vepreload command.")
 		public boolean vepreloadCommand = true;
 	}
 
-	public static class NetherPortals {
+	public static final class NetherPortals {
 		@Config.RequiresMcRestart
 		@Config.LangKey("verticalendportals.config.netherPortals.enabled")
 		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
@@ -84,6 +85,7 @@ public class VEPConfig {
 
 	@Config.Ignore
 	public static final String NAME = VerticalEndPortals.MOD_ID + "/" + VerticalEndPortals.MOD_ID;
+
 	@Config.Ignore
 	public static final Gson GSON = new GsonBuilder().
 			setPrettyPrinting().
@@ -112,6 +114,13 @@ public class VEPConfig {
 
 	private static final Field CONFIGS = RPUtils.findField(ConfigManager.class, "CONFIGS");
 
+	@SubscribeEvent
+	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+		if(event.getModID().equals(VerticalEndPortals.MOD_ID)) {
+			reload();
+		}
+	}
+
 	public static void reload() {
 		ConfigManager.sync(VerticalEndPortals.MOD_ID, Config.Type.INSTANCE);
 
@@ -139,13 +148,6 @@ public class VEPConfig {
 			reload();
 		} catch(Exception ex) {
 			RPUtils.crashReport("Error while modifying config", ex);
-		}
-	}
-
-	@SubscribeEvent
-	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-		if(event.getModID().equals(VerticalEndPortals.MOD_ID)) {
-			reload();
 		}
 	}
 

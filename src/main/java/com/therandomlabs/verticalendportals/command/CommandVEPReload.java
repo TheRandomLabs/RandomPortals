@@ -1,6 +1,6 @@
 package com.therandomlabs.verticalendportals.command;
 
-import com.therandomlabs.verticalendportals.config.VEPConfig;
+import com.therandomlabs.verticalendportals.VEPConfig;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

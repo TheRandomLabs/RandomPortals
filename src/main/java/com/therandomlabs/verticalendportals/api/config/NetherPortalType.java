@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.config;
+package com.therandomlabs.verticalendportals.api.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +15,7 @@ public final class NetherPortalType {
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount;
 
+	//TODO implement
 	public boolean doGeneratedFramesDrop;
 
 	public boolean whitelist; //Whether dimensions is a whitelist or a blacklist

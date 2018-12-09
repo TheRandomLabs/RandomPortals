@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.config;
+package com.therandomlabs.verticalendportals.api.config;
 
 import java.util.ArrayList;
 import java.util.List;

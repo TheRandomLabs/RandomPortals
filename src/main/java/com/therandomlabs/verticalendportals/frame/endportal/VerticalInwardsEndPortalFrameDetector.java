@@ -2,9 +2,9 @@ package com.therandomlabs.verticalendportals.frame.endportal;
 
 import java.util.function.Function;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
-import com.therandomlabs.verticalendportals.api.frame.FrameSize;
+import com.therandomlabs.verticalendportals.api.config.FrameSize;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
-import com.therandomlabs.verticalendportals.api.frame.SidedFrameDetector;
+import com.therandomlabs.verticalendportals.api.frame.detector.SidedFrameDetector;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

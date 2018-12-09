@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import com.therandomlabs.verticalendportals.VerticalEndPortals;
+import com.therandomlabs.verticalendportals.api.config.FrameSize;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-//TODO rewrite to be more performant
 public abstract class FrameDetector {
 	public static final int UNKNOWN = 0;
 	public static final int CORNER = 1;
@@ -38,7 +39,8 @@ public abstract class FrameDetector {
 		return detectWithCondition(world, pos, type, size, frame -> true);
 	}
 
-	public final Frame detectWithCondition(World world, BlockPos pos,
+	public final Frame
+	detectWithCondition(World world, BlockPos pos,
 			Predicate<Frame> frameCondition) {
 		return detectWithCondition(world, pos, getDefaultType(), getDefaultSize(), frameCondition);
 	}
@@ -272,9 +274,8 @@ public abstract class FrameDetector {
 		}
 
 		//There should only be one possible corner by this time since the length is already known
-
-		//TODO why is this being called twice for the same Frame?
 		if(nextIndex == startIndex) {
+			VerticalEndPortals.LOGGER.error(possibleCorners + " " + type + " " + startIndex);
 			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
 			final Frame frame = new Frame(world, type, corners);
 			return test(frame) && frameCondition.test(frame) ? frame : null;

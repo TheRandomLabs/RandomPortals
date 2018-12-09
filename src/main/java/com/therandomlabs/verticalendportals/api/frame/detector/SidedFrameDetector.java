@@ -1,5 +1,8 @@
-package com.therandomlabs.verticalendportals.api.frame;
+package com.therandomlabs.verticalendportals.api.frame.detector;
 
+import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
+import com.therandomlabs.verticalendportals.api.frame.FrameSide;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
