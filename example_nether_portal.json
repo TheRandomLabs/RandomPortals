@@ -18,11 +18,6 @@
 			//This has no effect since it's an ore dictionary name
 			"meta": 32767,
 			"minimumAmount": 1
-		},
-		{
-			"registryName": "minecraft:sponge",
-			"meta": 32767,
-			"minimumAmount": 0
 		}
 	],
 	//Valid values: "ANY", "ANY_NON_AIR", "SAME" (same as frameBlocks)
