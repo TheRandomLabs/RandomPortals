@@ -15,8 +15,7 @@ public final class NetherPortalType {
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount = true;
 
-	//TODO implement
-	public boolean doGeneratedFramesDrop;
+	public boolean doGeneratedFramesDrop = true;
 
 	public boolean whitelist;
 	public List<Integer> dimensions = new ArrayList<>();
@@ -35,6 +34,11 @@ public final class NetherPortalType {
 	public NetherPortalType() {}
 
 	public NetherPortalType(List<FrameBlock> frameBlocks, int dimensionID) {
+		this(null, frameBlocks, dimensionID);
+	}
+
+	public NetherPortalType(String name, List<FrameBlock> frameBlocks, int dimensionID) {
+		this.name = name;
 		this.frameBlocks = frameBlocks;
 		this.dimensionID = dimensionID;
 	}

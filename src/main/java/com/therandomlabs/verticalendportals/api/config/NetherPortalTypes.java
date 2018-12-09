@@ -19,8 +19,18 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.DimensionType;
 
-//TODO default types, so addons can add their own portal types
 public final class NetherPortalTypes {
+	public static final String VANILLA_NETHER_PORTAL_NAME = "vanilla_nether_portal";
+
+	private static final NetherPortalType VANILLA_NETHER_PORTAL = new NetherPortalType(
+			VANILLA_NETHER_PORTAL_NAME,
+			Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
+			DimensionType.NETHER.getId()
+	);
+
+	private static final Map<String, NetherPortalType> builtinTypes = new HashMap<>();
+	private static final Map<String, NetherPortalType> defaultTypes = new HashMap<>();
+
 	private static ImmutableMap<String, NetherPortalType> types;
 	private static StatePredicate validBlocks;
 
@@ -99,19 +109,22 @@ public final class NetherPortalTypes {
 		}
 
 		if(types.isEmpty() || (VEPConfig.netherPortals.forceCreateVanillaType &&
-				!types.containsKey("vanilla_nether_portal"))) {
-			final NetherPortalType vanillaNetherPortal = new NetherPortalType(
-					Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
-					DimensionType.NETHER.getId()
-			);
-
-			vanillaNetherPortal.name = "vanilla_nether_portal";
-
+				!types.containsKey(VANILLA_NETHER_PORTAL_NAME))) {
 			VEPConfig.writeJson(
-					directory.resolve("vanilla_nether_portal.json"), vanillaNetherPortal
+					directory.resolve(VANILLA_NETHER_PORTAL_NAME + ".json"), VANILLA_NETHER_PORTAL
 			);
 
-			types.put("vanilla_nether_portal", vanillaNetherPortal);
+			types.put(VANILLA_NETHER_PORTAL_NAME, VANILLA_NETHER_PORTAL);
+		}
+
+		types.putAll(builtinTypes);
+
+		for(Map.Entry<String, NetherPortalType> entry : defaultTypes.entrySet()) {
+			final String name = entry.getKey();
+
+			if(!types.containsKey(name)) {
+				types.put(name, entry.getValue());
+			}
 		}
 
 		NetherPortalTypes.types = ImmutableMap.copyOf(types);
@@ -133,5 +146,23 @@ public final class NetherPortalTypes {
 
 			return false;
 		};
+	}
+
+	public static void registerBuiltinType(String name, NetherPortalType type) {
+		type.name = name;
+		builtinTypes.put(name, type);
+	}
+
+	public static void unregisterBuiltinType(String name) {
+		builtinTypes.remove(name);
+	}
+
+	public static void registerDefaultType(String name, NetherPortalType type) {
+		type.name = name;
+		defaultTypes.put(name, type);
+	}
+
+	public static void unregisterDefaultType(String name) {
+		defaultTypes.remove(name);
 	}
 }

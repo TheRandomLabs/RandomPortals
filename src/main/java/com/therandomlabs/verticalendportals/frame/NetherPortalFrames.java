@@ -15,7 +15,6 @@ import com.therandomlabs.verticalendportals.api.frame.detector.BasicFrameDetecto
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
-import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;

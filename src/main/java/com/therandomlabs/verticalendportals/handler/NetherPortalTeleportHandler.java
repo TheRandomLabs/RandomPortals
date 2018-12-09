@@ -12,11 +12,9 @@ import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-@Mod.EventBusSubscriber
 public final class NetherPortalTeleportHandler {
 	public static class TeleportData {
 		private PortalData portal;

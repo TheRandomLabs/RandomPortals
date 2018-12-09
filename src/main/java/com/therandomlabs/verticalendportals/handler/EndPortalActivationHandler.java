@@ -15,14 +15,13 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public final class EndPortalActivationHandler {
 	private static final Random random = new Random();
 
-	@SubscribeEvent(priority = EventPriority.LOW)
-	public void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
+	@SubscribeEvent
+	public static void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
 		final World world = event.getWorld();
 		final EntityPlayer player = event.getEntityPlayer();
 		final ItemStack stack = event.getItemStack();

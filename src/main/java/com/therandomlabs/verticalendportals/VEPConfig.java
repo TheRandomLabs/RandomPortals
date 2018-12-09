@@ -114,6 +114,8 @@ public final class VEPConfig {
 
 	private static final Field CONFIGS = RPUtils.findField(ConfigManager.class, "CONFIGS");
 
+	private static boolean firstLoad = true;
+
 	@SubscribeEvent
 	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
 		if(event.getModID().equals(VerticalEndPortals.MOD_ID)) {
@@ -132,13 +134,20 @@ public final class VEPConfig {
 			RPUtils.crashReport("Error while modifying config", ex);
 		}
 
+		FrameSizes.reload();
+
+		//This method is first called in CommonProxy.preInit
+		//NetherPortalTypes.reload should first be called in CommonProxy.init
+		if(firstLoad) {
+			firstLoad = false;
+			return;
+		}
+
 		try {
 			NetherPortalTypes.reload();
 		} catch(IOException ex) {
 			RPUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
-
-		FrameSizes.reload();
 	}
 
 	public static void reloadFromDisk() {
