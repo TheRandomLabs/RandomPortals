@@ -452,6 +452,12 @@ public class VEPTeleporter extends Teleporter {
 		NetherPortalTeleportHandler.clearPortalType(entity);
 	}
 
+	//Use vanilla End teleportation behavior
+	@Override
+	public boolean isVanilla() {
+		return true;
+	}
+
 	public static void register() {
 		RPTeleporter.setTeleporter(VEPTeleporter.class);
 	}

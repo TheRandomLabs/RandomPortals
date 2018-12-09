@@ -40,15 +40,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 			return;
 		}
 
-		final int dimension;
-
-		if(world.provider.getDimensionType() == DimensionType.THE_END) {
-			dimension = DimensionType.OVERWORLD.getId();
-		} else {
-			dimension = DimensionType.THE_END.getId();
-		}
-
-		entity.changeDimension(dimension);
+		entity.changeDimension(DimensionType.THE_END.getId());
 	}
 
 	@Override
