@@ -167,6 +167,8 @@ public class VEPTeleporter extends Teleporter {
 					getValue().getFrame();
 		}
 
+		//TODO position is still slightly off
+
 		final EnumFacing entityFacing = entity.getHorizontalFacing();
 
 		final double xOffset;
@@ -437,7 +439,9 @@ public class VEPTeleporter extends Teleporter {
 			}
 		}
 
-		NetherPortalFrames.trySpawn(world, new BlockPos(portalX, portalY, portalZ), portalType);
+		NetherPortalFrames.trySpawn(
+				world, new BlockPos(portalX, portalY, portalZ), portalType, false
+		);
 
 		return true;
 	}

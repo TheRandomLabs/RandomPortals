@@ -13,18 +13,18 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 	private final FrameType defaultType;
 	private final Function<FrameType, FrameSize> defaultSize;
 	private final StatePredicate blockMatcher;
-	private final StatePredicate requiredCorner;
+	private final RequiredCorner requiredCorner;
 	private final EnumFacing facing;
 	private final Predicate<Frame> framePredicate;
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			StatePredicate blockMatcher, StatePredicate requiredCorner,
+			StatePredicate blockMatcher, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate) {
 		this(defaultSize, blockMatcher, requiredCorner, null, framePredicate);
 	}
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			StatePredicate blockMatcher, StatePredicate requiredCorner,
+			StatePredicate blockMatcher, RequiredCorner requiredCorner,
 			EnumFacing facing, Predicate<Frame> framePredicate) {
 		if(facing == null) {
 			defaultType = FrameType.VERTICAL;

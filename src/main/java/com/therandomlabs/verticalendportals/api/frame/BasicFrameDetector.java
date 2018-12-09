@@ -11,22 +11,22 @@ import net.minecraft.world.World;
 public class BasicFrameDetector extends FrameDetector {
 	private final Function<FrameType, FrameSize> defaultSize;
 	private final StatePredicate blockMatcher;
-	private final StatePredicate requiredCorner;
+	private final RequiredCorner requiredCorner;
 	private final Predicate<Frame> framePredicate;
 	private final StatePredicate innerPredicate;
 
-	public BasicFrameDetector(Block block, StatePredicate requiredCorner,
+	public BasicFrameDetector(Block block, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
 		this(StatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(StatePredicate blockMatcher, StatePredicate requiredCorner,
+	public BasicFrameDetector(StatePredicate blockMatcher, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
 		this(null, blockMatcher, requiredCorner, framePredicate, innerPredicate);
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize, Block block,
-			StatePredicate requiredCorner, Predicate<Frame> framePredicate,
+			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
 			StatePredicate innerPredicate) {
 		this(
 				defaultSize, StatePredicate.of(block), requiredCorner, framePredicate,
@@ -35,7 +35,7 @@ public class BasicFrameDetector extends FrameDetector {
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			StatePredicate blockMatcher, StatePredicate requiredCorner,
+			StatePredicate blockMatcher, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
 		this.defaultSize = defaultSize;
 		this.blockMatcher = blockMatcher;

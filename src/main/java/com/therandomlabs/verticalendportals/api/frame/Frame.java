@@ -1,5 +1,6 @@
 package com.therandomlabs.verticalendportals.api.frame;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,7 +28,7 @@ public class Frame {
 	private final BlockPos topRight;
 	private final BlockPos bottomLeft;
 	private final BlockPos bottomRight;
-	private World world;
+	private WeakReference<World> world;
 	private ImmutableList<BlockPos> topBlocks;
 	private ImmutableList<BlockPos> rightBlocks;
 	private ImmutableList<BlockPos> bottomBlocks;
@@ -48,7 +49,7 @@ public class Frame {
 
 	private Frame(World world, FrameType type, BlockPos topLeft, BlockPos topRight,
 			BlockPos bottomLeft, BlockPos bottomRight, int width, int height) {
-		this.world = world;
+		this.world = new WeakReference<>(world);
 		this.type = type;
 
 		this.width = width;
@@ -77,11 +78,11 @@ public class Frame {
 	}
 
 	public World getWorld() {
-		return world;
+		return world.get();
 	}
 
 	public void setWorld(World world) {
-		this.world = world;
+		this.world = new WeakReference<>(world);
 	}
 
 	public FrameType getType() {
@@ -114,6 +115,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getCornerBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -164,6 +167,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getTopBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -194,6 +199,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getRightBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -224,6 +231,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getBottomBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -254,6 +263,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getLeftBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -290,6 +301,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getFrameBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -322,6 +335,8 @@ public class Frame {
 	}
 
 	public List<IBlockState> getInnerBlocks() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return Collections.emptyList();
 		}
@@ -378,6 +393,8 @@ public class Frame {
 	}
 
 	public boolean isEmpty() {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return false;
 		}
@@ -400,6 +417,8 @@ public class Frame {
 	}
 
 	public boolean testInnerBlocks(StatePredicate predicate) {
+		final World world = this.world.get();
+
 		if(world == null) {
 			return false;
 		}

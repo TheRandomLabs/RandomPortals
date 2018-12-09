@@ -425,7 +425,7 @@ public class BlockNetherPortal extends BlockPortal {
 		);
 
 		return new AbstractMap.SimpleEntry<>(false, new NetherPortalSavedData.Portal(
-				NetherPortalTypes.get(frame), frame
+				NetherPortalTypes.get(frame), frame, true
 		));
 	}
 

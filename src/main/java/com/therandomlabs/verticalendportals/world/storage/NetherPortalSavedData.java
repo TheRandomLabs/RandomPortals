@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.config.NetherPortalType;
@@ -22,15 +23,18 @@ public class NetherPortalSavedData extends WorldSavedData {
 	public static final class Portal {
 		private final NetherPortalType type;
 		private final Frame frame;
+		private final boolean userCreated;
 
-		public Portal(NetherPortalType type, Frame frame) {
+		public Portal(NetherPortalType type, Frame frame, boolean userCreated) {
 			this.type = type;
 			this.frame = frame;
+			this.userCreated = userCreated;
 		}
 
 		@Override
 		public String toString() {
-			return "Portal[type=" + type.getName() + ",frame=" + frame + "]";
+			return "Portal[type=" + type.getName() + ",frame=" + frame + ",userCreated=" +
+					userCreated + "]";
 		}
 
 		public NetherPortalType getType() {
@@ -40,10 +44,17 @@ public class NetherPortalSavedData extends WorldSavedData {
 		public Frame getFrame() {
 			return frame;
 		}
+
+		public boolean isUserCreated() {
+			return userCreated;
+		}
 	}
 
 	public static final String ID = "nether_portals";
-	public static final String TAG_KEY = "Portals";
+
+	public static final String USER_CREATED_PORTALS_KEY = "UserCreatedPortals";
+	public static final String GENERATED_PORTALS_KEY = "GeneratedPortals";
+
 	public static final String PORTAL_TYPE_KEY = "PortalType";
 	public static final String FRAME_TYPE_KEY = "FrameType";
 	public static final String TOP_LEFT_KEY = "TopLeft";
@@ -52,8 +63,10 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 	private static final FrameType[] TYPES = FrameType.values();
 
-	private final Map<BlockPos, Portal> portals = new HashMap<>();
+	private final Map<BlockPos, Portal> userCreatedPortals = new HashMap<>();
+	private final Map<BlockPos, Portal> generatedPortals = new HashMap<>();
 	private final Map<BlockPos, Portal> portalCache = new HashMap<>();
+	private final Map<BlockPos, Portal> portalFrameCache = new HashMap<>();
 
 	public NetherPortalSavedData() {
 		super(ID);
@@ -65,43 +78,25 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		portals.clear();
+		userCreatedPortals.clear();
+		generatedPortals.clear();
+		portalCache.clear();
 
-		final NBTTagList list = nbt.getTagList(TAG_KEY, Constants.NBT.TAG_COMPOUND);
+		read(
+				nbt.getTagList(USER_CREATED_PORTALS_KEY, Constants.NBT.TAG_COMPOUND),
+				userCreatedPortals, true
+		);
 
-		for(NBTBase tag : list) {
-			final NBTTagCompound compound = (NBTTagCompound) tag;
-
-			final NetherPortalType type =
-					NetherPortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
-			final FrameType frameType = TYPES[compound.getInteger(FRAME_TYPE_KEY)];
-			final BlockPos topLeft = NBTUtil.getPosFromTag(compound.getCompoundTag(TOP_LEFT_KEY));
-			final int width = compound.getInteger(WIDTH_KEY);
-			final int height = compound.getInteger(HEIGHT_KEY);
-
-			portals.put(
-					topLeft, new Portal(type, new Frame(null, frameType, topLeft, width, height))
-			);
-		}
+		read(
+				nbt.getTagList(GENERATED_PORTALS_KEY, Constants.NBT.TAG_COMPOUND),
+				generatedPortals, false
+		);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		final NBTTagList tagList = new NBTTagList();
-
-		for(Portal portal : portals.values()) {
-			final NBTTagCompound compound = new NBTTagCompound();
-
-			compound.setString(PORTAL_TYPE_KEY, portal.type.getName());
-			compound.setInteger(FRAME_TYPE_KEY, portal.frame.getType().ordinal());
-			compound.setTag(TOP_LEFT_KEY, NBTUtil.createPosTag(portal.frame.getTopLeft()));
-			compound.setInteger(WIDTH_KEY, portal.frame.getWidth());
-			compound.setInteger(HEIGHT_KEY, portal.frame.getHeight());
-
-			tagList.appendTag(compound);
-		}
-
-		nbt.setTag(TAG_KEY, tagList);
+		nbt.setTag(USER_CREATED_PORTALS_KEY, write(userCreatedPortals, new NBTTagList()));
+		nbt.setTag(GENERATED_PORTALS_KEY, write(generatedPortals, new NBTTagList()));
 		return nbt;
 	}
 
@@ -111,50 +106,70 @@ public class NetherPortalSavedData extends WorldSavedData {
 		portalCache.clear();
 	}
 
-	public Map<BlockPos, Portal> getPortals() {
-		return portals;
+	public Map<BlockPos, Portal> getUserCreatedPortals() {
+		return userCreatedPortals;
 	}
 
-	public Map<BlockPos, Portal> getPortals(World world) {
-		if(world != null) {
-			for(Portal portal : portals.values()) {
-				portal.frame.setWorld(world);
-			}
-		}
-
-		return portals;
+	public Map<BlockPos, Portal> getUserCreatedPortals(World world) {
+		return getPortals(userCreatedPortals, world);
 	}
 
-	public Portal getPortal(BlockPos pos) {
-		return getPortal(null, pos);
+	public Map<BlockPos, Portal> getGeneratedPortals() {
+		return generatedPortals;
+	}
+
+	public Map<BlockPos, Portal> getGeneratedPortals(World world) {
+		return getPortals(generatedPortals, world);
+	}
+
+	public Portal getPortal(BlockPos portalPos) {
+		return getPortal(null, portalPos);
 	}
 
 	public Portal getPortal(World world, BlockPos portalPos) {
-		final Portal cachedPortal = portalCache.get(portalPos);
-
-		if(cachedPortal != null) {
-			return cachedPortal;
-		}
-
-		for(Portal portal : portals.values()) {
-			if(portal.frame.isInnerBlock(portalPos)) {
-				if(world != null) {
-					portal.frame.setWorld(world);
-				}
-
-				portalCache.put(portalPos, portal);
-				return portal;
-			}
-		}
-
-		return null;
+		return getPortal(portalCache, frame -> frame.isInnerBlock(portalPos), world, portalPos);
 	}
 
-	public Portal removePortal(BlockPos pos) {
+	public Portal getPortalByFrame(BlockPos portalPos) {
+		return getPortalByFrame(null, portalPos);
+	}
+
+	public Portal getPortalByFrame(World world, BlockPos framePos) {
+		return getPortal(portalFrameCache, frame -> frame.isFrameBlock(framePos), world, framePos);
+	}
+
+	public Portal removePortal(BlockPos portalPos) {
+		return removePortal(frame -> frame.isInnerBlock(portalPos), portalPos);
+	}
+
+	public Portal removePortalByFrame(BlockPos portalPos) {
+		return removePortal(frame -> frame.isFrameBlock(portalPos), portalPos);
+	}
+
+	public Portal getPortalByTopLeft(BlockPos topLeft) {
+		final Portal portal = userCreatedPortals.get(topLeft);
+		return portal == null ? generatedPortals.get(topLeft) : portal;
+	}
+
+	public void addPortal(Portal portal) {
+		if(portal.userCreated) {
+			addPortal(userCreatedPortals, portal);
+		} else {
+			addPortal(generatedPortals, portal);
+		}
+	}
+
+	private void addPortal(Map<BlockPos, Portal> portals, Portal portal) {
+		portals.put(portal.frame.getTopLeft(), portal);
+		markDirty();
+	}
+
+	private Portal removePortal(Map<BlockPos, Portal> portals, Predicate<Frame> predicate,
+			BlockPos pos) {
 		for(Map.Entry<BlockPos, Portal> entry : portals.entrySet()) {
 			final Portal portal = entry.getValue();
 
-			if(portal.frame.isInnerBlock(pos)) {
+			if(predicate.test(portal.frame)) {
 				portals.remove(entry.getKey());
 
 				final List<BlockPos> toRemove = new ArrayList<>();
@@ -173,13 +188,90 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return null;
 	}
 
-	public Portal getPortalByTopLeft(BlockPos topLeft) {
-		return portals.get(topLeft);
+	private Portal removePortal(Predicate<Frame> predicate, BlockPos portalPos) {
+		final Portal portal = removePortal(userCreatedPortals, predicate, portalPos);
+		return portal == null ? removePortal(generatedPortals, predicate, portalPos) : portal;
 	}
 
-	public void addPortal(Portal portal) {
-		portals.put(portal.frame.getTopLeft(), portal);
-		markDirty();
+	private void read(NBTTagList list, Map<BlockPos, Portal> portals, boolean userCreated) {
+		for(NBTBase tag : list) {
+			final NBTTagCompound compound = (NBTTagCompound) tag;
+
+			final NetherPortalType type =
+					NetherPortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
+			final FrameType frameType = TYPES[compound.getInteger(FRAME_TYPE_KEY)];
+			final BlockPos topLeft = NBTUtil.getPosFromTag(compound.getCompoundTag(TOP_LEFT_KEY));
+			final int width = compound.getInteger(WIDTH_KEY);
+			final int height = compound.getInteger(HEIGHT_KEY);
+
+			portals.put(topLeft, new Portal(
+					type, new Frame(null, frameType, topLeft, width, height), userCreated
+			));
+		}
+	}
+
+	private NBTTagList write(Map<BlockPos, Portal> portals, NBTTagList list) {
+		for(Portal portal : portals.values()) {
+			final NBTTagCompound compound = new NBTTagCompound();
+
+			compound.setString(PORTAL_TYPE_KEY, portal.type.getName());
+			compound.setInteger(FRAME_TYPE_KEY, portal.frame.getType().ordinal());
+			compound.setTag(TOP_LEFT_KEY, NBTUtil.createPosTag(portal.frame.getTopLeft()));
+			compound.setInteger(WIDTH_KEY, portal.frame.getWidth());
+			compound.setInteger(HEIGHT_KEY, portal.frame.getHeight());
+
+			list.appendTag(compound);
+		}
+
+		return list;
+	}
+
+	private Map<BlockPos, Portal> getPortals(Map<BlockPos, Portal> portals, World world) {
+		if(world != null) {
+			for(Portal portal : portals.values()) {
+				portal.frame.setWorld(world);
+			}
+		}
+
+		return portals;
+	}
+
+	private Portal getPortal(Map<BlockPos, Portal> portalCache, Predicate<Frame> predicate,
+			World world, BlockPos portalPos) {
+		Portal portal = portalCache.get(portalPos);
+
+		if(portal != null) {
+			if(world != null) {
+				portal.frame.setWorld(world);
+			}
+
+			return portal;
+		}
+
+		portal = actuallyGetPortal(userCreatedPortals, predicate, world, portalPos);
+
+		if(portal != null) {
+			portalCache.put(portalPos, portal);
+		}
+
+		portal = actuallyGetPortal(userCreatedPortals, predicate, world, portalPos);
+		portalCache.put(portalPos, portal);
+		return portal;
+	}
+
+	private Portal actuallyGetPortal(Map<BlockPos, Portal> portals, Predicate<Frame> predicate,
+			World world, BlockPos pos) {
+		for(Portal portal : portals.values()) {
+			if(predicate.test(portal.frame)) {
+				if(world != null) {
+					portal.frame.setWorld(world);
+				}
+
+				return portal;
+			}
+		}
+
+		return null;
 	}
 
 	public static NetherPortalSavedData get(World world) {

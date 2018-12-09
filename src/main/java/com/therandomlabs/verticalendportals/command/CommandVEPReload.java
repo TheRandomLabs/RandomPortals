@@ -30,7 +30,7 @@ public class CommandVEPReload extends CommandBase {
 			throws CommandException {
 		VEPConfig.reloadFromDisk();
 
-		if(server.isDedicatedServer()) {
+		if(server != null && server.isDedicatedServer()) {
 			notifyCommandListener(sender, this, "Vertical End Portals configuration reloaded!");
 		} else {
 			sender.sendMessage(new TextComponentTranslation("commands.vepreloadclient.success"));

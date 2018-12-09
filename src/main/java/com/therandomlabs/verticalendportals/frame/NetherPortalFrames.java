@@ -85,7 +85,8 @@ public final class NetherPortalFrames {
 	}
 
 	//pos must be an inner portal position adjacent to a frame position
-	public static boolean trySpawn(World world, BlockPos pos, NetherPortalType forcePortalType) {
+	public static boolean trySpawn(World world, BlockPos pos, NetherPortalType forcePortalType,
+			boolean userCreated) {
 		Frame frame = null;
 		BlockPos framePos = null;
 
@@ -97,7 +98,8 @@ public final class NetherPortalFrames {
 				frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
 						world, offset,
 						potentialFrame -> testFrame(
-								potentialFrame, offset, facing.getOpposite(), forcePortalType
+								potentialFrame, offset, facing.getOpposite(), forcePortalType,
+								userCreated
 						)
 				);
 
@@ -138,21 +140,23 @@ public final class NetherPortalFrames {
 	}
 
 	private static boolean testFrame(Frame frame, BlockPos framePos, EnumFacing inwards,
-			NetherPortalType forcePortalType) {
+			NetherPortalType forcePortalType, boolean userCreated) {
 		if(!frame.isFacingInwards(framePos, inwards)) {
 			return false;
 		}
 
 		if(forcePortalType != null) {
 			final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-			savedData.addPortal(new NetherPortalSavedData.Portal(forcePortalType, frame));
+			savedData.addPortal(
+					new NetherPortalSavedData.Portal(forcePortalType, frame, userCreated)
+			);
 			return true;
 		}
 
 		for(NetherPortalType type : NetherPortalTypes.getTypes().values()) {
 			if(type.test(frame)) {
 				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-				savedData.addPortal(new NetherPortalSavedData.Portal(type, frame));
+				savedData.addPortal(new NetherPortalSavedData.Portal(type, frame, userCreated));
 				return true;
 			}
 		}

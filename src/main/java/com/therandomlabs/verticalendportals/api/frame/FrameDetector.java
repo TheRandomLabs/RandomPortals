@@ -12,6 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+//TODO rewrite to be more performant
 public abstract class FrameDetector {
 	public static final int UNKNOWN = 0;
 	public static final int CORNER = 1;

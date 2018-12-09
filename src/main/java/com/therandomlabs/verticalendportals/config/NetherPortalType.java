@@ -5,14 +5,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public final class NetherPortalType {
 	public List<FrameBlock> frameBlocks;
+	public RequiredCorner requiredCorner;
+	public boolean cornerBlocksContributeToMinimumAmount;
+
+	public boolean doGeneratedFramesDrop;
+
 	public boolean whitelist; //Whether dimensions is a whitelist or a blacklist
 	public List<Integer> dimensions = new ArrayList<>();
+
 	public int dimensionID;
+
 	public boolean forcePortal; //In the End
+
 	public int minWidth = 3;
 	public int maxWidth = 9000;
 	public int minHeight = 3;
@@ -68,7 +79,8 @@ public final class NetherPortalType {
 	}
 
 	public boolean test(Frame frame) {
-		final int dimension = frame.getWorld().provider.getDimension();
+		final World world = frame.getWorld();
+		final int dimension = world.provider.getDimension();
 
 		if(whitelist) {
 			if(!dimensions.contains(dimension)) {
@@ -89,12 +101,25 @@ public final class NetherPortalType {
 
 		final Map<FrameBlock, Integer> detectedBlocks = new HashMap<>();
 
-		for(IBlockState state : frame.getFrameBlocks()) {
+		for(BlockPos pos : frame.getInnerBlockPositions()) {
+			final IBlockState state = world.getBlockState(pos);
+			final boolean corner = frame.isCorner(pos);
 			boolean found = false;
+
+			if(corner) {
+				found = requiredCorner.test(world, pos, state);
+
+				if(found && !cornerBlocksContributeToMinimumAmount) {
+					continue;
+				}
+			}
 
 			for(FrameBlock block : frameBlocks) {
 				if(block.test(state)) {
-					detectedBlocks.merge(block, 1, (a, b) -> a + b);
+					if(cornerBlocksContributeToMinimumAmount) {
+						detectedBlocks.merge(block, 1, (a, b) -> a + b);
+					}
+
 					found = true;
 					break;
 				}
