@@ -167,10 +167,9 @@ public class VEPTeleporter extends Teleporter {
 					getValue().getFrame();
 		}
 
-		//TODO position is still slightly off
+		//TODO position and yaw is still slightly off
 
 		final EnumFacing entityFacing = entity.getHorizontalFacing();
-
 		final double xOffset;
 		final double zOffset;
 		final EnumFacing forwards;

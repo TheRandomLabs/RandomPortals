@@ -46,6 +46,8 @@ public final class NetherPortalType {
 
 	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
+		final List<String> registryNames = new ArrayList<>();
+
 		for(int i = 0; i < frameBlocks.size(); i++) {
 			final FrameBlock frameBlock = frameBlocks.get(i);
 
@@ -54,6 +56,12 @@ public final class NetherPortalType {
 				continue;
 			}
 
+			if(registryNames.contains(frameBlock.registryName)) {
+				frameBlocks.remove(i--);
+				continue;
+			}
+
+			registryNames.add(frameBlock.registryName);
 			frameBlock.ensureCorrect();
 		}
 

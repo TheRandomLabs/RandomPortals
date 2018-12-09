@@ -2,6 +2,7 @@ package com.therandomlabs.verticalendportals.api.frame;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -10,17 +11,17 @@ import net.minecraft.world.World;
 
 public class BasicFrameDetector extends FrameDetector {
 	private final Function<FrameType, FrameSize> defaultSize;
-	private final StatePredicate blockMatcher;
+	private final Supplier<StatePredicate> blockMatcher;
 	private final RequiredCorner requiredCorner;
 	private final Predicate<Frame> framePredicate;
 	private final StatePredicate innerPredicate;
 
 	public BasicFrameDetector(Block block, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
-		this(StatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
+		this(() -> StatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(StatePredicate blockMatcher, RequiredCorner requiredCorner,
+	public BasicFrameDetector(Supplier<StatePredicate> blockMatcher, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
 		this(null, blockMatcher, requiredCorner, framePredicate, innerPredicate);
 	}
@@ -29,13 +30,13 @@ public class BasicFrameDetector extends FrameDetector {
 			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
 			StatePredicate innerPredicate) {
 		this(
-				defaultSize, StatePredicate.of(block), requiredCorner, framePredicate,
+				defaultSize, () -> StatePredicate.of(block), requiredCorner, framePredicate,
 				innerPredicate
 		);
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			StatePredicate blockMatcher, RequiredCorner requiredCorner,
+			Supplier<StatePredicate> blockMatcher, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
 		this.defaultSize = defaultSize;
 		this.blockMatcher = blockMatcher;
@@ -62,7 +63,7 @@ public class BasicFrameDetector extends FrameDetector {
 			return requiredCorner.test(world, pos, state);
 		}
 
-		return blockMatcher.test(world, pos, state);
+		return blockMatcher.get().test(world, pos, state);
 	}
 
 	@Override
