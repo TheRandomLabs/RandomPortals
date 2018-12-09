@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.config.FrameSize;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -15,6 +14,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class FrameDetector {
+	static final class Corner {
+		BlockPos pos;
+		int sideLength;
+
+		Corner(BlockPos pos, int sideLength) {
+			this.pos = pos;
+			this.sideLength = sideLength;
+		}
+	}
+
 	public static final int UNKNOWN = 0;
 	public static final int CORNER = 1;
 
@@ -275,7 +284,6 @@ public abstract class FrameDetector {
 
 		//There should only be one possible corner by this time since the length is already known
 		if(nextIndex == startIndex) {
-			VerticalEndPortals.LOGGER.error(possibleCorners + " " + type + " " + startIndex);
 			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
 			final Frame frame = new Frame(world, type, corners);
 			return test(frame) && frameCondition.test(frame) ? frame : null;

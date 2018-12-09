@@ -20,19 +20,25 @@ import net.minecraft.world.World;
 
 public class Frame {
 	private final FrameType type;
+
 	private final int width;
 	private final int height;
+
 	private final EnumFacing widthDirection;
 	private final EnumFacing heightDirection;
+
 	private final BlockPos topLeft;
 	private final BlockPos topRight;
 	private final BlockPos bottomLeft;
 	private final BlockPos bottomRight;
+
 	private WeakReference<World> world;
+
 	private ImmutableList<BlockPos> topBlocks;
 	private ImmutableList<BlockPos> rightBlocks;
 	private ImmutableList<BlockPos> bottomBlocks;
 	private ImmutableList<BlockPos> leftBlocks;
+
 	private ImmutableList<BlockPos> frameBlocks;
 	private ImmutableList<BlockPos> innerBlocks;
 
@@ -40,7 +46,7 @@ public class Frame {
 		this(world, type, topLeft, null, null, null, width, height);
 	}
 
-	Frame(World world, FrameType type, Map<Integer, Corner> corners) {
+	Frame(World world, FrameType type, Map<Integer, FrameDetector.Corner> corners) {
 		this(
 				world, type, corners.get(0).pos, corners.get(1).pos, corners.get(3).pos,
 				corners.get(2).pos, corners.get(0).sideLength, corners.get(1).sideLength
