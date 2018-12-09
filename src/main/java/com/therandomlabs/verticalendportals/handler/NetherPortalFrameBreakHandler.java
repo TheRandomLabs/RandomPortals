@@ -28,9 +28,9 @@ public final class NetherPortalFrameBreakHandler {
 
 	@SubscribeEvent
 	public static void onBlockDrops(BlockEvent.HarvestDropsEvent event) {
-		final NetherPortalType type = positions.get(
-				new AbstractMap.SimpleEntry<>(event.getWorld(), event.getPos())
-		);
+		final NetherPortalType type = positions.get(new AbstractMap.SimpleEntry<>(
+				event.getWorld(), event.getPos()
+		));
 
 		if(type != null && !type.doGeneratedFramesDrop) {
 			event.getDrops().clear();
@@ -45,7 +45,8 @@ public final class NetherPortalFrameBreakHandler {
 
 		final NetherPortalSavedData savedData = NetherPortalSavedData.get(event.world);
 
-		for(Map.Entry<Map.Entry<World, BlockPos>, NetherPortalType> entry : positions.entrySet()) {
+		for(Map.Entry<Map.Entry<World, BlockPos>, NetherPortalType> entry :
+				positions.entrySet()) {
 			final NetherPortalType type = entry.getValue();
 
 			if(type == null) {
@@ -58,7 +59,12 @@ public final class NetherPortalFrameBreakHandler {
 				savedData.removeGeneratedPortalFramePos(type.getName(), key.getValue());
 			}
 		}
+	}
 
-		positions.clear();
+	@SubscribeEvent
+	public static void onServerTick(TickEvent.ServerTickEvent event) {
+		if(event.phase == TickEvent.Phase.END) {
+			positions.clear();
+		}
 	}
 }

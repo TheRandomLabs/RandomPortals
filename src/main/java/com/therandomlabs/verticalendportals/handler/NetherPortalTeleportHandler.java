@@ -120,7 +120,7 @@ public final class NetherPortalTeleportHandler {
 	}
 
 	@SubscribeEvent
-	public static void onWorldTick(TickEvent.ServerTickEvent event) {
+	public static void onServerTick(TickEvent.ServerTickEvent event) {
 		if(event.phase != TickEvent.Phase.END) {
 			return;
 		}

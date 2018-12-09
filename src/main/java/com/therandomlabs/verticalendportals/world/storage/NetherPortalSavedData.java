@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import com.therandomlabs.verticalendportals.VerticalEndPortals;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
@@ -184,10 +183,8 @@ public class NetherPortalSavedData extends WorldSavedData {
 		final Set<BlockPos> positions = generatedPortalFrames.get(typeName);
 
 		if(positions != null) {
-			positions.remove(framePos);
+			markDirty();
 		}
-
-		markDirty();
 	}
 
 	public void addPortal(NetherPortalType type, Frame frame, boolean userCreated) {
