@@ -1,12 +1,12 @@
 package com.therandomlabs.verticalendportals.util;
 
 import com.therandomlabs.randompatches.util.RPTeleporter;
-import com.therandomlabs.verticalendportals.api.frame.Frame;
-import com.therandomlabs.verticalendportals.api.frame.FrameType;
-import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.api.config.FrameBlock;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
+import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;

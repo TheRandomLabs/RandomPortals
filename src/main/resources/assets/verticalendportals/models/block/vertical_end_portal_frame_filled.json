@@ -60,11 +60,11 @@
 					"uv": [4, 4, 12, 12],
 					"texture": "#eye"
 				},
-				"west":  {
+				"west": {
 					"uv": [4, 0, 12, 3],
 					"texture": "#eye"
 				},
-				"east":  {
+				"east": {
 					"uv": [4, 0, 12, 3],
 					"texture": "#eye"
 				}
