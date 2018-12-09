@@ -23,7 +23,7 @@
 	//Valid values: "ANY", "ANY_NON_AIR", "SAME" (same as frameBlocks)
 	"requiredCorner": "ANY_NON_AIR",
 	//If true, corner blocks will also contribute to minimumAmount
-	"cornerBlocksContributeToMinimumAmount": false,
+	"cornerBlocksContributeToMinimumAmount": true,
 	//Whether generated portal frames should drop
 	//Set this to false to prevent frame block farming
 	"doGeneratedFramesDrop": true,
