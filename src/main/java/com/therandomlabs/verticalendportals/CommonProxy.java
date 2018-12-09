@@ -6,7 +6,7 @@ import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.handler.EndPortalActivationHandler;
 import com.therandomlabs.verticalendportals.handler.NetherPortalFrameBreakHandler;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
-import com.therandomlabs.verticalendportals.util.VEPTeleporter;
+import com.therandomlabs.verticalendportals.world.VEPTeleporter;
 import net.minecraftforge.common.MinecraftForge;
 
 public class CommonProxy {

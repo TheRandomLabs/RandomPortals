@@ -1,4 +1,4 @@
-package com.therandomlabs.verticalendportals.util;
+package com.therandomlabs.verticalendportals.world;
 
 import com.therandomlabs.randompatches.util.RPTeleporter;
 import com.therandomlabs.verticalendportals.api.config.FrameBlock;
@@ -168,9 +168,6 @@ public class VEPTeleporter extends Teleporter {
 					getValue().getFrame();
 		}
 
-		//TODO position and yaw is still slightly off
-
-		final EnumFacing entityFacing = entity.getHorizontalFacing();
 		final double xOffset;
 		final double zOffset;
 		final EnumFacing forwards;
@@ -181,19 +178,20 @@ public class VEPTeleporter extends Teleporter {
 			forwards = EnumFacing.NORTH;
 		} else if(frame.getType().isVertical()) {
 			if(frame.getType() == FrameType.VERTICAL_X) {
-				xOffset = frame.getWidth() / 2.0 - 1.0;
+				xOffset = frame.getWidth() / 2.0;
 				zOffset = 0.0;
+				forwards = EnumFacing.NORTH;
 			} else {
 				xOffset = 0.0;
 				zOffset = -frame.getWidth() / 2.0 + 1.0;
+				forwards = EnumFacing.EAST;
 			}
 
-			forwards = frame.getWidthDirection().rotateY();
 			pos = frame.getBottomLeft().offset(forwards);
 		} else {
 			xOffset = frame.getWidth() / 2.0;
 			zOffset = -0.5;
-			forwards = entityFacing;
+			forwards = EnumFacing.SOUTH;
 			pos = frame.getBottomLeft().offset(EnumFacing.SOUTH);
 		}
 
@@ -201,12 +199,12 @@ public class VEPTeleporter extends Teleporter {
 		final double y = pos.getY() + 1.0;
 		final double z = pos.getZ() + zOffset;
 
-		float newYaw = Math.abs(entityFacing.getHorizontalIndex() * 90.0F - yaw) +
-				forwards.getHorizontalIndex() * 90.0F;
+		final EnumFacing originalPortalFacing =
+				NetherPortalTeleportHandler.getTeleportData(entity).getPortalFacing();
 
-		if(newYaw > 180.0F) {
-			newYaw = -360.F + newYaw;
-		}
+		final float newYaw = yaw -
+				originalPortalFacing.getOpposite().getHorizontalIndex() * 90.0F +
+				forwards.getHorizontalIndex() * 90.0F;
 
 		if(entity instanceof EntityPlayerMP) {
 			((EntityPlayerMP) entity).connection.setPlayerLocation(

@@ -8,9 +8,13 @@ import java.util.Map;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
+import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.world.storage.PortalData;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -19,10 +23,12 @@ public final class NetherPortalTeleportHandler {
 	public static class TeleportData {
 		private PortalData portal;
 		private BlockPos pos;
+		private EnumFacing portalFacing;
 
-		private TeleportData(PortalData portal, BlockPos pos) {
+		private TeleportData(PortalData portal, BlockPos pos, EnumFacing portalFacing) {
 			this.portal = portal;
 			this.pos = pos;
+			this.portalFacing = portalFacing;
 		}
 
 		public PortalData getPortal() {
@@ -35,6 +41,10 @@ public final class NetherPortalTeleportHandler {
 
 		public BlockPos getPos() {
 			return pos;
+		}
+
+		public EnumFacing getPortalFacing() {
+			return portalFacing;
 		}
 	}
 
@@ -52,7 +62,9 @@ public final class NetherPortalTeleportHandler {
 	}
 
 	public static void setPortal(Entity entity, PortalData portal, BlockPos pos) {
-		if(!entity.getEntityWorld().getMinecraftServer().getAllowNether()) {
+		final World world = entity.getEntityWorld();
+
+		if(!world.getMinecraftServer().getAllowNether()) {
 			return;
 		}
 
@@ -80,7 +92,23 @@ public final class NetherPortalTeleportHandler {
 		entity.lastPortalPos = pos;
 
 		if(!found) {
-			entities.put(new WeakReference<>(entity), new TeleportData(portal, pos));
+			final IBlockState state = world.getBlockState(pos);
+			final BlockNetherPortal block = (BlockNetherPortal) state.getBlock();
+			final EnumFacing.Axis axis = block.getEffectiveAxis(state);
+			final EnumFacing portalFacing;
+
+			switch(axis) {
+			case X:
+				portalFacing = EnumFacing.NORTH;
+				break;
+			case Y:
+				portalFacing = EnumFacing.SOUTH;
+				break;
+			default:
+				portalFacing = EnumFacing.EAST;
+			}
+
+			entities.put(new WeakReference<>(entity), new TeleportData(portal, pos, portalFacing));
 		}
 	}
 
