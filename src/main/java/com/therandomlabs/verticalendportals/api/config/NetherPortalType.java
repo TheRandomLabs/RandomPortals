@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 public final class NetherPortalType {
 	public List<FrameBlock> frameBlocks;
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
-	public boolean cornerBlocksContributeToMinimumAmount;
+	public boolean cornerBlocksContributeToMinimumAmount = true;
 
 	//TODO implement
 	public boolean doGeneratedFramesDrop;
