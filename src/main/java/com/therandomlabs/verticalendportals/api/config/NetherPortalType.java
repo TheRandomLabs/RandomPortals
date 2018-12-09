@@ -18,12 +18,12 @@ public final class NetherPortalType {
 	//TODO implement
 	public boolean doGeneratedFramesDrop;
 
-	public boolean whitelist; //Whether dimensions is a whitelist or a blacklist
+	public boolean whitelist;
 	public List<Integer> dimensions = new ArrayList<>();
 
 	public int dimensionID;
 
-	public boolean forcePortal; //In the End
+	public boolean forcePortal;
 
 	public int minWidth = 3;
 	public int maxWidth = 9000;
@@ -131,7 +131,7 @@ public final class NetherPortalType {
 
 			for(FrameBlock block : frameBlocks) {
 				if(block.test(state)) {
-					if(cornerBlocksContributeToMinimumAmount) {
+					if(!corner || cornerBlocksContributeToMinimumAmount) {
 						detectedBlocks.merge(block, 1, (a, b) -> a + b);
 					}
 
