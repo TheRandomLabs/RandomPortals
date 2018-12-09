@@ -10,6 +10,7 @@ import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -119,7 +120,7 @@ public class VEPTeleporter extends Teleporter {
 						pos2 = pos1.down();
 
 						if(BlockNetherPortal.isPortal(world, pos1)) {
-							final NetherPortalSavedData.Portal portal =
+							final PortalData portal =
 									NetherPortalSavedData.get(world).getPortal(pos1);
 
 							if(portal != null && portal.getType() == portalType) {

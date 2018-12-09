@@ -12,6 +12,7 @@ import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
@@ -153,11 +154,11 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final Map.Entry<Boolean, NetherPortalSavedData.Portal> entry =
+		final Map.Entry<Boolean, PortalData> entry =
 				findFrame(NetherPortalFrames.FRAMES, world, pos);
 
 		if(entry != null) {
-			final NetherPortalSavedData.Portal portal = entry.getValue();
+			final PortalData portal = entry.getValue();
 			final Frame frame = portal.getFrame();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
@@ -289,7 +290,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final NetherPortalSavedData.Portal portal = NetherPortalSavedData.get(world).getPortal(pos);
+		final PortalData portal = NetherPortalSavedData.get(world).getPortal(pos);
 		NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 	}
 
@@ -373,9 +374,9 @@ public class BlockNetherPortal extends BlockPortal {
 				block == VEPBlocks.lateral_nether_portal;
 	}
 
-	public static Map.Entry<Boolean, NetherPortalSavedData.Portal> findFrame(FrameDetector detector,
+	public static Map.Entry<Boolean, PortalData> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
-		final NetherPortalSavedData.Portal portal =
+		final PortalData portal =
 				NetherPortalSavedData.get(world).getPortal(world, portalPos);
 
 		if(portal != null) {
@@ -424,7 +425,7 @@ public class BlockNetherPortal extends BlockPortal {
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
 		);
 
-		return new AbstractMap.SimpleEntry<>(false, new NetherPortalSavedData.Portal(
+		return new AbstractMap.SimpleEntry<>(false, new PortalData(
 				NetherPortalTypes.get(frame), frame, true
 		));
 	}

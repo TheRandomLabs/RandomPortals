@@ -15,6 +15,7 @@ import com.therandomlabs.verticalendportals.api.frame.detector.BasicFrameDetecto
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
@@ -151,16 +152,14 @@ public final class NetherPortalFrames {
 
 		if(forcePortalType != null) {
 			final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-			savedData.addPortal(
-					new NetherPortalSavedData.Portal(forcePortalType, frame, userCreated)
-			);
+			savedData.addPortal(new PortalData(forcePortalType, frame, userCreated));
 			return true;
 		}
 
 		for(NetherPortalType type : NetherPortalTypes.getTypes().values()) {
 			if(type.test(frame)) {
 				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-				savedData.addPortal(new NetherPortalSavedData.Portal(type, frame, userCreated));
+				savedData.addPortal(new PortalData(type, frame, userCreated));
 				return true;
 			}
 		}

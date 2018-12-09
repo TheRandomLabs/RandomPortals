@@ -8,7 +8,7 @@ import java.util.Map;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
-import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,15 +19,15 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 @Mod.EventBusSubscriber
 public final class NetherPortalTeleportHandler {
 	public static class TeleportData {
-		private NetherPortalSavedData.Portal portal;
+		private PortalData portal;
 		private BlockPos pos;
 
-		private TeleportData(NetherPortalSavedData.Portal portal, BlockPos pos) {
+		private TeleportData(PortalData portal, BlockPos pos) {
 			this.portal = portal;
 			this.pos = pos;
 		}
 
-		public NetherPortalSavedData.Portal getPortal() {
+		public PortalData getPortal() {
 			return portal;
 		}
 
@@ -53,7 +53,7 @@ public final class NetherPortalTeleportHandler {
 		return null;
 	}
 
-	public static void setPortal(Entity entity, NetherPortalSavedData.Portal portal, BlockPos pos) {
+	public static void setPortal(Entity entity, PortalData portal, BlockPos pos) {
 		if(!entity.getEntityWorld().getMinecraftServer().getAllowNether()) {
 			return;
 		}

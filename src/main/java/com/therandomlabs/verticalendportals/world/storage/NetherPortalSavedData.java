@@ -20,35 +20,6 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
 public class NetherPortalSavedData extends WorldSavedData {
-	public static final class Portal {
-		private final NetherPortalType type;
-		private final Frame frame;
-		private final boolean userCreated;
-
-		public Portal(NetherPortalType type, Frame frame, boolean userCreated) {
-			this.type = type;
-			this.frame = frame;
-			this.userCreated = userCreated;
-		}
-
-		@Override
-		public String toString() {
-			return "Portal[type=" + type.getName() + ",frame=" + frame + ",userCreated=" +
-					userCreated + "]";
-		}
-
-		public NetherPortalType getType() {
-			return type;
-		}
-
-		public Frame getFrame() {
-			return frame;
-		}
-
-		public boolean isUserCreated() {
-			return userCreated;
-		}
-	}
 
 	public static final String ID = "nether_portals";
 
@@ -63,10 +34,10 @@ public class NetherPortalSavedData extends WorldSavedData {
 
 	private static final FrameType[] TYPES = FrameType.values();
 
-	private final Map<BlockPos, Portal> userCreatedPortals = new HashMap<>();
-	private final Map<BlockPos, Portal> generatedPortals = new HashMap<>();
-	private final Map<BlockPos, Portal> portalCache = new HashMap<>();
-	private final Map<BlockPos, Portal> portalFrameCache = new HashMap<>();
+	private final Map<BlockPos, PortalData> userCreatedPortals = new HashMap<>();
+	private final Map<BlockPos, PortalData> generatedPortals = new HashMap<>();
+	private final Map<BlockPos, PortalData> portalCache = new HashMap<>();
+	private final Map<BlockPos, PortalData> portalFrameCache = new HashMap<>();
 
 	public NetherPortalSavedData() {
 		super(ID);
@@ -106,75 +77,75 @@ public class NetherPortalSavedData extends WorldSavedData {
 		portalCache.clear();
 	}
 
-	public Map<BlockPos, Portal> getUserCreatedPortals() {
+	public Map<BlockPos, PortalData> getUserCreatedPortals() {
 		return userCreatedPortals;
 	}
 
-	public Map<BlockPos, Portal> getUserCreatedPortals(World world) {
+	public Map<BlockPos, PortalData> getUserCreatedPortals(World world) {
 		return getPortals(userCreatedPortals, world);
 	}
 
-	public Map<BlockPos, Portal> getGeneratedPortals() {
+	public Map<BlockPos, PortalData> getGeneratedPortals() {
 		return generatedPortals;
 	}
 
-	public Map<BlockPos, Portal> getGeneratedPortals(World world) {
+	public Map<BlockPos, PortalData> getGeneratedPortals(World world) {
 		return getPortals(generatedPortals, world);
 	}
 
-	public Portal getPortal(BlockPos portalPos) {
+	public PortalData getPortal(BlockPos portalPos) {
 		return getPortal(null, portalPos);
 	}
 
-	public Portal getPortal(World world, BlockPos portalPos) {
+	public PortalData getPortal(World world, BlockPos portalPos) {
 		return getPortal(portalCache, frame -> frame.isInnerBlock(portalPos), world, portalPos);
 	}
 
-	public Portal getPortalByFrame(BlockPos portalPos) {
+	public PortalData getPortalByFrame(BlockPos portalPos) {
 		return getPortalByFrame(null, portalPos);
 	}
 
-	public Portal getPortalByFrame(World world, BlockPos framePos) {
+	public PortalData getPortalByFrame(World world, BlockPos framePos) {
 		return getPortal(portalFrameCache, frame -> frame.isFrameBlock(framePos), world, framePos);
 	}
 
-	public Portal removePortal(BlockPos portalPos) {
+	public PortalData removePortal(BlockPos portalPos) {
 		return removePortal(frame -> frame.isInnerBlock(portalPos), portalPos);
 	}
 
-	public Portal removePortalByFrame(BlockPos portalPos) {
+	public PortalData removePortalByFrame(BlockPos portalPos) {
 		return removePortal(frame -> frame.isFrameBlock(portalPos), portalPos);
 	}
 
-	public Portal getPortalByTopLeft(BlockPos topLeft) {
-		final Portal portal = userCreatedPortals.get(topLeft);
+	public PortalData getPortalByTopLeft(BlockPos topLeft) {
+		final PortalData portal = userCreatedPortals.get(topLeft);
 		return portal == null ? generatedPortals.get(topLeft) : portal;
 	}
 
-	public void addPortal(Portal portal) {
-		if(portal.userCreated) {
+	public void addPortal(PortalData portal) {
+		if(portal.isUserCreated()) {
 			addPortal(userCreatedPortals, portal);
 		} else {
 			addPortal(generatedPortals, portal);
 		}
 	}
 
-	private void addPortal(Map<BlockPos, Portal> portals, Portal portal) {
-		portals.put(portal.frame.getTopLeft(), portal);
+	private void addPortal(Map<BlockPos, PortalData> portals, PortalData portal) {
+		portals.put(portal.getFrame().getTopLeft(), portal);
 		markDirty();
 	}
 
-	private Portal removePortal(Map<BlockPos, Portal> portals, Predicate<Frame> predicate,
+	private PortalData removePortal(Map<BlockPos, PortalData> portals, Predicate<Frame> predicate,
 			BlockPos pos) {
-		for(Map.Entry<BlockPos, Portal> entry : portals.entrySet()) {
-			final Portal portal = entry.getValue();
+		for(Map.Entry<BlockPos, PortalData> entry : portals.entrySet()) {
+			final PortalData portal = entry.getValue();
 
-			if(predicate.test(portal.frame)) {
+			if(predicate.test(portal.getFrame())) {
 				portals.remove(entry.getKey());
 
 				final List<BlockPos> toRemove = new ArrayList<>();
 
-				for(Map.Entry<BlockPos, Portal> cache : portalCache.entrySet()) {
+				for(Map.Entry<BlockPos, PortalData> cache : portalCache.entrySet()) {
 					toRemove.add(cache.getKey());
 				}
 
@@ -188,12 +159,12 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return null;
 	}
 
-	private Portal removePortal(Predicate<Frame> predicate, BlockPos portalPos) {
-		final Portal portal = removePortal(userCreatedPortals, predicate, portalPos);
+	private PortalData removePortal(Predicate<Frame> predicate, BlockPos portalPos) {
+		final PortalData portal = removePortal(userCreatedPortals, predicate, portalPos);
 		return portal == null ? removePortal(generatedPortals, predicate, portalPos) : portal;
 	}
 
-	private void read(NBTTagList list, Map<BlockPos, Portal> portals, boolean userCreated) {
+	private void read(NBTTagList list, Map<BlockPos, PortalData> portals, boolean userCreated) {
 		for(NBTBase tag : list) {
 			final NBTTagCompound compound = (NBTTagCompound) tag;
 
@@ -204,21 +175,22 @@ public class NetherPortalSavedData extends WorldSavedData {
 			final int width = compound.getInteger(WIDTH_KEY);
 			final int height = compound.getInteger(HEIGHT_KEY);
 
-			portals.put(topLeft, new Portal(
+			portals.put(topLeft, new PortalData(
 					type, new Frame(null, frameType, topLeft, width, height), userCreated
 			));
 		}
 	}
 
-	private NBTTagList write(Map<BlockPos, Portal> portals, NBTTagList list) {
-		for(Portal portal : portals.values()) {
+	private NBTTagList write(Map<BlockPos, PortalData> portals, NBTTagList list) {
+		for(PortalData portal : portals.values()) {
 			final NBTTagCompound compound = new NBTTagCompound();
+			final Frame frame = portal.getFrame();
 
-			compound.setString(PORTAL_TYPE_KEY, portal.type.getName());
-			compound.setInteger(FRAME_TYPE_KEY, portal.frame.getType().ordinal());
-			compound.setTag(TOP_LEFT_KEY, NBTUtil.createPosTag(portal.frame.getTopLeft()));
-			compound.setInteger(WIDTH_KEY, portal.frame.getWidth());
-			compound.setInteger(HEIGHT_KEY, portal.frame.getHeight());
+			compound.setString(PORTAL_TYPE_KEY, portal.getType().getName());
+			compound.setInteger(FRAME_TYPE_KEY, frame.getType().ordinal());
+			compound.setTag(TOP_LEFT_KEY, NBTUtil.createPosTag(frame.getTopLeft()));
+			compound.setInteger(WIDTH_KEY, frame.getWidth());
+			compound.setInteger(HEIGHT_KEY, frame.getHeight());
 
 			list.appendTag(compound);
 		}
@@ -226,23 +198,23 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return list;
 	}
 
-	private Map<BlockPos, Portal> getPortals(Map<BlockPos, Portal> portals, World world) {
+	private Map<BlockPos, PortalData> getPortals(Map<BlockPos, PortalData> portals, World world) {
 		if(world != null) {
-			for(Portal portal : portals.values()) {
-				portal.frame.setWorld(world);
+			for(PortalData portal : portals.values()) {
+				portal.getFrame().setWorld(world);
 			}
 		}
 
 		return portals;
 	}
 
-	private Portal getPortal(Map<BlockPos, Portal> portalCache, Predicate<Frame> predicate,
+	private PortalData getPortal(Map<BlockPos, PortalData> portalCache, Predicate<Frame> predicate,
 			World world, BlockPos portalPos) {
-		Portal portal = portalCache.get(portalPos);
+		PortalData portal = portalCache.get(portalPos);
 
 		if(portal != null) {
 			if(world != null) {
-				portal.frame.setWorld(world);
+				portal.getFrame().setWorld(world);
 			}
 
 			return portal;
@@ -259,12 +231,14 @@ public class NetherPortalSavedData extends WorldSavedData {
 		return portal;
 	}
 
-	private Portal actuallyGetPortal(Map<BlockPos, Portal> portals, Predicate<Frame> predicate,
-			World world, BlockPos pos) {
-		for(Portal portal : portals.values()) {
-			if(predicate.test(portal.frame)) {
+	private PortalData actuallyGetPortal(Map<BlockPos, PortalData> portals,
+			Predicate<Frame> predicate, World world, BlockPos pos) {
+		for(PortalData portal : portals.values()) {
+			final Frame frame = portal.getFrame();
+
+			if(predicate.test(frame)) {
 				if(world != null) {
-					portal.frame.setWorld(world);
+					frame.setWorld(world);
 				}
 
 				return portal;
