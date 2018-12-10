@@ -61,7 +61,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 			final int height = compound.getInteger(HEIGHT_KEY);
 
 			portals.put(topLeft, new PortalData(
-					type, new Frame(null, frameType, topLeft, width, height)
+					new Frame(null, frameType, topLeft, width, height), type
 			));
 		}
 
@@ -80,8 +80,8 @@ public class NetherPortalSavedData extends WorldSavedData {
 					NetherPortalTypes.get(typeName).getName(),
 					positions,
 					(a, b) -> {
-							a.addAll(b);
-							return a;
+						a.addAll(b);
+						return a;
 					}
 			);
 		}
@@ -188,7 +188,7 @@ public class NetherPortalSavedData extends WorldSavedData {
 	}
 
 	public void addPortal(NetherPortalType type, Frame frame, boolean userCreated) {
-		addPortal(new PortalData(type, frame), userCreated);
+		addPortal(new PortalData(frame, type), userCreated);
 	}
 
 	public void addPortal(PortalData portal, boolean userCreated) {

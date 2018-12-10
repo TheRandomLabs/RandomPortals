@@ -5,26 +5,26 @@ import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 
 public final class PortalData {
-	private String type;
 	private final Frame frame;
+	private String type;
 
-	public PortalData(NetherPortalType type, Frame frame) {
-		this.type = type.getName();
+	public PortalData(Frame frame, NetherPortalType type) {
 		this.frame = frame;
+		this.type = type.getName();
 	}
 
 	@Override
 	public String toString() {
-		return "PortalData[type=" + type + ",frame=" + frame + ",userCreated=]";
+		return "PortalData[frame=" + frame + ",type=" + type + "]";
+	}
+
+	public Frame getFrame() {
+		return frame;
 	}
 
 	public NetherPortalType getType() {
 		final NetherPortalType type = NetherPortalTypes.get(this.type);
 		this.type = type.getName();
 		return type;
-	}
-
-	public Frame getFrame() {
-		return frame;
 	}
 }
