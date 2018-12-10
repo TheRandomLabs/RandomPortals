@@ -22,15 +22,15 @@
 	],
 	//Valid values: "ANY", "ANY_NON_AIR", "SAME" (same as frameBlocks)
 	"requiredCorner": "ANY_NON_AIR",
+	//If true, corner blocks will also contribute to minimumAmount
+	"cornerBlocksContributeToMinimumAmount": true,
+	//Valid values: "LATERAL", "VERTICAL", "VERTICAL_X", "VERTICAL_Z", "LATERAL_OR_VERTICAL"
+	"type": "LATERAL_OR_VERTICAL",
 	//Whether the portal frame is activated when fire is placed inside it
 	//This is essentially useless without an addon mod
 	"canBeActivatedByFire": true,
-	//If true, corner blocks will also contribute to minimumAmount
-	"cornerBlocksContributeToMinimumAmount": true,
-	//Whether generated portal frames should drop
-	//Set this to false to prevent frame block farming
-	//This should also work with other mods such as Block Breakers from OpenBlocks
-	//and Exchangers
+	//Whether generated portal frames drop (set to false to prevent frame block farming)
+	//This should also work with other mods such as Block Breakers from OpenBlocks and Exchangers
 	"doGeneratedFramesDrop": true,
 	//If true, "dimensions" is a whitelist rather than a blacklist
 	"whitelist": false,
