@@ -1,6 +1,7 @@
 package com.therandomlabs.verticalendportals.api.netherportal;
 
 import java.util.List;
+import java.util.function.Function;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
@@ -10,6 +11,7 @@ import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.block.VEPBlocks;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
+import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -79,6 +81,42 @@ public class NetherPortalActivator {
 	}
 
 	public NetherPortal activate(World world, BlockPos pos) {
+		return activate(world, pos, axis -> {
+			final IBlockState state;
+
+			switch(axis) {
+			case X:
+				state = VEPBlocks.vertical_nether_portal.getDefaultState();
+				break;
+			case Y:
+				state = VEPBlocks.lateral_nether_portal.getDefaultState();
+				break;
+			default:
+				state = VEPBlocks.vertical_nether_portal.getDefaultState().withProperty(
+						BlockPortal.AXIS, EnumFacing.Axis.Z
+				);
+			}
+
+			return state.withProperty(BlockNetherPortal.USER_PLACED, false);
+		});
+	}
+
+	public NetherPortal activate(World world, BlockPos pos, IBlockState lateralPortal,
+			IBlockState verticalXPortal, IBlockState verticalZPortal) {
+		return activate(world, pos, axis -> {
+			switch(axis) {
+			case X:
+				return verticalXPortal;
+			case Y:
+				return lateralPortal;
+			default:
+				return verticalZPortal;
+			}
+		});
+	}
+
+	public NetherPortal activate(World world, BlockPos pos,
+			Function<EnumFacing.Axis, IBlockState> portalBlocks) {
 		final StatePredicate validBlocks;
 
 		if(forcePortalType == null) {
@@ -133,29 +171,18 @@ public class NetherPortalActivator {
 		}
 
 		final NetherPortal result = event.getPortal();
-		onActivate(world, result);
+		onActivate(world, result, portalBlocks);
 		return result;
 	}
 
-	protected void onActivate(World world, NetherPortal portal) {
+	protected void onActivate(World world, NetherPortal portal,
+			Function<EnumFacing.Axis, IBlockState> portalBlocks) {
 		NetherPortalSavedData.get(world).addPortal(portal, userCreated);
 
 		final Frame frame = portal.getFrame();
-		final EnumFacing.Axis axis = frame.getType().getAxis();
-		IBlockState state;
+		final IBlockState state = portalBlocks.apply(frame.getType().getAxis());
 
-		if(axis == EnumFacing.Axis.Y) {
-			state = VEPBlocks.lateral_nether_portal.getDefaultState();
-		} else {
-			state = VEPBlocks.vertical_nether_portal.getDefaultState().
-					withProperty(BlockNetherPortal.AXIS, axis);
-		}
-
-		state = state.withProperty(BlockNetherPortal.USER_PLACED, false);
-
-		final List<BlockPos> innerBlockPositions = frame.getInnerBlockPositions();
-
-		for(BlockPos innerPos : innerBlockPositions) {
+		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 			world.setBlockState(innerPos, state, 2);
 		}
 	}
