@@ -70,6 +70,21 @@ public final class FrameBlock {
 		return getBlocks().length == 0 ? null : blocks[0];
 	}
 
+	@SuppressWarnings("deprecation")
+	public IBlockState getActualState() {
+		final FrameBlock block = getActualBlock();
+
+		if(block == null) {
+			return null;
+		}
+
+		if(block.meta == OreDictionary.WILDCARD_VALUE) {
+			return block.getBlock().getDefaultState();
+		}
+
+		return block.getBlock().getStateFromMeta(block.meta);
+	}
+
 	public boolean isValid() {
 		return getBlocks() != null;
 	}

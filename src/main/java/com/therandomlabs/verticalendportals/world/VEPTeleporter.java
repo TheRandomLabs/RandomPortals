@@ -1,7 +1,6 @@
 package com.therandomlabs.verticalendportals.world;
 
 import com.therandomlabs.randompatches.util.RPTeleporter;
-import com.therandomlabs.verticalendportals.api.config.FrameBlock;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
@@ -187,83 +186,21 @@ public class VEPTeleporter extends Teleporter {
 		} else if(frame.getType().isVertical()) {
 			if(frame.getType() == FrameType.VERTICAL_X) {
 				xOffset = frame.getWidth() / 2.0;
-				zOffset = 0.0;
+				zOffset = 0.75;
 				forwards = EnumFacing.SOUTH;
 			} else {
-				xOffset = 0.0;
+				xOffset = 0.75;
 				zOffset = -frame.getWidth() / 2.0 + 1.0;
 				forwards = EnumFacing.EAST;
 			}
 
-			pos = frame.getBottomLeft().offset(forwards);
+			pos = frame.getBottomLeft();
 		} else {
 			xOffset = frame.getWidth() / 2.0;
 			zOffset = -0.5;
 			forwards = EnumFacing.SOUTH;
 			pos = frame.getBottomLeft().offset(EnumFacing.SOUTH);
 		}
-
-		/*double d5 = (double)blockpos.getX() + 0.5D;
-            double d7 = (double)blockpos.getZ() + 0.5D;
-            BlockPattern.PatternHelper blockpattern$patternhelper = Blocks.PORTAL.createPatternHelper(this.world, blockpos);
-            boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;
-            double d2 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
-            double d6 = (double)(blockpattern$patternhelper.getFrontTopLeft().getY() + 1) - entityIn.getLastPortalVec().y * (double)blockpattern$patternhelper.getHeight();
-
-            if (flag1)
-            {
-                ++d2;
-            }
-
-            if (blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X)
-            {
-                d7 = d2 + (1.0D - entityIn.getLastPortalVec().x) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
-            }
-            else
-            {
-                d5 = d2 + (1.0D - entityIn.getLastPortalVec().x) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
-            }
-
-            float f = 0.0F;
-            float f1 = 0.0F;
-            float f2 = 0.0F;
-            float f3 = 0.0F;
-
-            if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection())
-            {
-                f = 1.0F;
-                f1 = 1.0F;
-            }
-            else if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection().getOpposite())
-            {
-                f = -1.0F;
-                f1 = -1.0F;
-            }
-            else if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection().rotateY())
-            {
-                f2 = 1.0F;
-                f3 = -1.0F;
-            }
-            else
-            {
-                f2 = -1.0F;
-                f3 = 1.0F;
-            }
-
-            double d3 = entityIn.motionX;
-            double d4 = entityIn.motionZ;
-            entityIn.motionX = d3 * (double)f + d4 * (double)f3;
-            entityIn.motionZ = d3 * (double)f2 + d4 * (double)f1;
-            entityIn.rotationYaw = rotationYaw - (float)(entityIn.getTeleportDirection().getOpposite().getHorizontalIndex() * 90) + (float)(blockpattern$patternhelper.getForwards().getHorizontalIndex() * 90);
-
-            if (entityIn instanceof EntityPlayerMP)
-            {
-                ((EntityPlayerMP)entityIn).connection.setPlayerLocation(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
-            }
-            else
-            {
-                entityIn.setLocationAndAngles(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
-            }*/
 
 		final double x = pos.getX() + xOffset;
 		final double y = pos.getY() + 1.0;
@@ -285,7 +222,7 @@ public class VEPTeleporter extends Teleporter {
 	}
 
 	//My attempt to decipher the black magic that is Teleporter.makePortal
-	@SuppressWarnings({"Duplicates", "deprecation"})
+	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean makePortal(Entity entity) {
 		double distance = -1.0;
@@ -468,9 +405,7 @@ public class VEPTeleporter extends Teleporter {
 
 						if(yOffset == -1) {
 							final int index = random.nextInt(portalType.frameBlocks.size());
-							final FrameBlock frameBlock =
-									portalType.frameBlocks.get(index).getActualBlock();
-							state = frameBlock.getBlock().getStateFromMeta(frameBlock.meta);
+							state = portalType.frameBlocks.get(index).getActualState();
 						} else {
 							state = air;
 						}
@@ -492,14 +427,12 @@ public class VEPTeleporter extends Teleporter {
 
 				if(frame) {
 					final int index = random.nextInt(portalType.frameBlocks.size());
-					final FrameBlock frameBlock =
-							portalType.frameBlocks.get(index).getActualBlock();
 
 					world.setBlockState(new BlockPos(
 							portalX + horzOffset * xMultiplier,
 							portalY + yOffset,
 							portalZ + horzOffset * zMultiplier
-					), frameBlock.getBlock().getStateFromMeta(frameBlock.meta), 2);
+					), portalType.frameBlocks.get(index).getActualState(), 2);
 				}
 			}
 		}
