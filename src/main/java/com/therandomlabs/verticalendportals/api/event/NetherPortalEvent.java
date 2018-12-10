@@ -51,15 +51,15 @@ public class NetherPortalEvent extends Event {
 		private final NetherPortal portal;
 		private final Entity entity;
 		private final BlockPos portalPos;
-		private final EnumFacing portalFacing;
+		private final EnumFacing originalEntityFacing;
 
 		public Teleport(NetherPortal portal, Entity entity, BlockPos portalPos,
-				EnumFacing portalFacing) {
+				EnumFacing originalEntityFacing) {
 			super(portal.getFrame());
 			this.portal = portal;
 			this.entity = entity;
 			this.portalPos = portalPos;
-			this.portalFacing = portalFacing;
+			this.originalEntityFacing = originalEntityFacing;
 		}
 
 		public NetherPortal getPortal() {
@@ -74,8 +74,8 @@ public class NetherPortalEvent extends Event {
 			return portalPos;
 		}
 
-		public EnumFacing getPortalFacing() {
-			return portalFacing;
+		public EnumFacing getOriginalEntityFacing() {
+			return originalEntityFacing;
 		}
 	}
 

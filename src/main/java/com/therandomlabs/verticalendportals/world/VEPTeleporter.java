@@ -32,50 +32,54 @@ public class VEPTeleporter extends Teleporter {
 
 	@Override
 	public void placeInPortal(Entity entity, float yaw) {
-		final boolean placePortal;
+		final NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
 
-		if(world.provider.getDimension() == DimensionType.THE_END.getId()) {
-			final NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
-			placePortal = portalType != null && portalType.forcePortal;
-		} else {
-			placePortal = true;
-		}
+		if(portalType == null) {
+			if(world.provider.getDimensionType() == DimensionType.THE_END) {
+				final IBlockState obsidian = Blocks.OBSIDIAN.getDefaultState();
+				final IBlockState air = Blocks.AIR.getDefaultState();
 
-		if(placePortal) {
-			if(!placeInExistingPortal(entity, yaw)) {
-				makePortal(entity);
-				placeInExistingPortal(entity, yaw);
+				final BlockPos spawnPos = world.getSpawnCoordinate();
+
+				final int x = spawnPos.getX();
+				final int y = spawnPos.getY() - 1;
+				final int z = spawnPos.getZ();
+
+				for(int zOffset = -2; zOffset < 3; zOffset++) {
+					for(int xOffset = -2; xOffset < 3; xOffset++) {
+						for(int yOffset = -1; yOffset < 3; yOffset++) {
+							world.setBlockState(
+									new BlockPos(
+											x + xOffset,
+											y + yOffset,
+											z - zOffset
+									),
+									yOffset < 0 ? obsidian : air
+							);
+						}
+					}
+				}
+
+				entity.setLocationAndAngles(x, y, z, entity.rotationYaw, 0.0F);
+				entity.motionX = 0.0;
+				entity.motionY = 0.0;
+				entity.motionZ = 0.0;
+
+				return;
 			}
+
+			entity.moveToBlockPosAndAngles(
+					world.getTopSolidOrLiquidBlock(world.getSpawnPoint()),
+					yaw, entity.prevRotationPitch
+			);
 
 			return;
 		}
 
-		final IBlockState obsidian = Blocks.OBSIDIAN.getDefaultState();
-		final IBlockState air = Blocks.AIR.getDefaultState();
-
-		final int x = MathHelper.floor(entity.posX);
-		final int y = MathHelper.floor(entity.posY) - 1;
-		final int z = MathHelper.floor(entity.posZ);
-
-		for(int zOffset = -2; zOffset < 3; zOffset++) {
-			for(int xOffset = -2; xOffset < 3; xOffset++) {
-				for(int yOffset = -1; yOffset < 3; yOffset++) {
-					world.setBlockState(
-							new BlockPos(
-									x + xOffset,
-									y + yOffset,
-									z - zOffset
-							),
-							yOffset < 0 ? obsidian : air
-					);
-				}
-			}
+		if(!placeInExistingPortal(entity, yaw)) {
+			makePortal(entity);
+			placeInExistingPortal(entity, yaw);
 		}
-
-		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, 0.0F);
-		entity.motionX = 0.0;
-		entity.motionY = 0.0;
-		entity.motionZ = 0.0;
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -169,6 +173,9 @@ public class VEPTeleporter extends Teleporter {
 					getValue().getFrame();
 		}
 
+		final EnumFacing originalEntityFacing =
+				NetherPortalTeleportHandler.getTeleportData(entity).getOriginalEntityFacing();
+
 		final double xOffset;
 		final double zOffset;
 		final EnumFacing forwards;
@@ -181,7 +188,7 @@ public class VEPTeleporter extends Teleporter {
 			if(frame.getType() == FrameType.VERTICAL_X) {
 				xOffset = frame.getWidth() / 2.0;
 				zOffset = 0.0;
-				forwards = EnumFacing.NORTH;
+				forwards = EnumFacing.SOUTH;
 			} else {
 				xOffset = 0.0;
 				zOffset = -frame.getWidth() / 2.0 + 1.0;
@@ -196,15 +203,74 @@ public class VEPTeleporter extends Teleporter {
 			pos = frame.getBottomLeft().offset(EnumFacing.SOUTH);
 		}
 
+		/*double d5 = (double)blockpos.getX() + 0.5D;
+            double d7 = (double)blockpos.getZ() + 0.5D;
+            BlockPattern.PatternHelper blockpattern$patternhelper = Blocks.PORTAL.createPatternHelper(this.world, blockpos);
+            boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;
+            double d2 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
+            double d6 = (double)(blockpattern$patternhelper.getFrontTopLeft().getY() + 1) - entityIn.getLastPortalVec().y * (double)blockpattern$patternhelper.getHeight();
+
+            if (flag1)
+            {
+                ++d2;
+            }
+
+            if (blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X)
+            {
+                d7 = d2 + (1.0D - entityIn.getLastPortalVec().x) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
+            }
+            else
+            {
+                d5 = d2 + (1.0D - entityIn.getLastPortalVec().x) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
+            }
+
+            float f = 0.0F;
+            float f1 = 0.0F;
+            float f2 = 0.0F;
+            float f3 = 0.0F;
+
+            if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection())
+            {
+                f = 1.0F;
+                f1 = 1.0F;
+            }
+            else if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection().getOpposite())
+            {
+                f = -1.0F;
+                f1 = -1.0F;
+            }
+            else if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection().rotateY())
+            {
+                f2 = 1.0F;
+                f3 = -1.0F;
+            }
+            else
+            {
+                f2 = -1.0F;
+                f3 = 1.0F;
+            }
+
+            double d3 = entityIn.motionX;
+            double d4 = entityIn.motionZ;
+            entityIn.motionX = d3 * (double)f + d4 * (double)f3;
+            entityIn.motionZ = d3 * (double)f2 + d4 * (double)f1;
+            entityIn.rotationYaw = rotationYaw - (float)(entityIn.getTeleportDirection().getOpposite().getHorizontalIndex() * 90) + (float)(blockpattern$patternhelper.getForwards().getHorizontalIndex() * 90);
+
+            if (entityIn instanceof EntityPlayerMP)
+            {
+                ((EntityPlayerMP)entityIn).connection.setPlayerLocation(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
+            }
+            else
+            {
+                entityIn.setLocationAndAngles(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
+            }*/
+
 		final double x = pos.getX() + xOffset;
 		final double y = pos.getY() + 1.0;
 		final double z = pos.getZ() + zOffset;
 
-		final EnumFacing originalPortalFacing =
-				NetherPortalTeleportHandler.getTeleportData(entity).getPortalFacing();
-
 		final float newYaw = yaw -
-				originalPortalFacing.getOpposite().getHorizontalIndex() * 90.0F +
+				originalEntityFacing.getHorizontalIndex() * 90.0F +
 				forwards.getHorizontalIndex() * 90.0F;
 
 		if(entity instanceof EntityPlayerMP) {
@@ -451,10 +517,9 @@ public class VEPTeleporter extends Teleporter {
 		NetherPortalTeleportHandler.clearPortalType(entity);
 	}
 
-	//Use vanilla End teleportation behavior
 	@Override
 	public boolean isVanilla() {
-		return true;
+		return false;
 	}
 
 	public static void register() {

@@ -16,6 +16,17 @@ public final class NetherPortalFrameBreakHandler {
 			new HashMap<>();
 
 	@SubscribeEvent
+	public static void onBlockPlace(BlockEvent.PlaceEvent event) {
+		final World world = event.getWorld();
+		final BlockPos pos = event.getPos();
+
+		if(!event.getBlockSnapshot().getReplacedBlock().getBlock().isReplaceable(world, pos) &&
+				NetherPortalSavedData.get(world).getGeneratedPortalType(pos) != null) {
+			event.setCanceled(true);
+		}
+	}
+
+	@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event) {
 		final World world = event.getWorld();
 		final BlockPos pos = event.getPos();
