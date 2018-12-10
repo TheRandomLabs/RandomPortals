@@ -15,6 +15,7 @@ public final class NetherPortalType {
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount = true;
 
+	public boolean canBeActivatedByFire = true;
 	public boolean doGeneratedFramesDrop = true;
 
 	public boolean whitelist;

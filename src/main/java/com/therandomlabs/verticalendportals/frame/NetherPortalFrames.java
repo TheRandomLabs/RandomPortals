@@ -87,7 +87,7 @@ public final class NetherPortalFrames {
 
 	//pos must be an inner portal position adjacent to a frame position
 	public static boolean trySpawn(World world, BlockPos pos, NetherPortalType forcePortalType,
-			boolean userCreated) {
+			boolean userCreated, boolean activatedByFire) {
 		Frame frame = null;
 		BlockPos framePos = null;
 
@@ -103,7 +103,7 @@ public final class NetherPortalFrames {
 					world, offset,
 					potentialFrame -> testFrame(
 							potentialFrame, offset, facing.getOpposite(), forcePortalType,
-							userCreated
+							userCreated, activatedByFire
 					)
 			);
 
@@ -144,7 +144,7 @@ public final class NetherPortalFrames {
 	}
 
 	private static boolean testFrame(Frame frame, BlockPos framePos, EnumFacing inwards,
-			NetherPortalType forcePortalType, boolean userCreated) {
+			NetherPortalType forcePortalType, boolean userCreated, boolean activatedByFire) {
 		if(!frame.isFacingInwards(framePos, inwards)) {
 			return false;
 		}
@@ -156,7 +156,7 @@ public final class NetherPortalFrames {
 		}
 
 		for(NetherPortalType type : NetherPortalTypes.getTypes().values()) {
-			if(type.test(frame)) {
+			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame)) {
 				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
 				savedData.addPortal(type, frame, userCreated);
 				return true;
