@@ -22,6 +22,9 @@
 	],
 	//Valid values: "ANY", "ANY_NON_AIR", "SAME" (same as frameBlocks)
 	"requiredCorner": "ANY_NON_AIR",
+	//Whether the portal frame is activated when fire is placed inside it
+	//This is essentially useless without an addon mod
+	"canBeActivatedByFire": true,
 	//If true, corner blocks will also contribute to minimumAmount
 	"cornerBlocksContributeToMinimumAmount": true,
 	//Whether generated portal frames should drop
