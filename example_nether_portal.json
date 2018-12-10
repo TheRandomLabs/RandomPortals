@@ -29,6 +29,8 @@
 	"cornerBlocksContributeToMinimumAmount": true,
 	//Whether generated portal frames should drop
 	//Set this to false to prevent frame block farming
+	//This should also work with other mods such as Block Breakers from OpenBlocks
+	//and Exchangers
 	"doGeneratedFramesDrop": true,
 	//If true, "dimensions" is a whitelist rather than a blacklist
 	"whitelist": false,
