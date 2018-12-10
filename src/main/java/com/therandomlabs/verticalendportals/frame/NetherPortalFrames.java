@@ -1,27 +1,20 @@
 package com.therandomlabs.verticalendportals.frame;
 
-import java.util.List;
 import java.util.function.Function;
 import com.therandomlabs.verticalendportals.VEPConfig;
 import com.therandomlabs.verticalendportals.api.config.FrameSize;
-import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
-import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import com.therandomlabs.verticalendportals.api.frame.detector.BasicFrameDetector;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
-import com.therandomlabs.verticalendportals.block.VEPBlocks;
-import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.block.state.pattern.BlockStateMatcher;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 
 public final class NetherPortalFrames {
 	public static final Function<FrameType, FrameSize> SIZE = FrameSize.fromJSONs(
@@ -65,104 +58,36 @@ public final class NetherPortalFrames {
 	}
 
 	public static boolean isActivated(Frame frame) {
-		final BlockStateMatcher portal;
-		final FrameType type = frame.getType();
+		return isActivated(frame, BlockNetherPortal.Matcher::ofType);
+	}
 
-		if(type == FrameType.LATERAL) {
-			portal = BlockNetherPortal.Matcher.LATERAL;
-		} else if(type == FrameType.VERTICAL_X) {
-			portal = BlockNetherPortal.Matcher.VERTICAL_X;
-		} else {
-			portal = BlockNetherPortal.Matcher.VERTICAL_Z;
-		}
+	@SuppressWarnings("Duplicates")
+	public static boolean isActivated(Frame frame, StatePredicate lateralPortal,
+			StatePredicate verticalXPortal, StatePredicate verticalZPortal) {
+		return isActivated(frame, type -> {
+			if(type == FrameType.LATERAL) {
+				return lateralPortal;
+			}
 
-		for(IBlockState state : frame.getInnerBlocks()) {
-			if(!portal.apply(state)) {
+			if(type == FrameType.VERTICAL_X) {
+				return verticalXPortal;
+			}
+
+			return verticalZPortal;
+		});
+	}
+
+	public static boolean isActivated(Frame frame,
+			Function<FrameType, StatePredicate> portalFunction) {
+		final StatePredicate portal = portalFunction.apply(frame.getType());
+		final World world = frame.getWorld();
+
+		for(BlockPos pos : frame.getInnerBlockPositions()) {
+			if(!portal.test(world, pos, world.getBlockState(pos))) {
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	//pos must be an inner portal position adjacent to a frame position
-	public static boolean trySpawn(World world, BlockPos pos, NetherPortalType forcePortalType,
-			boolean userCreated, boolean activatedByFire) {
-		Frame frame = null;
-		BlockPos framePos = null;
-
-		for(EnumFacing facing : EnumFacing.values()) {
-			final BlockPos offset = pos.offset(facing);
-			final IBlockState state = world.getBlockState(offset);
-
-			if(!NetherPortalTypes.getValidBlocks().test(world, pos, state)) {
-				continue;
-			}
-
-			frame = NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(
-					world, offset,
-					potentialFrame -> testFrame(
-							potentialFrame, offset, facing.getOpposite(), forcePortalType,
-							userCreated, activatedByFire
-					)
-			);
-
-			if(frame != null) {
-				framePos = offset;
-			}
-
-			break;
-		}
-
-		if(frame == null) {
-			return false;
-		}
-
-		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Activate(frame, framePos))) {
-			return false;
-		}
-
-		final EnumFacing.Axis axis = frame.getType().getAxis();
-		IBlockState state;
-
-		if(axis == EnumFacing.Axis.Y) {
-			state = VEPBlocks.lateral_nether_portal.getDefaultState();
-		} else {
-			state = VEPBlocks.vertical_nether_portal.getDefaultState().
-					withProperty(BlockNetherPortal.AXIS, axis);
-		}
-
-		state = state.withProperty(BlockNetherPortal.USER_PLACED, false);
-
-		final List<BlockPos> innerBlockPositions = frame.getInnerBlockPositions();
-
-		for(BlockPos innerPos : innerBlockPositions) {
-			world.setBlockState(innerPos, state, 2);
-		}
-
-		return true;
-	}
-
-	private static boolean testFrame(Frame frame, BlockPos framePos, EnumFacing inwards,
-			NetherPortalType forcePortalType, boolean userCreated, boolean activatedByFire) {
-		if(!frame.isFacingInwards(framePos, inwards)) {
-			return false;
-		}
-
-		if(forcePortalType != null) {
-			final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-			savedData.addPortal(forcePortalType, frame, userCreated);
-			return true;
-		}
-
-		for(NetherPortalType type : NetherPortalTypes.getTypes().values()) {
-			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame)) {
-				final NetherPortalSavedData savedData = NetherPortalSavedData.get(frame.getWorld());
-				savedData.addPortal(type, frame, userCreated);
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

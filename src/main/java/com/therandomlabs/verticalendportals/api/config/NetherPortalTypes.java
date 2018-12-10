@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +24,7 @@ import net.minecraft.world.DimensionType;
 public final class NetherPortalTypes {
 	public static final String VANILLA_NETHER_PORTAL_NAME = "vanilla_nether_portal";
 
-	private static final NetherPortalType VANILLA_NETHER_PORTAL = new NetherPortalType(
+	public static final NetherPortalType VANILLA_NETHER_PORTAL = new NetherPortalType(
 			VANILLA_NETHER_PORTAL_NAME,
 			Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
 			DimensionType.NETHER.getId()
@@ -61,6 +63,30 @@ public final class NetherPortalTypes {
 
 	public static StatePredicate getValidBlocks() {
 		return validBlocks;
+	}
+
+	public static StatePredicate getValidBlocks(NetherPortalType... types) {
+		return getValidBlocks(Arrays.asList(types));
+	}
+
+	public static StatePredicate getValidBlocks(Collection<NetherPortalType> types) {
+		final List<Predicate<IBlockState>> matchers = new ArrayList<>();
+
+		for(NetherPortalType type : types) {
+			for(FrameBlock frameBlock : type.frameBlocks) {
+				matchers.add(frameBlock::test);
+			}
+		}
+
+		return (world, pos, state) -> {
+			for(Predicate<IBlockState> matcher : matchers) {
+				if(matcher.test(state)) {
+					return true;
+				}
+			}
+
+			return false;
+		};
 	}
 
 	public static NetherPortalType get(Frame frame) {
@@ -128,24 +154,7 @@ public final class NetherPortalTypes {
 		}
 
 		NetherPortalTypes.types = ImmutableMap.copyOf(types);
-
-		final List<Predicate<IBlockState>> matchers = new ArrayList<>();
-
-		for(NetherPortalType type : types.values()) {
-			for(FrameBlock frameBlock : type.frameBlocks) {
-				matchers.add(frameBlock::test);
-			}
-		}
-
-		validBlocks = (world, pos, state) -> {
-			for(Predicate<IBlockState> matcher : matchers) {
-				if(matcher.test(state)) {
-					return true;
-				}
-			}
-
-			return false;
-		};
+		validBlocks = getValidBlocks(types.values());
 	}
 
 	public static void registerBuiltinType(String name, NetherPortalType type) {

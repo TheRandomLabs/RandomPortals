@@ -9,17 +9,17 @@ import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameDetector;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.api.netherportal.NetherPortal;
+import com.therandomlabs.verticalendportals.api.util.StatePredicate;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
-import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.block.state.pattern.BlockStateMatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -37,29 +37,30 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Mod.EventBusSubscriber(modid = VerticalEndPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
 	public static final class Matcher {
-		public static final BlockStateMatcher LATERAL =
-				BlockStateMatcher.forBlock(VEPBlocks.lateral_nether_portal);
+		public static final StatePredicate LATERAL =
+				StatePredicate.of(VEPBlocks.lateral_nether_portal);
 
-		public static final BlockStateMatcher VERTICAL_X = BlockStateMatcher.forBlock(
+		public static final StatePredicate VERTICAL_X = StatePredicate.of(
 				VEPBlocks.vertical_nether_portal
 		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
 
-		public static final BlockStateMatcher VERTICAL_Z = BlockStateMatcher.forBlock(
+		public static final StatePredicate VERTICAL_Z = StatePredicate.of(
 				VEPBlocks.vertical_nether_portal
 		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
 
 		private Matcher() {}
 
-		public static BlockStateMatcher ofType(FrameType type) {
+		@SuppressWarnings("Duplicates")
+		public static StatePredicate ofType(FrameType type) {
 			if(type == FrameType.LATERAL) {
-				return BlockNetherPortal.Matcher.LATERAL;
+				return LATERAL;
 			}
 
 			if(type == FrameType.VERTICAL_X) {
-				return BlockNetherPortal.Matcher.VERTICAL_X;
+				return VERTICAL_X;
 			}
 
-			return BlockNetherPortal.Matcher.VERTICAL_Z;
+			return VERTICAL_Z;
 		}
 	}
 
@@ -154,11 +155,11 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final Map.Entry<Boolean, PortalData> entry =
+		final Map.Entry<Boolean, NetherPortal> entry =
 				findFrame(NetherPortalFrames.FRAMES, world, pos);
 
 		if(entry != null) {
-			final PortalData portal = entry.getValue();
+			final NetherPortal portal = entry.getValue();
 			final Frame frame = portal.getFrame();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
@@ -290,7 +291,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final PortalData portal = NetherPortalSavedData.get(world).getPortal(pos);
+		final NetherPortal portal = NetherPortalSavedData.get(world).getPortal(pos);
 		NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 	}
 
@@ -374,9 +375,9 @@ public class BlockNetherPortal extends BlockPortal {
 				block == VEPBlocks.lateral_nether_portal;
 	}
 
-	public static Map.Entry<Boolean, PortalData> findFrame(FrameDetector detector,
+	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
-		final PortalData portal =
+		final NetherPortal portal =
 				NetherPortalSavedData.get(world).getPortal(world, portalPos);
 
 		if(portal != null) {
@@ -392,7 +393,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final FrameType type = FrameType.fromAxis(axis);
 		final int maxWidth = NetherPortalFrames.SIZE.apply(type).maxWidth;
 
-		final BlockStateMatcher portalMatcher = Matcher.ofType(type);
+		final StatePredicate portalMatcher = Matcher.ofType(type);
 
 		BlockPos framePos = null;
 		BlockPos checkPos = portalPos;
@@ -411,7 +412,7 @@ public class BlockNetherPortal extends BlockPortal {
 				break;
 			}
 
-			if(!portalMatcher.apply(checkState)) {
+			if(!portalMatcher.test(world, checkPos, checkState)) {
 				break;
 			}
 		}
@@ -425,7 +426,7 @@ public class BlockNetherPortal extends BlockPortal {
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
 		);
 
-		return new AbstractMap.SimpleEntry<>(false, new PortalData(
+		return new AbstractMap.SimpleEntry<>(false, new NetherPortal(
 				frame, NetherPortalTypes.get(frame)
 		));
 	}

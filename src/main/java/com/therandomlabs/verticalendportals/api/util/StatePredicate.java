@@ -2,6 +2,7 @@ package com.therandomlabs.verticalendportals.api.util;
 
 import java.util.function.Predicate;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -10,6 +11,11 @@ import net.minecraftforge.oredict.OreDictionary;
 @FunctionalInterface
 public interface StatePredicate {
 	boolean test(World world, BlockPos pos, IBlockState state);
+
+	default <T extends Comparable<T>> StatePredicate where(IProperty<T> property,
+			Predicate<? super T> is) {
+		return (world, pos, state) -> test(world, pos, state) && is.test(state.getValue(property));
+	}
 
 	static StatePredicate of(Predicate<IBlockState> predicate) {
 		return (world, pos, state) -> predicate.test(state);

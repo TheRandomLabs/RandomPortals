@@ -8,8 +8,8 @@ import java.util.Map;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.event.NetherPortalEvent;
+import com.therandomlabs.verticalendportals.api.netherportal.NetherPortal;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
-import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -21,17 +21,17 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public final class NetherPortalTeleportHandler {
 	public static class TeleportData {
-		private PortalData portal;
+		private NetherPortal portal;
 		private BlockPos pos;
 		private EnumFacing portalFacing;
 
-		private TeleportData(PortalData portal, BlockPos pos, EnumFacing portalFacing) {
+		private TeleportData(NetherPortal portal, BlockPos pos, EnumFacing portalFacing) {
 			this.portal = portal;
 			this.pos = pos;
 			this.portalFacing = portalFacing;
 		}
 
-		public PortalData getPortal() {
+		public NetherPortal getPortal() {
 			return portal;
 		}
 
@@ -61,7 +61,7 @@ public final class NetherPortalTeleportHandler {
 		return null;
 	}
 
-	public static void setPortal(Entity entity, PortalData portal, BlockPos pos) {
+	public static void setPortal(Entity entity, NetherPortal portal, BlockPos pos) {
 		final World world = entity.getEntityWorld();
 
 		if(!world.getMinecraftServer().getAllowNether()) {
@@ -183,7 +183,7 @@ public final class NetherPortalTeleportHandler {
 		entity.timeUntilPortal = entity.getPortalCooldown();
 
 		final NetherPortalEvent.Teleport event = new NetherPortalEvent.Teleport(
-				data.portal == null ? null : data.portal.getFrame(), entity, data.pos
+				data.portal, entity, data.pos, data.portalFacing
 		);
 
 		if(MinecraftForge.EVENT_BUS.post(event)) {

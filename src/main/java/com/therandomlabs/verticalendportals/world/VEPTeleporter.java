@@ -6,11 +6,12 @@ import com.therandomlabs.verticalendportals.api.config.NetherPortalType;
 import com.therandomlabs.verticalendportals.api.config.NetherPortalTypes;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
 import com.therandomlabs.verticalendportals.api.frame.FrameType;
+import com.therandomlabs.verticalendportals.api.netherportal.NetherPortal;
+import com.therandomlabs.verticalendportals.api.netherportal.NetherPortalActivator;
 import com.therandomlabs.verticalendportals.block.BlockNetherPortal;
 import com.therandomlabs.verticalendportals.frame.NetherPortalFrames;
 import com.therandomlabs.verticalendportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.verticalendportals.world.storage.NetherPortalSavedData;
-import com.therandomlabs.verticalendportals.world.storage.PortalData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -120,7 +121,7 @@ public class VEPTeleporter extends Teleporter {
 						pos2 = pos1.down();
 
 						if(BlockNetherPortal.isPortal(world, pos1)) {
-							final PortalData portal =
+							final NetherPortal portal =
 									NetherPortalSavedData.get(world).getPortal(pos1);
 
 							if(portal != null && portal.getType() == portalType) {
@@ -437,8 +438,8 @@ public class VEPTeleporter extends Teleporter {
 			}
 		}
 
-		NetherPortalFrames.trySpawn(
-				world, new BlockPos(portalX, portalY, portalZ), portalType, false
+		new NetherPortalActivator().forcePortalType(portalType).setUserCreated(false).activate(
+				world, new BlockPos(portalX, portalY, portalZ)
 		);
 
 		return true;

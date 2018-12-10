@@ -1,32 +1,69 @@
 package com.therandomlabs.verticalendportals.api.event;
 
 import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.netherportal.NetherPortal;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class NetherPortalEvent extends Event {
+	@Cancelable
 	public static class Activate extends NetherPortalEvent {
+		private NetherPortal portal;
 		private final BlockPos activatedFrameBlock;
+		private final boolean userCreated;
+		private final boolean activatedByFire;
 
-		public Activate(Frame frame, BlockPos activatedFrameBlock) {
-			super(frame);
+		public Activate(NetherPortal portal, BlockPos activatedFrameBlock, boolean userCreated,
+				boolean activatedByFire) {
+			super(portal.getFrame());
+			this.portal = portal;
 			this.activatedFrameBlock = activatedFrameBlock;
+			this.userCreated = userCreated;
+			this.activatedByFire = activatedByFire;
+		}
+
+		public NetherPortal getPortal() {
+			return portal;
+		}
+
+		public void setPortal(NetherPortal portal) {
+			this.portal = portal;
 		}
 
 		public BlockPos getActivatedFrameBlock() {
 			return activatedFrameBlock;
 		}
+
+		public boolean isUserCreated() {
+			return userCreated;
+		}
+
+		public boolean isActivatedByFire() {
+			return activatedByFire;
+		}
 	}
 
+	@Cancelable
 	public static class Teleport extends NetherPortalEvent {
+		private final NetherPortal portal;
 		private final Entity entity;
 		private final BlockPos portalPos;
+		private final EnumFacing portalFacing;
 
-		public Teleport(Frame frame, Entity entity, BlockPos portalPos) {
-			super(frame);
+		public Teleport(NetherPortal portal, Entity entity, BlockPos portalPos,
+				EnumFacing portalFacing) {
+			super(portal.getFrame());
+			this.portal = portal;
 			this.entity = entity;
 			this.portalPos = portalPos;
+			this.portalFacing = portalFacing;
+		}
+
+		public NetherPortal getPortal() {
+			return portal;
 		}
 
 		public Entity getEntity() {
@@ -36,17 +73,16 @@ public class NetherPortalEvent extends Event {
 		public BlockPos getPortalPos() {
 			return portalPos;
 		}
+
+		public EnumFacing getPortalFacing() {
+			return portalFacing;
+		}
 	}
 
 	private final Frame frame;
 
 	public NetherPortalEvent(Frame frame) {
 		this.frame = frame;
-	}
-
-	@Override
-	public boolean isCancelable() {
-		return true;
 	}
 
 	public Frame getFrame() {
