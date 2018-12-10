@@ -52,6 +52,14 @@ public enum FrameType {
 		return vertical;
 	}
 
+	public boolean test(FrameType type) {
+		if(this == type || this == LATERAL_OR_VERTICAL) {
+			return true;
+		}
+
+		return type == VERTICAL && (type == VERTICAL_X || type == VERTICAL_Z);
+	}
+
 	public static FrameType fromAxis(EnumFacing.Axis axis) {
 		for(FrameType type : values()) {
 			if(type.axis == axis) {

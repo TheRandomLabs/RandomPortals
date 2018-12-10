@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.therandomlabs.verticalendportals.api.frame.Frame;
+import com.therandomlabs.verticalendportals.api.frame.FrameType;
 import com.therandomlabs.verticalendportals.api.frame.RequiredCorner;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -15,6 +16,7 @@ public final class NetherPortalType {
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount = true;
 
+	public FrameType type = FrameType.LATERAL_OR_VERTICAL;
 	public boolean canBeActivatedByFire = true;
 	public boolean doGeneratedFramesDrop = true;
 
@@ -93,6 +95,10 @@ public final class NetherPortalType {
 	}
 
 	public boolean test(Frame frame) {
+		if(!type.test(frame.getType())) {
+			return false;
+		}
+
 		final World world = frame.getWorld();
 		final int dimension = world.provider.getDimension();
 
