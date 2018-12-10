@@ -179,7 +179,7 @@ public class NetherPortalActivator {
 
 		for(NetherPortalType type : types) {
 			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame)) {
-				return new NetherPortal(frame, forcePortalType);
+				return new NetherPortal(frame, type);
 			}
 		}
 
