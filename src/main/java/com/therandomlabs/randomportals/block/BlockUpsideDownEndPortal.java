@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockUpsideDownEndPortal extends BlockLateralEndPortal{
+public class BlockUpsideDownEndPortal extends BlockLateralEndPortal {
 	private static final AxisAlignedBB AABB_BLOCK = new AxisAlignedBB(
 			0.0, 0.25, 0.0, 1.0, 1.0, 1.0
 	);

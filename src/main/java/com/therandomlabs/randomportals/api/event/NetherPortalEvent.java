@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 public class NetherPortalEvent extends Event {
 	@Cancelable
 	public static class Activate extends NetherPortalEvent {
-		private NetherPortal portal;
+		private final NetherPortal portal;
 		private final BlockPos activatedFrameBlock;
 		private final boolean userCreated;
 		private final boolean activatedByFire;
@@ -27,10 +27,6 @@ public class NetherPortalEvent extends Event {
 
 		public NetherPortal getPortal() {
 			return portal;
-		}
-
-		public void setPortal(NetherPortal portal) {
-			this.portal = portal;
 		}
 
 		public BlockPos getActivatedFrameBlock() {

@@ -133,7 +133,6 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
 			BlockPos fromPos) {
@@ -274,7 +273,6 @@ public class BlockNetherPortal extends BlockPortal {
 		return z && (side == EnumFacing.NORTH || side == EnumFacing.SOUTH);
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
 		if(entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
@@ -377,6 +375,7 @@ public class BlockNetherPortal extends BlockPortal {
 				block == RPOBlocks.lateral_nether_portal;
 	}
 
+	@SuppressWarnings("Duplicates")
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
 		final NetherPortal portal =

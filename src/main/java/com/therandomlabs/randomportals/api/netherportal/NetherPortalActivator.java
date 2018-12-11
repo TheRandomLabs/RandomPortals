@@ -166,7 +166,7 @@ public class NetherPortalActivator {
 		);
 
 		if(MinecraftForge.EVENT_BUS.post(event)) {
-			return event.getPortal();
+			return null;
 		}
 
 		final NetherPortal result = event.getPortal();

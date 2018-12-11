@@ -81,7 +81,6 @@ public class RPOTeleporter extends Teleporter {
 		}
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean placeInExistingPortal(Entity entity, float yaw) {
 		double distance = -1.0;

@@ -56,7 +56,6 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 		return defaultSize;
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	protected boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
 			FrameSide side, int position) {

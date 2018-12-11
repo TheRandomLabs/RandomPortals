@@ -39,7 +39,6 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		setRegistryName(registryName);
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
 		if(world.isRemote || entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
