@@ -1,5 +1,5 @@
 {
-	"homepage": "https://minecraft.curseforge.com/projects/vertical-end-portals",
+	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
 		"1.12.2-0.5.0.0": "Added the \"type\" and \"canBeActivatedByFire\" properties to Nether portal types.\nBug fixes and improvements.",
 		"1.12.2-0.4.0.0": "Required corners are now configurable for Nether portal types.\nGenerated portal frame dropping can now be disabled for Nether portal types.\nBug fixes and improvements.",

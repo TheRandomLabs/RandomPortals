@@ -1,1 +1,1 @@
-# Miscellaneous Files for Vertical End Portals
+# Miscellaneous Files for RandomPortals
