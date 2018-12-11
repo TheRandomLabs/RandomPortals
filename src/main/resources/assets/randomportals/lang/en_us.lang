@@ -1,0 +1,36 @@
+randomportals.config.client=Client
+randomportals.config.client.tooltip=Options related to features that only work client-side.
+randomportals.config.client.portalsCreativeTab=Portals creative tab
+randomportals.config.client.rporeloadclientCommand=/rporeloadclient
+
+randomportals.config.endPortals=End Portals
+randomportals.config.endPortals.tooltip=Options related to End portals.
+randomportals.config.endPortals.enabled=Enabled
+randomportals.config.endPortals.useAllVariantsJson=Use all_variants JSON
+
+randomportals.config.misc=Miscellaneous
+randomportals.config.misc.tooltip=Options that don't fit into any other categories.
+randomportals.config.misc.rporeloadCommand=/rporeload
+
+randomportals.config.netherPortals=Nether Portals
+randomportals.config.netherPortals.tooltip=Options related to Nether portals.
+randomportals.config.netherPortals.enabled=Enabled
+randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
+randomportals.config.netherPortals.useAllVariantsJson=Use all_variants JSON
+
+itemGroup.portals=Portals
+
+tile.endPortalFrameLateral.name=Lateral End Portal Frame
+tile.endPortalLateral.name=Lateral End Portal
+
+tile.endPortalFrameVertical.name=Vertical End Portal Frame
+tile.endPortalVertical.name=Vertical End Portal
+
+tile.endPortalFrameUpsideDown.name=Upside Down End Portal Frame
+tile.endPortalUpsideDown.name=Upside Down End Portal
+
+tile.netherPortalVertical.name=Vertical Nether Portal
+tile.netherPortalLateral.name=Lateral Nether Portal
+
+commands.rporeloadclient.usage=/rporeloadclient
+commands.rporeloadclient.success=RandomPortals client-sided configuration reloaded!

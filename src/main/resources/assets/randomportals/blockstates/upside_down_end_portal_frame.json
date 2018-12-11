@@ -1,0 +1,34 @@
+{
+	"variants": {
+		"eye=false,facing=north": {
+			"model": "randomportals:upside_down_end_portal_frame_empty"
+		},
+		"eye=false,facing=east": {
+			"model": "randomportals:upside_down_end_portal_frame_empty",
+			"y": 90
+		},
+		"eye=false,facing=south": {
+			"model": "randomportals:upside_down_end_portal_frame_empty",
+			"y": 180
+		},
+		"eye=false,facing=west": {
+			"model": "randomportals:upside_down_end_portal_frame_empty",
+			"y": 270
+		},
+		"eye=true,facing=north": {
+			"model": "randomportals:upside_down_end_portal_frame_filled"
+		},
+		"eye=true,facing=east": {
+			"model": "randomportals:upside_down_end_portal_frame_filled",
+			"y": 90
+		},
+		"eye=true,facing=south": {
+			"model": "randomportals:upside_down_end_portal_frame_filled",
+			"y": 180
+		},
+		"eye=true,facing=west": {
+			"model": "randomportals:upside_down_end_portal_frame_filled",
+			"y": 270
+		}
+	}
+}

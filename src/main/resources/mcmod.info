@@ -1,17 +1,17 @@
 [
 	{
-		"modid": "verticalendportals",
-		"name": "Vertical End Portals",
-		"description": "Vertical End portals!",
+		"modid": "randomportals",
+		"name": "RandomPortals",
+		"description": "Brings vertical End portals and lateral Nether portals to Minecraft.",
 		"version": "${version}",
 		"mcversion": "${mcversion}",
-		"url": "https://minecraft.curseforge.com/projects/vertical-end-portals",
-		"updateJSON": "https://raw.githubusercontent.com/TheRandomLabs/Vertical-End-Portals/misc/versions.json",
+		"url": "https://minecraft.curseforge.com/projects/randomportals",
+		"updateJSON": "https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json",
 		"authorList": [
 			"TheRandomLabs"
 		],
-		"credits": "u/Sp00nWhales for suggesting this glorious mod.",
-		"logoFile": "assets/verticalendportals/logo.png",
+		"credits": "Lulz01 for testing.",
+		"logoFile": "assets/randomportals/logo.png",
 		"screenshots": [],
 		"dependencies": []
 	}

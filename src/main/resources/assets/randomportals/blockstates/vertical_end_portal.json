@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=south": {
+			"model": "randomportals:vertical_end_portal"
+		},
+		"facing=west": {
+			"model": "randomportals:vertical_end_portal",
+			"y": 90
+		},
+		"facing=north": {
+			"model": "randomportals:vertical_end_portal",
+			"y": 180
+		},
+		"facing=east": {
+			"model": "randomportals:vertical_end_portal",
+			"y": 270
+		}
+	}
+}
