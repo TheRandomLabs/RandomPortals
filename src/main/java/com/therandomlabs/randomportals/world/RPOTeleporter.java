@@ -10,7 +10,7 @@ import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
-import com.therandomlabs.randomportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -124,7 +124,7 @@ public class RPOTeleporter extends Teleporter {
 
 						if(BlockNetherPortal.isPortal(world, pos1)) {
 							final NetherPortal portal =
-									NetherPortalSavedData.get(world).getPortal(pos1);
+									RPOSavedData.get(world).getNetherPortal(pos1);
 
 							if(portal != null && portal.getType() == portalType) {
 								for(pos2 = pos1.down(); BlockNetherPortal.isPortal(world, pos2);

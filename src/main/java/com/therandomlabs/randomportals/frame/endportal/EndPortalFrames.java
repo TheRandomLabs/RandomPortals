@@ -16,6 +16,7 @@ import com.therandomlabs.randomportals.api.frame.RequiredCorner;
 import com.therandomlabs.randomportals.api.frame.detector.BasicVerticalFrameDetector;
 import com.therandomlabs.randomportals.api.util.StatePredicate;
 import com.therandomlabs.randomportals.block.RPOBlocks;
+import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockStateMatcher;
@@ -158,6 +159,7 @@ public final class EndPortalFrames {
 
 			world.playBroadcastSound(1038, frame.getTopLeft().add(1, 0, 1), 0);
 
+			RPOSavedData.get(world).addEndPortal(frame);
 			return frame;
 		}
 
@@ -193,6 +195,7 @@ public final class EndPortalFrames {
 
 		world.playBroadcastSound(1038, innerBlockPositions.get(0), 0);
 
+		RPOSavedData.get(world).addEndPortal(frame);
 		return frame;
 	}
 

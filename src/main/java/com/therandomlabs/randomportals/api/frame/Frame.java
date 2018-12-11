@@ -78,6 +78,26 @@ public class Frame {
 	}
 
 	@Override
+	public boolean equals(Object object) {
+		if(this == object) {
+			return true;
+		}
+
+		if(!(object instanceof Frame)) {
+			return false;
+		}
+
+		final Frame frame = (Frame) object;
+		return topLeft.equals(frame.topLeft) && width == frame.width && height == frame.height &&
+				type == frame.type;
+	}
+
+	@Override
+	public int hashCode() {
+		return topLeft.hashCode() * width * height * type.hashCode();
+	}
+
+	@Override
 	public String toString() {
 		return "Frame[topLeft=" + topLeft + ",topRight=" + topRight + ",bottomLeft=" + bottomLeft +
 				",bottomRight=" + bottomRight + ",type=" + type + "]";

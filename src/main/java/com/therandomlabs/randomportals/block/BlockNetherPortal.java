@@ -14,7 +14,7 @@ import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.util.StatePredicate;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
-import com.therandomlabs.randomportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
@@ -224,7 +224,7 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		removing.clear();
-		NetherPortalSavedData.get(world).removePortal(pos);
+		RPOSavedData.get(world).removeNetherPortal(pos);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -291,7 +291,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final NetherPortal portal = NetherPortalSavedData.get(world).getPortal(pos);
+		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(pos);
 		NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 	}
 
@@ -355,7 +355,7 @@ public class BlockNetherPortal extends BlockPortal {
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
 		if(!world.isRemote) {
-			NetherPortalSavedData.get(world).removePortal(pos);
+			RPOSavedData.get(world).removeNetherPortal(pos);
 		}
 
 		return actuallyRemoved;
@@ -379,7 +379,7 @@ public class BlockNetherPortal extends BlockPortal {
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
 		final NetherPortal portal =
-				NetherPortalSavedData.get(world).getPortal(world, portalPos);
+				RPOSavedData.get(world).getNetherPortal(world, portalPos);
 
 		if(portal != null) {
 			return new AbstractMap.SimpleEntry<>(true, portal);

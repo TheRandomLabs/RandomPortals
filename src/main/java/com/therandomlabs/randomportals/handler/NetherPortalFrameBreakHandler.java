@@ -4,7 +4,7 @@ import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import com.therandomlabs.randomportals.api.config.NetherPortalType;
-import com.therandomlabs.randomportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.BlockEvent;
@@ -21,7 +21,7 @@ public final class NetherPortalFrameBreakHandler {
 		final BlockPos pos = event.getPos();
 
 		if(!event.getBlockSnapshot().getReplacedBlock().getBlock().isReplaceable(world, pos) &&
-				NetherPortalSavedData.get(world).getGeneratedPortalType(pos) != null) {
+				RPOSavedData.get(world).getGeneratedNetherPortalType(pos) != null) {
 			event.setCanceled(true);
 		}
 	}
@@ -33,7 +33,7 @@ public final class NetherPortalFrameBreakHandler {
 
 		positions.put(
 				new AbstractMap.SimpleEntry<>(world, pos),
-				NetherPortalSavedData.get(world).getGeneratedPortalType(pos)
+				RPOSavedData.get(world).getGeneratedNetherPortalType(pos)
 		);
 	}
 
@@ -54,7 +54,7 @@ public final class NetherPortalFrameBreakHandler {
 			return;
 		}
 
-		final NetherPortalSavedData savedData = NetherPortalSavedData.get(event.world);
+		final RPOSavedData savedData = RPOSavedData.get(event.world);
 
 		for(Map.Entry<Map.Entry<World, BlockPos>, NetherPortalType> entry :
 				positions.entrySet()) {
@@ -67,7 +67,7 @@ public final class NetherPortalFrameBreakHandler {
 			final Map.Entry<World, BlockPos> key = entry.getKey();
 
 			if(key.getKey() == event.world) {
-				savedData.removeGeneratedPortalFramePos(type.getName(), key.getValue());
+				savedData.removeGeneratedNetherPortalFramePos(type.getName(), key.getValue());
 			}
 		}
 	}

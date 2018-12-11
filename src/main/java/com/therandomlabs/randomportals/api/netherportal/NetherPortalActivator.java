@@ -9,7 +9,7 @@ import com.therandomlabs.randomportals.api.util.StatePredicate;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
-import com.therandomlabs.randomportals.world.storage.NetherPortalSavedData;
+import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -176,7 +176,7 @@ public class NetherPortalActivator {
 
 	protected void onActivate(World world, NetherPortal portal,
 			Function<EnumFacing.Axis, IBlockState> portalBlocks) {
-		NetherPortalSavedData.get(world).addPortal(portal, userCreated);
+		RPOSavedData.get(world).addNetherPortal(portal, userCreated);
 
 		final Frame frame = portal.getFrame();
 		final IBlockState state = portalBlocks.apply(frame.getType().getAxis());

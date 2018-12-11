@@ -9,6 +9,7 @@ import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.util.StatePredicate;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import com.therandomlabs.randomportals.handler.EndPortalActivationHandler;
+import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortal;
 import net.minecraft.block.material.Material;
@@ -72,7 +73,11 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 
 	@SuppressWarnings({"ConditionCoveredByFurtherCondition", "Duplicates"})
 	public static Frame findFrame(World world, BlockPos portalPos) {
-		//TODO saved data
+		Frame frame = RPOSavedData.get(world).getEndPortal(portalPos);
+
+		if(frame != null) {
+			return frame;
+		}
 
 		final IBlockState state = world.getBlockState(portalPos);
 		final Block block = state.getBlock();
@@ -138,7 +143,6 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 
 		final Predicate<Frame> condition =
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos);
-		Frame frame;
 
 		if(frameBlock == Blocks.END_PORTAL_FRAME) {
 			frame = EndPortalFrames.LATERAL.detectWithCondition(world, framePos, condition);
