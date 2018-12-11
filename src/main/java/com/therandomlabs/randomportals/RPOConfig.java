@@ -96,19 +96,19 @@ public final class RPOConfig {
 
 	@Config.LangKey("randomportals.config.client")
 	@Config.Comment("Options related to features that only work client-side.")
-	public static Client client = new Client();
+	public static final Client client = new Client();
 
 	@Config.LangKey("randomportals.config.endPortals")
 	@Config.Comment("Options related to End portals.")
-	public static EndPortals endPortals = new EndPortals();
+	public static final EndPortals endPortals = new EndPortals();
 
 	@Config.LangKey("randomportals.config.misc")
 	@Config.Comment("Options that don't fit into any other categories.")
-	public static Misc misc = new Misc();
+	public static final Misc misc = new Misc();
 
 	@Config.LangKey("randomportals.config.netherPortals")
 	@Config.Comment("Options related to Nether portals.")
-	public static NetherPortals netherPortals = new NetherPortals();
+	public static final NetherPortals netherPortals = new NetherPortals();
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
