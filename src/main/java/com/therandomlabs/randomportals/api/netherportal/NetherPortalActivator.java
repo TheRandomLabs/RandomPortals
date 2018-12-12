@@ -162,7 +162,7 @@ public class NetherPortalActivator {
 		}
 
 		final NetherPortalEvent.Activate event = new NetherPortalEvent.Activate(
-				portal.portal, framePos, userCreated, activatedByFire
+				world, portal.portal, framePos, userCreated, activatedByFire
 		);
 
 		if(MinecraftForge.EVENT_BUS.post(event)) {

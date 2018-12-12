@@ -1,10 +1,13 @@
 package com.therandomlabs.randomportals.api.event;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
@@ -12,25 +15,31 @@ public class NetherPortalEvent extends Event {
 	@Cancelable
 	public static class Activate extends NetherPortalEvent {
 		private final NetherPortal portal;
-		private final BlockPos activatedFrameBlock;
+		private final BlockPos activatedFramePos;
 		private final boolean userCreated;
 		private final boolean activatedByFire;
 
-		public Activate(NetherPortal portal, BlockPos activatedFrameBlock, boolean userCreated,
-				boolean activatedByFire) {
-			super(portal.getFrame());
+		public Activate(World world, NetherPortal portal, BlockPos activatedFramePos,
+				boolean userCreated, boolean activatedByFire) {
+			super(world, portal.getFrame());
 			this.portal = portal;
-			this.activatedFrameBlock = activatedFrameBlock;
+			this.activatedFramePos = activatedFramePos;
 			this.userCreated = userCreated;
 			this.activatedByFire = activatedByFire;
 		}
 
+		@Nonnull
+		public Frame getFrame() {
+			return frame;
+		}
+
+		@Nonnull
 		public NetherPortal getPortal() {
 			return portal;
 		}
 
-		public BlockPos getActivatedFrameBlock() {
-			return activatedFrameBlock;
+		public BlockPos getActivatedFramePos() {
+			return activatedFramePos;
 		}
 
 		public boolean isUserCreated() {
@@ -51,13 +60,19 @@ public class NetherPortalEvent extends Event {
 
 		public Teleport(NetherPortal portal, Entity entity, BlockPos portalPos,
 				EnumFacing originalEntityFacing) {
-			super(portal == null ? null : portal.getFrame());
+			super(entity.getEntityWorld(), portal == null ? null : portal.getFrame());
 			this.portal = portal;
 			this.entity = entity;
 			this.portalPos = portalPos;
 			this.originalEntityFacing = originalEntityFacing;
 		}
 
+		@Nullable
+		public Frame getFrame() {
+			return frame;
+		}
+
+		@Nullable
 		public NetherPortal getPortal() {
 			return portal;
 		}
@@ -75,13 +90,16 @@ public class NetherPortalEvent extends Event {
 		}
 	}
 
-	private final Frame frame;
+	protected final World world;
+	protected final Frame frame;
 
-	public NetherPortalEvent(Frame frame) {
+	public NetherPortalEvent(World world, Frame frame) {
+		this.world = world;
 		this.frame = frame;
 	}
 
-	public Frame getFrame() {
-		return frame;
+	@Nonnull
+	public World getWorld() {
+		return world;
 	}
 }

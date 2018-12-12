@@ -67,7 +67,7 @@ public final class FrameBlock {
 	}
 
 	public FrameBlock getActualBlock() {
-		return getBlocks().length == 0 ? null : blocks[0];
+		return getActualBlocks().length == 0 ? null : blocks[0];
 	}
 
 	@SuppressWarnings("deprecation")
@@ -86,7 +86,7 @@ public final class FrameBlock {
 	}
 
 	public boolean isValid() {
-		return getBlocks() != null;
+		return getActualBlocks() != null;
 	}
 
 	public void ensureCorrect() {
@@ -99,7 +99,7 @@ public final class FrameBlock {
 		final Block block = state.getBlock();
 		final int meta = block.getMetaFromState(state);
 
-		for(FrameBlock frameBlock : getBlocks()) {
+		for(FrameBlock frameBlock : getActualBlocks()) {
 			if(frameBlock.getBlock() == block && (frameBlock.meta == OreDictionary.WILDCARD_VALUE ||
 					frameBlock.meta == meta)) {
 				return true;
@@ -109,7 +109,7 @@ public final class FrameBlock {
 		return false;
 	}
 
-	private FrameBlock[] getBlocks() {
+	private FrameBlock[] getActualBlocks() {
 		if(blocks != null) {
 			return blocks;
 		}

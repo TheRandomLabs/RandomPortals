@@ -141,7 +141,10 @@ public final class EndPortalFrames {
 		}
 
 		if(frame != null && !frame.isCorner(framePos)) {
-			if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Activate(frame, framePos))) {
+			final EndPortalEvent.Activate event =
+					new EndPortalEvent.Activate(world, frame, framePos);
+
+			if(MinecraftForge.EVENT_BUS.post(event)) {
 				return null;
 			}
 
@@ -180,8 +183,13 @@ public final class EndPortalFrames {
 			}
 		}
 
-		if(frame == null || frame.isCorner(framePos) ||
-				MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Activate(frame, framePos))) {
+		if(frame == null || frame.isCorner(framePos)) {
+			return null;
+		}
+
+		final EndPortalEvent.Activate event = new EndPortalEvent.Activate(world, frame, framePos);
+
+		if(MinecraftForge.EVENT_BUS.post(event)) {
 			return null;
 		}
 
