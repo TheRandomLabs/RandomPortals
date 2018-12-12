@@ -27,7 +27,7 @@ public final class RandomPortals {
 	public static final String MOD_ID = "randomportals";
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
-	public static final String DEPENDENCIES = "required-after:randompatches@[1.12.2-1.9.1.2,)";
+	public static final String DEPENDENCIES = "required-after:rpintegration@[1.12.2-1.0.0.0,)";
 	public static final String UPDATE_JSON =
 			"https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
