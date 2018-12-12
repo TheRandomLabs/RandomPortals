@@ -160,16 +160,17 @@ public abstract class FrameDetector {
 
 				checkPos = checkPos.offset(opposite);
 				checkState = getState(world, checkPos);
+				final BlockPos checkPos2 = checkPos.offset(previousFacing);
 				final IBlockState checkState2 =
 						getState(world, checkPos.offset(previousFacing));
 
 				//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 				//we look for the top-left corner (which has position 1)
 				//The length of the previous side is unknown, so we pass in 0 for position
-				if(test(world, type, pos, checkState, side, 1) &&
-						test(world, type, pos, checkState2, previousSide, UNKNOWN)) {
+				if(test(world, type, checkPos, checkState, side, 1) &&
+						test(world, type, checkPos2, checkState2, previousSide, UNKNOWN)) {
 					possibleCorners.add(checkPos);
-				} else if(!testInner(world, pos, checkState2)) {
+				} else if(!testInner(world, checkPos2, checkState2)) {
 					//Then checkState2 is an inner block
 					break;
 				}
