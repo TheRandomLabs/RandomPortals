@@ -161,8 +161,7 @@ public abstract class FrameDetector {
 				checkPos = checkPos.offset(opposite);
 				checkState = getState(world, checkPos);
 				final BlockPos checkPos2 = checkPos.offset(previousFacing);
-				final IBlockState checkState2 =
-						getState(world, checkPos.offset(previousFacing));
+				final IBlockState checkState2 = getState(world, checkPos2);
 
 				//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 				//we look for the top-left corner (which has position 1)
@@ -259,16 +258,17 @@ public abstract class FrameDetector {
 			checkPos = checkPos.offset(facing);
 			checkState = getState(world, checkPos);
 
-			final IBlockState checkState2 = getState(world, checkPos.offset(nextFacing));
+			final BlockPos checkPos2 = checkPos.offset(nextFacing);
+			final IBlockState checkState2 = getState(world, checkPos2);
 
 			//For example, if this is a lateral frame and facing is EAST (i.e. the top side),
 			//we look for the top-right corner (which has position 1 on the right side)
 			//We're testing for the second block on the next side (i.e. position 2)
 			if(length >= minLength &&
 					test(world, type, pos, checkState, nextSide, CORNER) &&
-					test(world, type, pos, checkState2, nextSide, 2)) {
+					test(world, type, checkPos2, checkState2, nextSide, 2)) {
 				possibleCorners.add(new AbstractMap.SimpleEntry<>(checkPos, length));
-			} else if(!testInner(world, pos, checkState2)) {
+			} else if(!testInner(world, checkPos2, checkState2)) {
 				//Then checkState2 is an inner block
 				break;
 			}
