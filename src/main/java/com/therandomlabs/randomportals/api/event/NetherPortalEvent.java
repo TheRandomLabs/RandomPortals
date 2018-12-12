@@ -131,6 +131,7 @@ public class NetherPortalEvent extends Event {
 
 		/**
 		 * Returns the sending portal frame.
+		 *
 		 * @return the sending portal frame.
 		 */
 		@Override

@@ -78,6 +78,11 @@ public class Frame {
 	}
 
 	@Override
+	public int hashCode() {
+		return topLeft.hashCode() * width * height * type.hashCode();
+	}
+
+	@Override
 	public boolean equals(Object object) {
 		if(this == object) {
 			return true;
@@ -90,11 +95,6 @@ public class Frame {
 		final Frame frame = (Frame) object;
 		return topLeft.equals(frame.topLeft) && width == frame.width && height == frame.height &&
 				type == frame.type;
-	}
-
-	@Override
-	public int hashCode() {
-		return topLeft.hashCode() * width * height * type.hashCode();
 	}
 
 	@Override

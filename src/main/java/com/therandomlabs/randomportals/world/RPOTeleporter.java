@@ -86,6 +86,8 @@ public class RPOTeleporter extends Teleporter {
 
 	@Override
 	public boolean placeInExistingPortal(Entity entity, float yaw) {
+		//TODO implement NetherPortalFix
+
 		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
 		final NetherPortalEvent.Teleport.SearchingForDestination searching =
 				new NetherPortalEvent.Teleport.SearchingForDestination(entity, data);

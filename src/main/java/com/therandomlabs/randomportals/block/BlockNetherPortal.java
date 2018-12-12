@@ -375,7 +375,6 @@ public class BlockNetherPortal extends BlockPortal {
 				block == RPOBlocks.lateral_nether_portal;
 	}
 
-	@SuppressWarnings("Duplicates")
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
 		final NetherPortal portal =
