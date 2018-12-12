@@ -5,10 +5,12 @@ import com.therandomlabs.randompatches.integration.world.RPITeleporter;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.NetherPortalType;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
+import com.therandomlabs.randomportals.api.netherportal.TeleportData;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
@@ -25,6 +27,7 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
 
 public class RPOTeleporter extends Teleporter {
 	public RPOTeleporter(WorldServer world) {
@@ -33,58 +36,66 @@ public class RPOTeleporter extends Teleporter {
 
 	@Override
 	public void placeInPortal(Entity entity, float yaw) {
-		final NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
-
-		if(portalType == null) {
-			if(world.provider.getDimensionType() == DimensionType.THE_END) {
-				final IBlockState obsidian = Blocks.OBSIDIAN.getDefaultState();
-				final IBlockState air = Blocks.AIR.getDefaultState();
-
-				final BlockPos spawnPos = world.getSpawnCoordinate();
-
-				final int x = spawnPos.getX();
-				final int y = spawnPos.getY() - 1;
-				final int z = spawnPos.getZ();
-
-				for(int zOffset = -2; zOffset < 3; zOffset++) {
-					for(int xOffset = -2; xOffset < 3; xOffset++) {
-						for(int yOffset = -1; yOffset < 3; yOffset++) {
-							world.setBlockState(
-									new BlockPos(
-											x + xOffset,
-											y + yOffset,
-											z - zOffset
-									),
-									yOffset < 0 ? obsidian : air
-							);
-						}
-					}
-				}
-
-				entity.setLocationAndAngles(x, y, z, entity.rotationYaw, 0.0F);
-				entity.motionX = 0.0;
-				entity.motionY = 0.0;
-				entity.motionZ = 0.0;
-
-				return;
+		if(NetherPortalTeleportHandler.getTeleportData(entity) != null) {
+			if(!placeInExistingPortal(entity, yaw)) {
+				makePortal(entity);
+				placeInExistingPortal(entity, yaw);
 			}
-
-			entity.moveToBlockPosAndAngles(
-					world.getTopSolidOrLiquidBlock(world.getSpawnPoint()),
-					yaw, entity.prevRotationPitch
-			);
 
 			return;
 		}
 
-		if(!placeInExistingPortal(entity, yaw)) {
-			makePortal(entity);
-			placeInExistingPortal(entity, yaw);
+		if(world.provider.getDimensionType() != DimensionType.THE_END) {
+			//Then we have no idea where to put the entity
+			entity.moveToBlockPosAndAngles(
+					world.getTopSolidOrLiquidBlock(world.getSpawnPoint()),
+					yaw, entity.prevRotationPitch
+			);
+			return;
 		}
+
+		final IBlockState obsidian = Blocks.OBSIDIAN.getDefaultState();
+		final IBlockState air = Blocks.AIR.getDefaultState();
+
+		final BlockPos spawnPos = world.getSpawnCoordinate();
+
+		final int x = spawnPos.getX();
+		final int y = spawnPos.getY() - 1;
+		final int z = spawnPos.getZ();
+
+		for(int zOffset = -2; zOffset < 3; zOffset++) {
+			for(int xOffset = -2; xOffset < 3; xOffset++) {
+				for(int yOffset = -1; yOffset < 3; yOffset++) {
+					world.setBlockState(
+							new BlockPos(
+									x + xOffset,
+									y + yOffset,
+									z - zOffset
+							),
+							yOffset < 0 ? obsidian : air
+					);
+				}
+			}
+		}
+
+		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, 0.0F);
+		entity.motionX = 0.0;
+		entity.motionY = 0.0;
+		entity.motionZ = 0.0;
 	}
 
 	@Override
 	public boolean placeInExistingPortal(Entity entity, float yaw) {
+		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
+		final NetherPortalEvent.Teleport.SearchingForDestination searching =
+				new NetherPortalEvent.Teleport.SearchingForDestination(entity, data);
+
+		if(MinecraftForge.EVENT_BUS.post(searching)) {
+			//If false is returned, then placeInPortal will call makePortal and then this method
+			//again
+			return true;
+		}
+
 		double distance = -1.0;
 
 		boolean shouldCache = true;
@@ -95,7 +106,7 @@ public class RPOTeleporter extends Teleporter {
 				MathHelper.floor(entity.posZ)
 		);
 
-		final Teleporter.PortalPosition portalPos = destinationCoordinateCache.get(chunkPos);
+		final PortalPosition portalPos = destinationCoordinateCache.get(chunkPos);
 
 		if(portalPos != null) {
 			distance = 0.0;
@@ -103,12 +114,7 @@ public class RPOTeleporter extends Teleporter {
 			portalPos.lastUpdateTime = world.getTotalWorldTime();
 			shouldCache = false;
 		} else {
-			NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
-
-			if(portalType == null) {
-				portalType = NetherPortalTypes.getDefault();
-			}
-
+			final NetherPortalType portalType = data.getPortalType();
 			BlockPos pos3 = new BlockPos(entity);
 
 			for(int xOffset = -128; xOffset <= 128; ++xOffset) {
@@ -173,9 +179,6 @@ public class RPOTeleporter extends Teleporter {
 					getValue().getFrame();
 		}
 
-		final EnumFacing originalEntityFacing =
-				NetherPortalTeleportHandler.getTeleportData(entity).getOriginalEntityFacing();
-
 		final double xOffset;
 		final double zOffset;
 		final EnumFacing forwards;
@@ -208,8 +211,17 @@ public class RPOTeleporter extends Teleporter {
 		final double z = pos.getZ() + zOffset;
 
 		final float newYaw = yaw -
-				originalEntityFacing.getHorizontalIndex() * 90.0F +
+				entity.getHorizontalFacing().getHorizontalIndex() * 90.0F +
 				forwards.getHorizontalIndex() * 90.0F;
+
+		final NetherPortalEvent.Teleport.DestinationFound found =
+				new NetherPortalEvent.Teleport.DestinationFound(
+						entity, data, frame, x, y, z, yaw, entity.rotationPitch
+				);
+
+		if(MinecraftForge.EVENT_BUS.post(found)) {
+			return true;
+		}
 
 		if(entity instanceof EntityPlayerMP) {
 			((EntityPlayerMP) entity).connection.setPlayerLocation(
@@ -390,11 +402,8 @@ public class RPOTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		NetherPortalType portalType = NetherPortalTeleportHandler.getPortalType(entity);
-
-		if(portalType == null) {
-			portalType = NetherPortalTypes.getDefault();
-		}
+		final NetherPortalType portalType =
+				NetherPortalTeleportHandler.getTeleportData(entity).getPortalType();
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
@@ -448,7 +457,7 @@ public class RPOTeleporter extends Teleporter {
 	@Override
 	public void placeEntity(World world, Entity entity, float yaw) {
 		super.placeEntity(world, entity, yaw);
-		NetherPortalTeleportHandler.clearPortalType(entity);
+		NetherPortalTeleportHandler.clearTeleportData(entity);
 	}
 
 	@Override
