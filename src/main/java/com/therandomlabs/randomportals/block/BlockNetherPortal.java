@@ -11,6 +11,7 @@ import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
+import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
 import com.therandomlabs.randomportals.api.util.StatePredicate;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
@@ -35,7 +36,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-//TODO portal block registry for RPOTeleporter and isPortal()
 @Mod.EventBusSubscriber(modid = RandomPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
 	public static final class Matcher {
@@ -98,6 +98,7 @@ public class BlockNetherPortal extends BlockPortal {
 		this(true);
 		setTranslationKey("netherPortalVertical");
 		setRegistryName("minecraft:portal");
+		PortalBlockRegistry.register(this);
 	}
 
 	protected BlockNetherPortal(boolean flag) {
@@ -354,16 +355,6 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
 		return state.getValue(AXIS);
-	}
-
-	public static boolean isPortal(World world, BlockPos pos) {
-		return isPortal(world.getBlockState(pos).getBlock());
-	}
-
-	@SuppressWarnings("ConditionCoveredByFurtherCondition")
-	public static boolean isPortal(Block block) {
-		return block == RPOBlocks.vertical_nether_portal ||
-				block == RPOBlocks.lateral_nether_portal;
 	}
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,

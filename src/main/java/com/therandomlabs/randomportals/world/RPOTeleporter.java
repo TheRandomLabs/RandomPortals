@@ -10,6 +10,7 @@ import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
+import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
@@ -132,12 +133,12 @@ public class RPOTeleporter extends Teleporter {
 					for(; pos1.getY() >= 0; pos1 = pos2) {
 						pos2 = pos1.down();
 
-						if(BlockNetherPortal.isPortal(world, pos1)) {
+						if(PortalBlockRegistry.isPortal(world, pos1)) {
 							final NetherPortal portal =
 									RPOSavedData.get(world).getNetherPortal(pos1);
 
 							if(portal != null && portal.getType() == portalType) {
-								for(pos2 = pos1.down(); BlockNetherPortal.isPortal(world, pos2);
+								for(pos2 = pos1.down(); PortalBlockRegistry.isPortal(world, pos2);
 									pos2 = pos2.down()) {
 									pos1 = pos2;
 								}
