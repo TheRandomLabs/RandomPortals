@@ -25,7 +25,7 @@ public final class NetherPortalFrames {
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
 			SIZE,
 			NetherPortalTypes::getValidBlocks,
-			RequiredCorner.ANY_NON_AIR,
+			RequiredCorner.ANY,
 			frame -> true,
 			(world, pos, state) -> true
 	);
@@ -33,7 +33,7 @@ public final class NetherPortalFrames {
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
 			SIZE,
 			NetherPortalTypes::getValidBlocks,
-			RequiredCorner.ANY_NON_AIR,
+			RequiredCorner.ANY,
 			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
 			NetherPortalFrames::isEmpty
 	);
