@@ -71,7 +71,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		return new ItemStack(this);
 	}
 
-	@SuppressWarnings({"ConditionCoveredByFurtherCondition"})
+	@SuppressWarnings("ConditionCoveredByFurtherCondition")
 	public static Frame findFrame(World world, BlockPos portalPos) {
 		Frame frame = RPOSavedData.get(world).getEndPortal(portalPos);
 
