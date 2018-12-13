@@ -175,18 +175,9 @@ public class Frame {
 		return isBetween(pos, topLeft, topRight);
 	}
 
-	@SuppressWarnings("Duplicates")
 	public ImmutableList<BlockPos> getTopBlockPositions() {
 		if(topBlocks == null) {
-			final List<BlockPos> topBlocks = new ArrayList<>(width);
-
-			for(int offset = 0; offset < width; offset++) {
-				topBlocks.add(
-						topLeft.offset(widthDirection, offset)
-				);
-			}
-
-			this.topBlocks = ImmutableList.copyOf(topBlocks);
+			topBlocks = getPositions(true, false);
 		}
 
 		return topBlocks;
@@ -209,16 +200,7 @@ public class Frame {
 
 	public ImmutableList<BlockPos> getRightBlockPositions() {
 		if(rightBlocks == null) {
-			final List<BlockPos> rightBlocks = new ArrayList<>(height);
-
-			for(int offset = 0; offset < height; offset++) {
-				rightBlocks.add(
-						topLeft.offset(widthDirection, width - 1).
-								offset(heightDirection, offset)
-				);
-			}
-
-			this.rightBlocks = ImmutableList.copyOf(rightBlocks);
+			rightBlocks = getPositions(false, true);
 		}
 
 		return rightBlocks;
@@ -241,16 +223,7 @@ public class Frame {
 
 	public ImmutableList<BlockPos> getBottomBlockPositions() {
 		if(bottomBlocks == null) {
-			final List<BlockPos> bottomBlocks = new ArrayList<>(width);
-
-			for(int offset = 0; offset < width; offset++) {
-				bottomBlocks.add(
-						topLeft.offset(widthDirection, offset).
-								offset(heightDirection, height - 1)
-				);
-			}
-
-			this.bottomBlocks = ImmutableList.copyOf(bottomBlocks);
+			bottomBlocks = getPositions(true, true);
 		}
 
 		return bottomBlocks;
@@ -271,18 +244,9 @@ public class Frame {
 		return isBetween(pos, bottomLeft, topLeft);
 	}
 
-	@SuppressWarnings("Duplicates")
 	public ImmutableList<BlockPos> getLeftBlockPositions() {
 		if(leftBlocks == null) {
-			final List<BlockPos> leftBlocks = new ArrayList<>(height);
-
-			for(int offset = 0; offset < height; offset++) {
-				leftBlocks.add(
-						topLeft.offset(heightDirection, offset)
-				);
-			}
-
-			this.leftBlocks = ImmutableList.copyOf(leftBlocks);
+			leftBlocks = getPositions(false, false);
 		}
 
 		return leftBlocks;
@@ -497,5 +461,35 @@ public class Frame {
 		default:
 			return y > minY && z > minZ && y < maxY && z < maxZ && x == minX;
 		}
+	}
+
+	private ImmutableList<BlockPos> getPositions(boolean width, boolean offsetBoth) {
+		final int maxOffset;
+		final EnumFacing offsetDirection;
+		final EnumFacing otherOffsetDirection;
+		final int otherOffset;
+
+		if(width) {
+			maxOffset = this.width;
+			offsetDirection = widthDirection;
+			otherOffsetDirection = heightDirection;
+			otherOffset = offsetBoth ? height - 1 : 0;
+		} else {
+			maxOffset = height;
+			offsetDirection = heightDirection;
+			otherOffsetDirection = widthDirection;
+			otherOffset = offsetBoth ? this.width - 1 : 0;
+		}
+
+		final List<BlockPos> positions = new ArrayList<>(maxOffset);
+
+		for(int offset = 0; offset < maxOffset; offset++) {
+			positions.add(
+					topLeft.offset(offsetDirection, offset).
+							offset(otherOffsetDirection, otherOffset)
+			);
+		}
+
+		return ImmutableList.copyOf(positions);
 	}
 }

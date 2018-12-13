@@ -24,13 +24,8 @@ public final class NetherPortalType {
 	public List<Integer> dimensions = new ArrayList<>();
 
 	public int dimensionID;
-
 	public boolean forcePortal;
-
-	public int minWidth = 3;
-	public int maxWidth = 9000;
-	public int minHeight = 3;
-	public int maxHeight = 9000;
+	public FrameSize size;
 
 	transient String name;
 
@@ -52,7 +47,6 @@ public final class NetherPortalType {
 				"],dimensionID=" + dimensionID + "]";
 	}
 
-	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		final List<String> registryNames = new ArrayList<>();
 
@@ -73,21 +67,7 @@ public final class NetherPortalType {
 			frameBlock.ensureCorrect();
 		}
 
-		if(minWidth < 3) {
-			minWidth = 3;
-		}
-
-		if(minHeight < 3) {
-			minHeight = 3;
-		}
-
-		if(maxWidth < minWidth) {
-			maxWidth = minWidth;
-		}
-
-		if(maxHeight < minHeight) {
-			maxHeight = minHeight;
-		}
+		size.ensureCorrect();
 	}
 
 	public String getName() {
@@ -112,10 +92,7 @@ public final class NetherPortalType {
 			}
 		}
 
-		final int width = frame.getWidth();
-		final int height = frame.getHeight();
-
-		if(width < minWidth || width > maxWidth || height < minHeight || height > maxHeight) {
+		if(!size.test(frame.getWidth(), frame.getHeight())) {
 			return false;
 		}
 

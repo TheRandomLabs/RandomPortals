@@ -62,20 +62,11 @@ public final class NetherPortalFrames {
 		return isActivated(frame, BlockNetherPortal.Matcher::ofType);
 	}
 
-	@SuppressWarnings("Duplicates")
 	public static boolean isActivated(Frame frame, StatePredicate lateralPortal,
 			StatePredicate verticalXPortal, StatePredicate verticalZPortal) {
-		return isActivated(frame, type -> {
-			if(type == FrameType.LATERAL) {
-				return lateralPortal;
-			}
-
-			if(type == FrameType.VERTICAL_X) {
-				return verticalXPortal;
-			}
-
-			return verticalZPortal;
-		});
+		return isActivated(
+				frame, type -> type.get(lateralPortal, verticalXPortal, verticalZPortal)
+		);
 	}
 
 	public static boolean isActivated(Frame frame,

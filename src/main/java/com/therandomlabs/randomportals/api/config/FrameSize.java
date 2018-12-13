@@ -20,7 +20,6 @@ public class FrameSize {
 		this.maxHeight = maxHeight;
 	}
 
-	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		if(minWidth < 3) {
 			minWidth = 3;
@@ -37,6 +36,14 @@ public class FrameSize {
 		if(maxHeight < minHeight) {
 			maxHeight = minHeight;
 		}
+	}
+
+	public boolean test(int width, int height) {
+		return width >= minWidth && width <= maxWidth && height >= minHeight && height <= maxHeight;
+	}
+
+	public int getMaxSize(boolean vertical) {
+		return vertical ? maxHeight : Math.max(maxWidth, maxHeight);
 	}
 
 	public static Function<FrameType, FrameSize> fromJSONs(String species,

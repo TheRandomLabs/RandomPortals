@@ -52,17 +52,8 @@ public class BlockNetherPortal extends BlockPortal {
 
 		private Matcher() {}
 
-		@SuppressWarnings("Duplicates")
 		public static StatePredicate ofType(FrameType type) {
-			if(type == FrameType.LATERAL) {
-				return LATERAL;
-			}
-
-			if(type == FrameType.VERTICAL_X) {
-				return VERTICAL_X;
-			}
-
-			return VERTICAL_Z;
+			return type.get(LATERAL, VERTICAL_X, VERTICAL_Z);
 		}
 	}
 
@@ -392,13 +383,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final FrameType type = FrameType.fromAxis(axis);
 		final FrameSize size = NetherPortalFrames.SIZE.apply(type);
-		final int maxSize;
-
-		if(frameDirection == EnumFacing.NORTH) {
-			maxSize = Math.max(size.maxWidth, size.maxHeight);
-		} else {
-			maxSize = size.maxHeight;
-		}
+		final int maxSize = size.getMaxSize(frameDirection == EnumFacing.DOWN);
 
 		final StatePredicate portalMatcher = Matcher.ofType(type);
 

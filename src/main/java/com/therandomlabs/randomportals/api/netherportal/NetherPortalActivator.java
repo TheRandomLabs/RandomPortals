@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public class NetherPortalActivator {
-	static final class PortalContainer {
+	private static final class PortalContainer {
 		NetherPortal portal;
 	}
 

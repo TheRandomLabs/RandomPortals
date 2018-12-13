@@ -60,6 +60,18 @@ public enum FrameType {
 		return type == VERTICAL && (type == VERTICAL_X || type == VERTICAL_Z);
 	}
 
+	public <T> T get(T lateral, T verticalX, T verticalZ) {
+		if(this == LATERAL) {
+			return lateral;
+		}
+
+		if(this == VERTICAL_X) {
+			return verticalX;
+		}
+
+		return verticalZ;
+	}
+
 	public static FrameType fromAxis(EnumFacing.Axis axis) {
 		for(FrameType type : values()) {
 			if(type.axis == axis) {

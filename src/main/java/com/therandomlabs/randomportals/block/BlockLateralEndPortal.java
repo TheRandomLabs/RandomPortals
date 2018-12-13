@@ -71,7 +71,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		return new ItemStack(this);
 	}
 
-	@SuppressWarnings({"ConditionCoveredByFurtherCondition", "Duplicates"})
+	@SuppressWarnings({"ConditionCoveredByFurtherCondition"})
 	public static Frame findFrame(World world, BlockPos portalPos) {
 		Frame frame = RPOSavedData.get(world).getEndPortal(portalPos);
 
@@ -103,14 +103,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		int maxSize = 0;
 
 		for(Function<FrameType, FrameSize> sizeFunction : EndPortalFrames.SIZES) {
-			final FrameSize frameSize = sizeFunction.apply(type);
-			final int size;
-
-			if(frameDirection == EnumFacing.NORTH) {
-				size = Math.max(frameSize.maxWidth, frameSize.maxHeight);
-			} else {
-				size = frameSize.maxHeight;
-			}
+			final int size = sizeFunction.apply(type).getMaxSize(frameDirection == EnumFacing.DOWN);
 
 			if(size > maxSize) {
 				maxSize = size;
