@@ -1,6 +1,8 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-0.8.0.0": "Bug fixes and improvements.",
+		"1.12.2-0.7.0.0": "RandomPortals now requires RandomPatches Integration.\nBug fixes and improvements.",
 		"1.12.2-0.6.0.0": "Renamed the mod to RandomPortals.\nBug fixes and improvements.\nAny vertical and upside down End portals in preexisting worlds will have to be reactivated for them to render properly.\nAny custom Nether portals in preexisting worlds will revert to vanilla Nether portal behavior.",
 		"1.12.2-0.5.0.0": "Added the \"type\" and \"canBeActivatedByFire\" properties to Nether portal types.\nBug fixes and improvements.",
 		"1.12.2-0.4.0.0": "Required corners are now configurable for Nether portal types.\nGenerated portal frame dropping can now be disabled for Nether portal types.\nBug fixes and improvements.",
@@ -9,7 +11,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-0.6.0.0",
-		"1.12.2-recommended": "1.12.2-0.6.0.0"
+		"1.12.2-latest": "1.12.2-0.8.0.0",
+		"1.12.2-recommended": "1.12.2-0.8.0.0"
 	}
 }
