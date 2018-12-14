@@ -25,7 +25,7 @@ public final class NetherPortalType {
 
 	public int dimensionID;
 	public boolean forcePortal;
-	public FrameSize size;
+	public FrameSize size = new FrameSize();
 
 	transient String name;
 

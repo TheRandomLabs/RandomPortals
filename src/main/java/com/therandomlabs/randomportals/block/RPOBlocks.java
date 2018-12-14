@@ -9,9 +9,7 @@ import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.tileentity.TileEntityUpsideDownEndPortal;
 import com.therandomlabs.randomportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEndPortal;
 import net.minecraft.block.BlockFire;
-import net.minecraft.block.BlockPortal;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -42,20 +40,11 @@ public final class RPOBlocks {
 		}
 	}
 
-	@GameRegistry.ObjectHolder("minecraft:fire")
-	public static final BlockFire fire = null;
-
 	public static final BlockVerticalEndPortalFrame vertical_end_portal_frame = null;
 	public static final BlockUpsideDownEndPortalFrame upside_down_end_portal_frame = null;
 
-	@GameRegistry.ObjectHolder("minecraft:end_portal")
-	public static final BlockEndPortal lateral_end_portal = null;
-
 	public static final BlockVerticalEndPortal vertical_end_portal = null;
 	public static final BlockUpsideDownEndPortal upside_down_end_portal = null;
-
-	@GameRegistry.ObjectHolder("minecraft:portal")
-	public static final BlockPortal vertical_nether_portal = null;
 
 	public static final BlockLateralNetherPortal lateral_nether_portal = null;
 

@@ -153,7 +153,7 @@ public final class EndPortalFrames {
 			if(block == RPOBlocks.upside_down_end_portal_frame) {
 				portalState = RPOBlocks.upside_down_end_portal.getDefaultState();
 			} else {
-				portalState = RPOBlocks.lateral_end_portal.getDefaultState();
+				portalState = Blocks.END_PORTAL.getDefaultState();
 			}
 
 			for(BlockPos innerPos : frame.getInnerBlockPositions()) {

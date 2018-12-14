@@ -26,6 +26,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -43,11 +44,11 @@ public class BlockNetherPortal extends BlockPortal {
 				StatePredicate.of(RPOBlocks.lateral_nether_portal);
 
 		public static final StatePredicate VERTICAL_X = StatePredicate.of(
-				RPOBlocks.vertical_nether_portal
+				Blocks.PORTAL
 		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
 
 		public static final StatePredicate VERTICAL_Z = StatePredicate.of(
-				RPOBlocks.vertical_nether_portal
+				Blocks.PORTAL
 		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
 
 		private Matcher() {}
@@ -156,21 +157,21 @@ public class BlockNetherPortal extends BlockPortal {
 			final Frame frame = portal.getFrame();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
-			//If ture, the frame is not guaranteed to still exist, so we call NetherPortalType.test
+			//If true, the frame is not guaranteed to still exist, so we call NetherPortalType.test
+			//The following loop then ensures that the inner blocks are all portal blocks
 			boolean shouldBreak = entry.getKey() && !portal.getType().test(frame);
 
-			if(!shouldBreak) {
-				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-					final IBlockState innerState = world.getBlockState(innerPos);
-					final Block innerBlock = innerState.getBlock();
+			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+				final IBlockState innerState = world.getBlockState(innerPos);
+				final Block innerBlock = innerState.getBlock();
 
-					if(innerBlock != this || innerState.getValue(USER_PLACED) ||
-							((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
-						shouldBreak = true;
-						break;
-					}
+				if(innerBlock != this || innerState.getValue(USER_PLACED) ||
+						((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
+					shouldBreak = true;
+					break;
 				}
 			}
+
 
 			if(!shouldBreak) {
 				return;
@@ -283,7 +284,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(pos);
+		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
 		NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 	}
 
@@ -410,7 +411,7 @@ public class BlockNetherPortal extends BlockPortal {
 		);
 
 		return new AbstractMap.SimpleEntry<>(false, new NetherPortal(
-				frame, NetherPortalTypes.get(frame)
+				frame, null, NetherPortalTypes.get(frame)
 		));
 	}
 

@@ -71,7 +71,6 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		return new ItemStack(this);
 	}
 
-	@SuppressWarnings("ConditionCoveredByFurtherCondition")
 	public static Frame findFrame(World world, BlockPos portalPos) {
 		Frame frame = RPOSavedData.get(world).getEndPortal(portalPos);
 
@@ -87,7 +86,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		final EnumFacing frameDirection;
 		final FrameType type;
 
-		if(block == RPOBlocks.lateral_end_portal || block == RPOBlocks.upside_down_end_portal) {
+		if(block == Blocks.END_PORTAL || block == RPOBlocks.upside_down_end_portal) {
 			facing = null;
 			portalMatcher = StatePredicate.of(block);
 			frameDirection = EnumFacing.NORTH;

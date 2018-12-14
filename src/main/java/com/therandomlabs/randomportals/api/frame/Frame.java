@@ -16,6 +16,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 
 public class Frame {
@@ -33,6 +34,7 @@ public class Frame {
 	private final BlockPos bottomRight;
 
 	private WeakReference<World> world;
+	private DimensionType dimensionType;
 
 	private ImmutableList<BlockPos> topBlocks;
 	private ImmutableList<BlockPos> rightBlocks;
@@ -55,7 +57,11 @@ public class Frame {
 
 	private Frame(World world, FrameType type, BlockPos topLeft, BlockPos topRight,
 			BlockPos bottomLeft, BlockPos bottomRight, int width, int height) {
-		this.world = new WeakReference<>(world);
+		if(world != null) {
+			this.world = new WeakReference<>(world);
+			dimensionType = world.provider.getDimensionType();
+		}
+
 		this.type = type;
 
 		this.width = width;
@@ -104,11 +110,21 @@ public class Frame {
 	}
 
 	public World getWorld() {
-		return world.get();
+		return world == null ? null : world.get();
 	}
 
 	public void setWorld(World world) {
-		this.world = new WeakReference<>(world);
+		if(world == null) {
+			this.world = null;
+			dimensionType = null;
+		} else {
+			this.world = new WeakReference<>(world);
+			dimensionType = world.provider.getDimensionType();
+		}
+	}
+
+	public DimensionType getDimensionType() {
+		return dimensionType;
 	}
 
 	public FrameType getType() {
@@ -276,7 +292,8 @@ public class Frame {
 
 			//Each corner is in two lists, so we use a set to remove duplicates
 			final Set<BlockPos> frameBlocks = new HashSet<>(
-					topBlocks.size() + rightBlocks.size() + bottomBlocks.size() + leftBlocks.size()
+					topBlocks.size() + rightBlocks.size() + bottomBlocks.size() +
+							leftBlocks.size() - 4
 			);
 
 			frameBlocks.addAll(topBlocks);
@@ -333,6 +350,38 @@ public class Frame {
 
 		return getInnerBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
+	}
+
+	public List<BlockPos> getInnerRow(int row) {
+		if(row < 1 || row > height - 2) {
+			throw new IllegalArgumentException(String.format(
+					"Invalid row %s for frame with width %s and height %s", row, width, height
+			));
+		}
+
+		return getPositions(
+				topLeft.offset(widthDirection), width - 2, widthDirection, row, heightDirection
+		);
+	}
+
+	public List<BlockPos> getInnerRowFromBottom(int row) {
+		return getInnerRow(height - 1 - row);
+	}
+
+	public List<BlockPos> getInnerColumn(int column) {
+		if(column < 1 || column > width - 2) {
+			throw new IllegalArgumentException(String.format(
+					"Invalid column %s for frame with width %s and height %s", column, width, height
+			));
+		}
+
+		return getPositions(
+				topLeft.offset(heightDirection), height - 2, heightDirection, column, widthDirection
+		);
+	}
+
+	public List<BlockPos> getInnerColumnFromBottom(int column) {
+		return getInnerColumn(width - 1 - column);
 	}
 
 	public FrameSide getSide(BlockPos pos) {
@@ -464,30 +513,27 @@ public class Frame {
 	}
 
 	private ImmutableList<BlockPos> getPositions(boolean width, boolean offsetBoth) {
-		final int maxOffset;
-		final EnumFacing offsetDirection;
-		final EnumFacing otherOffsetDirection;
-		final int otherOffset;
-
 		if(width) {
-			maxOffset = this.width;
-			offsetDirection = widthDirection;
-			otherOffsetDirection = heightDirection;
-			otherOffset = offsetBoth ? height - 1 : 0;
-		} else {
-			maxOffset = height;
-			offsetDirection = heightDirection;
-			otherOffsetDirection = widthDirection;
-			otherOffset = offsetBoth ? this.width - 1 : 0;
+			return getPositions(
+					topLeft, this.width, widthDirection, offsetBoth ? height - 1 : 0,
+					heightDirection
+			);
 		}
 
-		final List<BlockPos> positions = new ArrayList<>(maxOffset);
+		return getPositions(
+				topLeft, height, heightDirection, offsetBoth ? this.width - 1 : 0, widthDirection
+		);
+	}
 
-		for(int offset = 0; offset < maxOffset; offset++) {
-			positions.add(
-					topLeft.offset(offsetDirection, offset).
-							offset(otherOffsetDirection, otherOffset)
-			);
+	private ImmutableList<BlockPos> getPositions(BlockPos startingPos, int maxOffset,
+			EnumFacing offsetDirection, int otherOffset, EnumFacing otherOffsetDirection) {
+		final List<BlockPos> positions = new ArrayList<>(maxOffset);
+		final BlockPos toOffset = startingPos.offset(otherOffsetDirection, otherOffset);
+
+		positions.add(toOffset);
+
+		for(int offset = 1; offset < maxOffset; offset++) {
+			positions.add(toOffset.offset(offsetDirection, offset));
 		}
 
 		return ImmutableList.copyOf(positions);

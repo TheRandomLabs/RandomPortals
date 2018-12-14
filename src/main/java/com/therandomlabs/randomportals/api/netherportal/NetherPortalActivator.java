@@ -12,6 +12,7 @@ import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -85,13 +86,13 @@ public class NetherPortalActivator {
 
 			switch(axis) {
 			case X:
-				state = RPOBlocks.vertical_nether_portal.getDefaultState();
+				state = Blocks.PORTAL.getDefaultState();
 				break;
 			case Y:
 				state = RPOBlocks.lateral_nether_portal.getDefaultState();
 				break;
 			default:
-				state = RPOBlocks.vertical_nether_portal.getDefaultState().withProperty(
+				state = Blocks.PORTAL.getDefaultState().withProperty(
 						BlockPortal.AXIS, EnumFacing.Axis.Z
 				);
 			}
@@ -192,7 +193,7 @@ public class NetherPortalActivator {
 		}
 
 		if(forcePortalType != null) {
-			return new NetherPortal(frame, forcePortalType);
+			return new NetherPortal(frame, null, forcePortalType);
 		}
 
 		final NetherPortalType[] types;
@@ -205,7 +206,7 @@ public class NetherPortalActivator {
 
 		for(NetherPortalType type : types) {
 			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame)) {
-				return new NetherPortal(frame, type);
+				return new NetherPortal(frame, null, type);
 			}
 		}
 

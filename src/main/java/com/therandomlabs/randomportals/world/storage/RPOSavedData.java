@@ -25,7 +25,10 @@ public class RPOSavedData extends WorldSavedData {
 
 	public static final String NETHER_PORTALS_KEY = "NetherPortals";
 
+	public static final String FRAME_KEY = "Frame";
+	public static final String RECEIVING_FRAME_KEY = "ReceivingFrame";
 	public static final String PORTAL_TYPE_KEY = "PortalType";
+
 	public static final String FRAME_TYPE_KEY = "FrameType";
 	public static final String TOP_LEFT_KEY = "TopLeft";
 	public static final String WIDTH_KEY = "Width";
@@ -58,11 +61,18 @@ public class RPOSavedData extends WorldSavedData {
 		for(NBTBase tag : nbt.getTagList(NETHER_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
 			final NBTTagCompound compound = (NBTTagCompound) tag;
 
-			final Frame frame = readFrame(compound);
+			final Frame frame = readFrame(compound.getCompoundTag(FRAME_KEY));
+
+			//Saved with old version - remove when 1.12.2-1.0.0.0 is released
+			if(frame == null) {
+				continue;
+			}
+
+			final Frame receivingFrame = readFrame(compound.getCompoundTag(RECEIVING_FRAME_KEY));
 			final NetherPortalType type =
 					NetherPortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
 
-			netherPortals.put(frame.getTopLeft(), new NetherPortal(readFrame(compound), type));
+			netherPortals.put(frame.getTopLeft(), new NetherPortal(frame, receivingFrame, type));
 		}
 
 		final NBTTagCompound compound = nbt.getCompoundTag(GENERATED_NETHER_PORTAL_FRAMES_KEY);
@@ -97,8 +107,16 @@ public class RPOSavedData extends WorldSavedData {
 		final NBTTagList netherPortalList = new NBTTagList();
 
 		for(NetherPortal portal : netherPortals.values()) {
-			final NBTTagCompound compound = writeFrame(new NBTTagCompound(), portal.getFrame());
+			final NBTTagCompound compound = new NBTTagCompound();
+
+			final NBTTagCompound frame = writeFrame(new NBTTagCompound(), portal.getFrame());
+			final NBTTagCompound receivingFrame =
+					writeFrame(new NBTTagCompound(), portal.getReceivingFrame());
+
+			compound.setTag(FRAME_KEY, frame);
+			compound.setTag(RECEIVING_FRAME_KEY, receivingFrame);
 			compound.setString(PORTAL_TYPE_KEY, portal.getType().getName());
+
 			netherPortalList.appendTag(compound);
 		}
 
@@ -168,7 +186,7 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	public NetherPortal addNetherPortal(Frame frame, NetherPortalType type, boolean userCreated) {
-		final NetherPortal portal = new NetherPortal(frame, type);
+		final NetherPortal portal = new NetherPortal(frame, null, type);
 		addNetherPortal(portal, userCreated);
 		return portal;
 	}
@@ -313,23 +331,29 @@ public class RPOSavedData extends WorldSavedData {
 		return null;
 	}
 
+	public static Frame readFrame(NBTTagCompound compound) {
+		final int width = compound.getInteger(WIDTH_KEY);
+
+		return width == 0 ? null : new Frame(
+				null,
+				TYPES[compound.getInteger(FRAME_TYPE_KEY)],
+				NBTUtil.getPosFromTag(compound.getCompoundTag(TOP_LEFT_KEY)),
+				width,
+				compound.getInteger(HEIGHT_KEY)
+		);
+	}
+
 	public static NBTTagCompound writeFrame(NBTTagCompound compound, Frame frame) {
+		if(frame == null) {
+			return compound;
+		}
+
 		compound.setInteger(FRAME_TYPE_KEY, frame.getType().ordinal());
 		compound.setTag(TOP_LEFT_KEY, NBTUtil.createPosTag(frame.getTopLeft()));
 		compound.setInteger(WIDTH_KEY, frame.getWidth());
 		compound.setInteger(HEIGHT_KEY, frame.getHeight());
 
 		return compound;
-	}
-
-	public static Frame readFrame(NBTTagCompound compound) {
-		return new Frame(
-				null,
-				TYPES[compound.getInteger(FRAME_TYPE_KEY)],
-				NBTUtil.getPosFromTag(compound.getCompoundTag(TOP_LEFT_KEY)),
-				compound.getInteger(WIDTH_KEY),
-				compound.getInteger(HEIGHT_KEY)
-		);
 	}
 
 	public static RPOSavedData get(World world) {
