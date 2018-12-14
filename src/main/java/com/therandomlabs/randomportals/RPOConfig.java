@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
 
+//TODO option to disable persistent receiving Nether portals
 @Mod.EventBusSubscriber(modid = RandomPortals.MOD_ID)
 @Config(modid = RandomPortals.MOD_ID, name = RPOConfig.NAME, category = "")
 public final class RPOConfig {

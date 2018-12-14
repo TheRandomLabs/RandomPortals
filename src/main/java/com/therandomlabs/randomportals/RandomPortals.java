@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,10 +28,13 @@ public final class RandomPortals {
 	public static final String MOD_ID = "randomportals";
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
-	public static final String DEPENDENCIES = "required-after:rpintegration@[1.12.2-1.0.0.0,)";
+	public static final String DEPENDENCIES =
+			"required-after:rpintegration@[1.12.2-1.0.0.0,);before:movingworld";
 	public static final String UPDATE_JSON =
 			"https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
+
+	public static final boolean MOVINGWORLD_INSTALLED = Loader.isModLoaded("movingworld");
 
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
