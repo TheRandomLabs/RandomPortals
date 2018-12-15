@@ -30,7 +30,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
 
-//TODO option to disable persistent receiving Nether portals
 @Mod.EventBusSubscriber(modid = RandomPortals.MOD_ID)
 @Config(modid = RandomPortals.MOD_ID, name = RPOConfig.NAME, category = "")
 public final class RPOConfig {
@@ -77,6 +76,13 @@ public final class RPOConfig {
 		@Config.Comment("Whether to always create the \"vanilla_nether_portal\" Nether portal " +
 				"type when it doesn't exist.")
 		public boolean forceCreateVanillaType = true;
+
+		@Config.LangKey("randomportals.config.netherPortals.persistentReceivingPortals")
+		@Config.Comment({
+				"Whether receiving Nether portals should be persistent.",
+				"This makes mods like Netherless obsolete."
+		})
+		public boolean persistentReceivingPortals = true;
 
 		@Config.LangKey("randomportals.config.netherPortals.useAllVariantsJson")
 		@Config.Comment(

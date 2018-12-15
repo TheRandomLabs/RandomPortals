@@ -16,6 +16,7 @@ randomportals.config.netherPortals=Nether Portals
 randomportals.config.netherPortals.tooltip=Options related to Nether portals.
 randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
+randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
 randomportals.config.netherPortals.useAllVariantsJson=Use all_variants JSON
 
 itemGroup.portals=Portals
@@ -31,6 +32,9 @@ tile.endPortalUpsideDown.name=Upside Down End Portal
 
 tile.netherPortalVertical.name=Vertical Nether Portal
 tile.netherPortalLateral.name=Lateral Nether Portal
+
+commands.rporeload.usage=/rporeload
+commands.rporeload.success=RandomPortals configuration reloaded!
 
 commands.rporeloadclient.usage=/rporeloadclient
 commands.rporeloadclient.success=RandomPortals client-sided configuration reloaded!

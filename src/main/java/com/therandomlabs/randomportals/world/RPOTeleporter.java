@@ -2,6 +2,7 @@ package com.therandomlabs.randomportals.world;
 
 import com.therandomlabs.randompatches.integration.RPIStaticConfig;
 import com.therandomlabs.randompatches.integration.world.RPITeleporter;
+import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.NetherPortalType;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
@@ -105,10 +106,15 @@ public class RPOTeleporter extends Teleporter {
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		final NetherPortalType portalType = data.getPortalType();
 		final NetherPortal sendingPortal = data.getPortal();
-		final Frame receivingFrame =
-				sendingPortal == null ? null : sendingPortal.getReceivingFrame();
-		NetherPortal receivingPortal = null;
+		final Frame receivingFrame;
 
+		if(RPOConfig.netherPortals.persistentReceivingPortals) {
+			receivingFrame = sendingPortal == null ? null : sendingPortal.getReceivingFrame();
+		} else {
+			receivingFrame = null;
+		}
+
+		NetherPortal receivingPortal = null;
 		BlockPos portalPos = null;
 
 		if(receivingFrame == null) {

@@ -22,7 +22,7 @@ public class CommandRPOReload extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return isClient ? "commands.rporeloadclient.usage" : "/rporeload";
+		return "commands." + getName() + ".usage";
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class CommandRPOReload extends CommandBase {
 		RPOConfig.reloadFromDisk();
 
 		if(server != null && server.isDedicatedServer()) {
-			notifyCommandListener(sender, this, "RandomPortals configuration reloaded!");
+			notifyCommandListener(sender, this, "commands.rporeload.success");
 		} else {
 			sender.sendMessage(new TextComponentTranslation("commands.rporeloadclient.success"));
 		}
