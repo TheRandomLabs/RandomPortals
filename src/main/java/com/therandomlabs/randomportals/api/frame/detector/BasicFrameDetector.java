@@ -27,8 +27,9 @@ public class BasicFrameDetector extends FrameDetector {
 		this(() -> FrameStatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(Supplier<FrameStatePredicate> blockMatcher, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate) {
+	public BasicFrameDetector(Supplier<FrameStatePredicate> blockMatcher,
+			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
+			FrameStatePredicate innerPredicate) {
 		this(null, blockMatcher, requiredCorner, framePredicate, innerPredicate);
 	}
 
