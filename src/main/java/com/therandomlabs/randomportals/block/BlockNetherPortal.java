@@ -2,6 +2,7 @@ package com.therandomlabs.randomportals.block;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import com.therandomlabs.randomportals.RandomPortals;
@@ -26,7 +27,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -41,15 +42,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockNetherPortal extends BlockPortal {
 	public static final class Matcher {
 		public static final StatePredicate LATERAL =
-				StatePredicate.of(RPOBlocks.lateral_nether_portal);
+				StatePredicate.ofBlock(block -> block.getClass() == BlockLateralNetherPortal.class);
 
-		public static final StatePredicate VERTICAL_X = StatePredicate.of(
-				Blocks.PORTAL
-		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
+		public static final StatePredicate VERTICAL_X =
+				StatePredicate.ofBlock(block -> block.getClass() == BlockNetherPortal.class)
+						.where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
 
-		public static final StatePredicate VERTICAL_Z = StatePredicate.of(
-				Blocks.PORTAL
-		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
+		public static final StatePredicate VERTICAL_Z =
+				StatePredicate.ofBlock(block -> block.getClass() == BlockNetherPortal.class)
+						.where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
 
 		private Matcher() {}
 
@@ -95,14 +96,30 @@ public class BlockNetherPortal extends BlockPortal {
 
 	private static final List<BlockPos> removing = new ArrayList<>();
 
-	public BlockNetherPortal() {
-		this(true);
-		setTranslationKey("netherPortalVertical");
-		setRegistryName("minecraft:portal");
-		PortalBlockRegistry.register(this);
+	private static final Map<EnumDyeColor, BlockNetherPortal> colors =
+			new EnumMap<>(EnumDyeColor.class);
+
+	private final EnumDyeColor color;
+
+	public BlockNetherPortal(EnumDyeColor color) {
+		this(
+				color == EnumDyeColor.PURPLE ?
+						"minecraft:portal" : color.getName() + "_vertical_nether_portal",
+				color
+		);
+
+		final String translationKey = color.getTranslationKey();
+		setTranslationKey(
+				"netherPortalVertical" + Character.toUpperCase(translationKey.charAt(0)) +
+						translationKey.substring(1)
+		);
+
+		if(!colors.containsKey(color)) {
+			colors.put(color, this);
+		}
 	}
 
-	protected BlockNetherPortal(boolean flag) {
+	protected BlockNetherPortal(String registryName, EnumDyeColor color) {
 		setDefaultState(blockState.getBaseState().
 				withProperty(AXIS, EnumFacing.Axis.X).
 				withProperty(USER_PLACED, true));
@@ -111,6 +128,9 @@ public class BlockNetherPortal extends BlockPortal {
 		setSoundType(SoundType.GLASS);
 		setLightLevel(0.75F);
 		setCreativeTab(CreativeTabs.DECORATIONS);
+		setRegistryName(registryName);
+		PortalBlockRegistry.register(this);
+		this.color = color;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -356,6 +376,14 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
 		return state.getValue(AXIS);
+	}
+
+	public EnumDyeColor getColor() {
+		return color;
+	}
+
+	public static BlockNetherPortal getByColor(EnumDyeColor color) {
+		return colors.get(color);
 	}
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,

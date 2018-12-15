@@ -1,0 +1,7 @@
+{
+	"parent": "block/portal_ew",
+	"textures": {
+		"particle": "randomportals:blocks/lime_portal",
+		"portal": "randomportals:blocks/lime_portal"
+	}
+}

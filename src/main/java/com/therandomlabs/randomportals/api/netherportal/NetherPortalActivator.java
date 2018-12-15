@@ -89,7 +89,7 @@ public class NetherPortalActivator {
 				state = Blocks.PORTAL.getDefaultState();
 				break;
 			case Y:
-				state = RPOBlocks.lateral_nether_portal.getDefaultState();
+				state = RPOBlocks.purple_lateral_nether_portal.getDefaultState();
 				break;
 			default:
 				state = Blocks.PORTAL.getDefaultState().withProperty(

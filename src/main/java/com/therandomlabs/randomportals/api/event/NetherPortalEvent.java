@@ -144,6 +144,7 @@ public class NetherPortalEvent extends Event {
 			return entity;
 		}
 
+		@Nonnull
 		public TeleportData getData() {
 			return data;
 		}

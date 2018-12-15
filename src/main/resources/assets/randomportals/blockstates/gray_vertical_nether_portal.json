@@ -1,0 +1,16 @@
+{
+	"variants": {
+		"axis=x,user_placed=false": {
+			"model": "randomportals:gray_vertical_nether_portal_ns"
+		},
+		"axis=x,user_placed=true": {
+			"model": "randomportals:gray_vertical_nether_portal_ns"
+		},
+		"axis=z,user_placed=false": {
+			"model": "randomportals:gray_vertical_nether_portal_ew"
+		},
+		"axis=z,user_placed=true": {
+			"model": "randomportals:gray_vertical_nether_portal_ew"
+		}
+	}
+}

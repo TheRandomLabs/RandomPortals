@@ -12,6 +12,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
@@ -46,7 +47,38 @@ public final class RPOBlocks {
 	public static final BlockVerticalEndPortal vertical_end_portal = null;
 	public static final BlockUpsideDownEndPortal upside_down_end_portal = null;
 
-	public static final BlockLateralNetherPortal lateral_nether_portal = null;
+	public static final BlockNetherPortal white_vertical_nether_portal = null;
+	public static final BlockNetherPortal orange_vertical_nether_portal = null;
+	public static final BlockNetherPortal magenta_vertical_nether_portal = null;
+	public static final BlockNetherPortal light_blue_vertical_nether_portal = null;
+	public static final BlockNetherPortal yellow_vertical_nether_portal = null;
+	public static final BlockNetherPortal lime_vertical_nether_portal = null;
+	public static final BlockNetherPortal pink_vertical_nether_portal = null;
+	public static final BlockNetherPortal gray_vertical_nether_portal = null;
+	public static final BlockNetherPortal silver_vertical_nether_portal = null;
+	public static final BlockNetherPortal cyan_vertical_nether_portal = null;
+	public static final BlockNetherPortal blue_vertical_nether_portal = null;
+	public static final BlockNetherPortal brown_vertical_nether_portal = null;
+	public static final BlockNetherPortal green_vertical_nether_portal = null;
+	public static final BlockNetherPortal red_vertical_nether_portal = null;
+	public static final BlockNetherPortal black_vertical_nether_portal = null;
+
+	public static final BlockLateralNetherPortal white_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal orange_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal magenta_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal light_blue_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal yellow_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal lime_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal pink_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal gray_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal silver_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal cyan_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal purple_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal blue_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal brown_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal green_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal red_lateral_nether_portal = null;
+	public static final BlockLateralNetherPortal black_lateral_nether_portal = null;
 
 	private static ImmutableList<Block> blocksWithItems;
 
@@ -71,11 +103,13 @@ public final class RPOBlocks {
 		if(RPOConfig.netherPortals.enabled) {
 			registry.register(new BlockRPOFire());
 
-			Collections.addAll(
-					blocksWithItems,
-					new BlockNetherPortal(),
-					new BlockLateralNetherPortal()
-			);
+			for(EnumDyeColor color : EnumDyeColor.values()) {
+				Collections.addAll(
+						blocksWithItems,
+						new BlockNetherPortal(color),
+						new BlockLateralNetherPortal(color)
+				);
+			}
 		}
 
 		for(Block block : blocksWithItems) {

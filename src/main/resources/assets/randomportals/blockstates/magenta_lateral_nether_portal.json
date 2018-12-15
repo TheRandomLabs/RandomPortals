@@ -1,0 +1,16 @@
+{
+	"variants": {
+		"axis=x,user_placed=false": {
+			"model": "randomportals:magenta_lateral_nether_portal"
+		},
+		"axis=x,user_placed=true": {
+			"model": "randomportals:magenta_lateral_nether_portal"
+		},
+		"axis=z,user_placed=false": {
+			"model": "randomportals:magenta_lateral_nether_portal"
+		},
+		"axis=z,user_placed=true": {
+			"model": "randomportals:magenta_lateral_nether_portal"
+		}
+	}
+}

@@ -1,5 +1,6 @@
 package com.therandomlabs.randomportals;
 
+import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.command.CommandRPOReload;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -71,6 +72,10 @@ public final class RandomPortals {
 						MOD_ID, mapping.key.getPath()
 				)));
 			}
+
+			if(mapping.key.getPath().equals("lateral_nether_portal")) {
+				mapping.remap(RPOBlocks.purple_lateral_nether_portal);
+			}
 		}
 	}
 
@@ -81,6 +86,10 @@ public final class RandomPortals {
 				mapping.remap(ForgeRegistries.ITEMS.getValue(new ResourceLocation(
 						MOD_ID, mapping.key.getPath()
 				)));
+			}
+
+			if(mapping.key.getPath().equals("lateral_nether_portal")) {
+				mapping.remap(Item.getItemFromBlock(RPOBlocks.purple_lateral_nether_portal));
 			}
 		}
 	}

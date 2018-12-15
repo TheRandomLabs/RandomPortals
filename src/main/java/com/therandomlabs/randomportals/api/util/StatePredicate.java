@@ -34,4 +34,8 @@ public interface StatePredicate {
 		return (world, pos, state) -> state.getBlock() == block &&
 				(meta == OreDictionary.WILDCARD_VALUE || meta == block.getMetaFromState(state));
 	}
+
+	static StatePredicate ofBlock(Predicate<Block> predicate) {
+		return (world, pos, state) -> predicate.test(state.getBlock());
+	}
 }

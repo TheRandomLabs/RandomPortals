@@ -1,7 +1,10 @@
 package com.therandomlabs.randomportals.block;
 
+import java.util.EnumMap;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
@@ -12,10 +15,21 @@ import net.minecraft.world.World;
 //we have to behave as if the block is on the Y-axis while ignoring the AXIS property,
 //which is always X
 public class BlockLateralNetherPortal extends BlockNetherPortal {
-	public BlockLateralNetherPortal() {
-		super(true);
-		setTranslationKey("netherPortalLateral");
-		setRegistryName("lateral_nether_portal");
+	private static final Map<EnumDyeColor, BlockLateralNetherPortal> colors =
+			new EnumMap<>(EnumDyeColor.class);
+
+	public BlockLateralNetherPortal(EnumDyeColor color) {
+		super(color.getName() + "_lateral_nether_portal", color);
+
+		final String translationKey = color.getTranslationKey();
+		setTranslationKey(
+				"netherPortalLateral" + Character.toUpperCase(translationKey.charAt(0)) +
+						translationKey.substring(1)
+		);
+
+		if(!colors.containsKey(color)) {
+			colors.put(color, this);
+		}
 	}
 
 	@Override
@@ -43,5 +57,9 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
 		return getDefaultState();
+	}
+
+	public static BlockLateralNetherPortal getByColor(EnumDyeColor color) {
+		return colors.get(color);
 	}
 }

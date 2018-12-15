@@ -1,0 +1,7 @@
+{
+	"parent": "randomportals:block/purple_lateral_nether_portal",
+	"textures": {
+		"particle": "randomportals:blocks/red_portal",
+		"portal": "randomportals:blocks/red_portal"
+	}
+}

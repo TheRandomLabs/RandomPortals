@@ -39,7 +39,7 @@ public class RPOTeleporter extends Teleporter {
 	@Override
 	public void placeInPortal(Entity entity, float yaw) {
 		if(NetherPortalTeleportHandler.getTeleportData(entity) != null) {
-			if(!placeInExistingPortal(entity, yaw)) {
+			if(!placeInExistingPortal(entity, yaw) && entity instanceof EntityPlayerMP) {
 				makePortal(entity);
 				placeInExistingPortal(entity, yaw);
 			}
@@ -472,7 +472,7 @@ public class RPOTeleporter extends Teleporter {
 
 	@Override
 	public void placeEntity(World world, Entity entity, float yaw) {
-		super.placeEntity(world, entity, yaw);
+		placeInPortal(entity, yaw);
 		NetherPortalTeleportHandler.clearTeleportData(entity);
 	}
 
