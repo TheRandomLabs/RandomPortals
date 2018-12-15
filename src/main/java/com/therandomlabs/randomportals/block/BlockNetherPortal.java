@@ -314,6 +314,8 @@ public class BlockNetherPortal extends BlockPortal {
 		for(BlockPos portalPos : getRelevantPortalBlockPositions(world, pos)) {
 			world.setBlockState(portalPos, newState, 2);
 		}
+
+		world.removeEntity(entity);
 	}
 
 	@Override
