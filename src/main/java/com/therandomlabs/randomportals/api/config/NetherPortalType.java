@@ -8,6 +8,7 @@ import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,6 +20,9 @@ public final class NetherPortalType {
 	public FrameType type = FrameType.LATERAL_OR_VERTICAL;
 	public boolean canBeActivatedByFire = true;
 	public boolean doGeneratedFramesDrop = true;
+
+	public EnumDyeColor color = EnumDyeColor.PURPLE;
+	public boolean forceColor;
 
 	public boolean whitelist;
 	public List<Integer> dimensions = new ArrayList<>();

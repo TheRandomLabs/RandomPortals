@@ -1,6 +1,6 @@
 package com.therandomlabs.randomportals.api.netherportal;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import com.therandomlabs.randomportals.api.config.NetherPortalType;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
@@ -13,6 +13,7 @@ import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -81,20 +82,19 @@ public class NetherPortalActivator {
 	}
 
 	public NetherPortal activate(World world, BlockPos pos) {
-		return activate(world, pos, axis -> {
+		return activate(world, pos, (axis, color) -> {
 			final IBlockState state;
 
 			switch(axis) {
 			case X:
-				state = Blocks.PORTAL.getDefaultState();
+				state = ((BlockNetherPortal) Blocks.PORTAL).getByColor(color).getDefaultState();
 				break;
 			case Y:
-				state = RPOBlocks.purple_lateral_nether_portal.getDefaultState();
+				state = RPOBlocks.purple_lateral_nether_portal.getByColor(color).getDefaultState();
 				break;
 			default:
-				state = Blocks.PORTAL.getDefaultState().withProperty(
-						BlockPortal.AXIS, EnumFacing.Axis.Z
-				);
+				state = ((BlockNetherPortal) Blocks.PORTAL).getByColor(color).getDefaultState().
+						withProperty(BlockPortal.AXIS, EnumFacing.Axis.Z);
 			}
 
 			return state.withProperty(BlockNetherPortal.USER_PLACED, false);
@@ -103,7 +103,7 @@ public class NetherPortalActivator {
 
 	public NetherPortal activate(World world, BlockPos pos, IBlockState lateralPortal,
 			IBlockState verticalXPortal, IBlockState verticalZPortal) {
-		return activate(world, pos, axis -> {
+		return activate(world, pos, (axis, color) -> {
 			switch(axis) {
 			case X:
 				return verticalXPortal;
@@ -116,7 +116,7 @@ public class NetherPortalActivator {
 	}
 
 	public NetherPortal activate(World world, BlockPos pos,
-			Function<EnumFacing.Axis, IBlockState> portalBlocks) {
+			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
 		final StatePredicate validBlocks;
 
 		if(forcePortalType == null) {
@@ -176,11 +176,13 @@ public class NetherPortalActivator {
 	}
 
 	protected void onActivate(World world, NetherPortal portal,
-			Function<EnumFacing.Axis, IBlockState> portalBlocks) {
+			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
 		RPOSavedData.get(world).addNetherPortal(portal, userCreated);
 
 		final Frame frame = portal.getFrame();
-		final IBlockState state = portalBlocks.apply(frame.getType().getAxis());
+		final IBlockState state = portalBlocks.apply(
+				frame.getType().getAxis(), portal.getType().color
+		);
 
 		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 			world.setBlockState(innerPos, state, 2);

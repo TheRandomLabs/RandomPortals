@@ -303,8 +303,9 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		if(newColor == null) {
-			final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
+		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
+
+		if(newColor == null || (portal != null && portal.getType().forceColor)) {
 			NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 			return;
 		}
