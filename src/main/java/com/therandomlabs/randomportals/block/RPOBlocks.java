@@ -103,14 +103,12 @@ public final class RPOBlocks {
 		if(RPOConfig.netherPortals.enabled) {
 			registry.register(new BlockRPOFire());
 
-			//Use two separate loops to separate vertical and lateral portals in the creative tab
-
 			for(EnumDyeColor color : EnumDyeColor.values()) {
-				blocksWithItems.add(new BlockNetherPortal(color));
-			}
-
-			for(EnumDyeColor color : EnumDyeColor.values()) {
-				blocksWithItems.add(new BlockLateralNetherPortal(color));
+				Collections.addAll(
+						blocksWithItems,
+						new BlockNetherPortal(color),
+						new BlockLateralNetherPortal(color)
+				);
 			}
 		}
 
