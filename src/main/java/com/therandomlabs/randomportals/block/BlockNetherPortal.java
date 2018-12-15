@@ -209,7 +209,9 @@ public class BlockNetherPortal extends BlockPortal {
 				}
 			}
 		} else {
-			removing.addAll(getConnectedPortals(world, pos, this, axis));
+			removing.addAll(getConnectedPortals(
+					world, pos, this, axis, state.getValue(USER_PLACED)
+			));
 		}
 
 		for(BlockPos removePos : removing) {
@@ -413,7 +415,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return entry.getValue().getFrame().getInnerBlockPositions();
 		}
 
-		return getConnectedPortals(world, portalPos, block, axis);
+		return getConnectedPortals(world, portalPos, block, axis, state.getValue(USER_PLACED));
 	}
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
@@ -474,18 +476,18 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	private static ImmutableList<BlockPos> getConnectedPortals(World world, BlockPos portalPos,
-			BlockNetherPortal block, EnumFacing.Axis axis) {
+			BlockNetherPortal block, EnumFacing.Axis axis, boolean userPlaced) {
 		final List<BlockPos> positions = new ArrayList<>();
+		final EnumFacing[] relevantFacings = getRelevantFacings(axis);
 
 		positions.add(portalPos);
-
-		int previousSize = -1;
+		int previousSize = 0;
 
 		for(int i = 0; i < positions.size() || positions.size() != previousSize; i++) {
 			previousSize = positions.size();
 			final BlockPos removingPos = positions.get(i);
 
-			for(EnumFacing facing : getRelevantFacings(axis)) {
+			for(EnumFacing facing : relevantFacings) {
 				final BlockPos neighbor = removingPos.offset(facing);
 
 				if(positions.contains(neighbor)) {
@@ -494,8 +496,9 @@ public class BlockNetherPortal extends BlockPortal {
 
 				final IBlockState neighborState = world.getBlockState(neighbor);
 
-				if(neighborState.getBlock() == block && !neighborState.getValue(USER_PLACED) &&
-						block.getEffectiveAxis(neighborState) == axis) {
+				if(neighborState.getBlock() == block &&
+						block.getEffectiveAxis(neighborState) == axis &&
+						neighborState.getValue(USER_PLACED) == userPlaced) {
 					positions.add(neighbor);
 				}
 			}
