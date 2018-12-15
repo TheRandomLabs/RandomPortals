@@ -53,13 +53,18 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 		return EnumFacing.Axis.Y;
 	}
 
+	@Override
+	public BlockNetherPortal getByColor(EnumDyeColor color) {
+		return get(color);
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public IBlockState withRotation(IBlockState state, Rotation rotation) {
 		return getDefaultState();
 	}
 
-	public static BlockLateralNetherPortal getByColor(EnumDyeColor color) {
+	public static BlockLateralNetherPortal get(EnumDyeColor color) {
 		return colors.get(color);
 	}
 }

@@ -148,7 +148,7 @@ public class RPOTeleporter extends Teleporter {
 			if(portalPos == null) {
 				return false;
 			}
-			
+
 			receivingPortal = RPOSavedData.get(world).getNetherPortal(portalPos);
 
 			if(receivingPortal != null && portalType != receivingPortal.getType()) {

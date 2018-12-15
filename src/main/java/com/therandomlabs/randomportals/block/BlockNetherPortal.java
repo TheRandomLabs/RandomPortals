@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
@@ -26,7 +27,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -162,7 +165,6 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		final EnumFacing irrelevantFacing = getIrrelevantFacing(axis);
-		final EnumFacing[] relevantFacings = getRelevantFacings(axis);
 
 		if(pos.offset(irrelevantFacing).equals(fromPos) ||
 				pos.offset(irrelevantFacing.getOpposite()).equals(fromPos)) {
@@ -207,29 +209,7 @@ public class BlockNetherPortal extends BlockPortal {
 				}
 			}
 		} else {
-			removing.add(pos);
-
-			int previousSize = -1;
-
-			for(int i = 0; i < removing.size() || removing.size() != previousSize; i++) {
-				previousSize = removing.size();
-				final BlockPos removingPos = removing.get(i);
-
-				for(EnumFacing facing : relevantFacings) {
-					final BlockPos neighbor = removingPos.offset(facing);
-
-					if(removing.contains(neighbor)) {
-						continue;
-					}
-
-					final IBlockState neighborState = world.getBlockState(neighbor);
-
-					if(neighborState.getBlock() == this && !neighborState.getValue(USER_PLACED) &&
-							getEffectiveAxis(neighborState) == axis) {
-						removing.add(neighbor);
-					}
-				}
-			}
+			removing.addAll(getConnectedPortals(world, pos, this, axis));
 		}
 
 		for(BlockPos removePos : removing) {
@@ -298,14 +278,42 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
+		EnumDyeColor newColor = null;
+
+		if(entity instanceof EntityItem) {
+			final ItemStack stack = ((EntityItem) entity).getItem();
+
+			if(stack.getItem() == Items.DYE) {
+				newColor = EnumDyeColor.byDyeDamage(stack.getMetadata());
+			}
+		}
+
+		if(color == newColor) {
+			newColor = null;
+		}
+
 		if(world.isRemote) {
-			//Use vanilla Minecraft logic
-			entity.setPortal(pos);
+			if(newColor == null) {
+				//On the client, the Nether portal logic is not changed
+				entity.setPortal(pos);
+			}
+
 			return;
 		}
 
-		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
-		NetherPortalTeleportHandler.setPortal(entity, portal, pos);
+		if(newColor == null) {
+			final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
+			NetherPortalTeleportHandler.setPortal(entity, portal, pos);
+			return;
+		}
+
+		final IBlockState newState = getByColor(newColor).getDefaultState().
+				withProperty(AXIS, state.getValue(AXIS)).
+				withProperty(USER_PLACED, state.getValue(USER_PLACED));
+
+		for(BlockPos portalPos : getRelevantPortalBlockPositions(world, pos)) {
+			world.setBlockState(portalPos, newState, 2);
+		}
 	}
 
 	@Override
@@ -382,8 +390,28 @@ public class BlockNetherPortal extends BlockPortal {
 		return color;
 	}
 
-	public static BlockNetherPortal getByColor(EnumDyeColor color) {
+	public BlockNetherPortal getByColor(EnumDyeColor color) {
+		return get(color);
+	}
+
+	public static BlockNetherPortal get(EnumDyeColor color) {
 		return colors.get(color);
+	}
+
+	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(World world,
+			BlockPos portalPos) {
+		final IBlockState state = world.getBlockState(portalPos);
+		final BlockNetherPortal block = (BlockNetherPortal) state.getBlock();
+		final EnumFacing.Axis axis = block.getEffectiveAxis(state);
+
+		final Map.Entry<Boolean, NetherPortal> entry =
+				findFrame(NetherPortalFrames.FRAMES, world, portalPos);
+
+		if(entry != null) {
+			return entry.getValue().getFrame().getInnerBlockPositions();
+		}
+
+		return getConnectedPortals(world, portalPos, block, axis);
 	}
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
@@ -441,6 +469,37 @@ public class BlockNetherPortal extends BlockPortal {
 		return new AbstractMap.SimpleEntry<>(false, new NetherPortal(
 				frame, null, NetherPortalTypes.get(frame)
 		));
+	}
+
+	private static ImmutableList<BlockPos> getConnectedPortals(World world, BlockPos portalPos,
+			BlockNetherPortal block, EnumFacing.Axis axis) {
+		final List<BlockPos> positions = new ArrayList<>();
+
+		positions.add(portalPos);
+
+		int previousSize = -1;
+
+		for(int i = 0; i < positions.size() || positions.size() != previousSize; i++) {
+			previousSize = positions.size();
+			final BlockPos removingPos = positions.get(i);
+
+			for(EnumFacing facing : getRelevantFacings(axis)) {
+				final BlockPos neighbor = removingPos.offset(facing);
+
+				if(positions.contains(neighbor)) {
+					continue;
+				}
+
+				final IBlockState neighborState = world.getBlockState(neighbor);
+
+				if(neighborState.getBlock() == block && !neighborState.getValue(USER_PLACED) &&
+						block.getEffectiveAxis(neighborState) == axis) {
+					positions.add(neighbor);
+				}
+			}
+		}
+
+		return ImmutableList.copyOf(positions);
 	}
 
 	private static EnumFacing getIrrelevantFacing(EnumFacing.Axis axis) {

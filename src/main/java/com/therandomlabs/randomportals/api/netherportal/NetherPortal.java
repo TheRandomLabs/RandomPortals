@@ -39,11 +39,6 @@ public final class NetherPortal {
 		return receivingFrame;
 	}
 
-	@Nullable
-	public Frame getReceivingFrame(World world) {
-		return getFrame(receivingFrame, world);
-	}
-
 	public void setReceivingFrame(Frame frame) {
 		receivingFrame = frame;
 
@@ -54,6 +49,11 @@ public final class NetherPortal {
 				RPOSavedData.get(world).markDirty();
 			}
 		}
+	}
+
+	@Nullable
+	public Frame getReceivingFrame(World world) {
+		return getFrame(receivingFrame, world);
 	}
 
 	public NetherPortalType getType() {
