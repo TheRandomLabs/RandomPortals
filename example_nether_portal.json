@@ -32,6 +32,11 @@
 	//Whether generated portal frames drop (set to false to prevent frame block farming)
 	//This should also work with other mods such as Block Breakers from OpenBlocks and Exchangers
 	"doGeneratedFramesDrop": true,
+	//Valid values: "WHITE", "ORANGE", "MAGENTA", "LIGHT_BLUE", "YELLOW", "LIME", "PINK", "GRAY",
+	//"SILVER", "CYAN", "PURPLE", "BLUE", "BROWN", "GREEN", "RED", "BLACK"
+	"color": "ORANGE",
+	//If true, the portal cannot be dyed
+	"forceColor": true,
 	//If true, "dimensions" is a whitelist rather than a blacklist
 	"whitelist": false,
 	//Whitelist or blacklist of dimensions this portal type can be activated in
