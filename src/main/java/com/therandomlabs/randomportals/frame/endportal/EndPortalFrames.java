@@ -14,7 +14,7 @@ import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
 import com.therandomlabs.randomportals.api.frame.detector.BasicVerticalFrameDetector;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
@@ -73,7 +73,7 @@ public final class EndPortalFrames {
 
 		vertical.put(EnumFacing.NORTH, new BasicVerticalFrameDetector(
 				NORMAL,
-				StatePredicate.of(
+				FrameStatePredicate.of(
 						BlockStateMatcher.forBlock(RPOBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
@@ -84,7 +84,7 @@ public final class EndPortalFrames {
 
 		vertical.put(EnumFacing.EAST, new BasicVerticalFrameDetector(
 				NORMAL,
-				StatePredicate.of(
+				FrameStatePredicate.of(
 						BlockStateMatcher.forBlock(RPOBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
@@ -95,7 +95,7 @@ public final class EndPortalFrames {
 
 		vertical.put(EnumFacing.SOUTH, new BasicVerticalFrameDetector(
 				NORMAL,
-				StatePredicate.of(
+				FrameStatePredicate.of(
 						BlockStateMatcher.forBlock(RPOBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),
@@ -107,7 +107,7 @@ public final class EndPortalFrames {
 
 		vertical.put(EnumFacing.WEST, new BasicVerticalFrameDetector(
 				NORMAL,
-				StatePredicate.of(
+				FrameStatePredicate.of(
 						BlockStateMatcher.forBlock(RPOBlocks.vertical_end_portal_frame).
 								where(EYE, eye -> eye)
 				),

@@ -6,7 +6,7 @@ import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.event.EndPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import com.therandomlabs.randomportals.handler.EndPortalActivationHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
@@ -82,18 +82,18 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		final Block block = state.getBlock();
 
 		final EnumFacing facing;
-		final StatePredicate portalMatcher;
+		final FrameStatePredicate portalMatcher;
 		final EnumFacing frameDirection;
 		final FrameType type;
 
 		if(block == Blocks.END_PORTAL || block == RPOBlocks.upside_down_end_portal) {
 			facing = null;
-			portalMatcher = StatePredicate.of(block);
+			portalMatcher = FrameStatePredicate.of(block);
 			frameDirection = EnumFacing.NORTH;
 			type = FrameType.LATERAL;
 		} else {
 			facing = state.getValue(FACING);
-			portalMatcher = StatePredicate.of(block).with(FACING, facing);
+			portalMatcher = FrameStatePredicate.of(block).with(FACING, facing);
 			frameDirection = EnumFacing.DOWN;
 			type = facing.getAxis() == EnumFacing.Axis.X ?
 					FrameType.VERTICAL_Z : FrameType.VERTICAL_X;

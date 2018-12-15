@@ -50,6 +50,12 @@ public final class RPOConfig {
 		@Config.Comment("Enables vertical End portals and a variety of End portal tweaks.")
 		public boolean enabled = true;
 
+		@Config.RangeDouble(min = 0.0, max = 1.0)
+		@Config.LangKey("randomportals.config.endPortals.frameHeadVillagerSpawnChance")
+		@Config.Comment("The chance that a villager spawns with a vertical End portal frame on " +
+				"their head.")
+		public double frameHeadVillagerSpawnChance = 0.05;
+
 		@Config.LangKey("randomportals.config.endPortals.useAllVariantsJson")
 		@Config.Comment(
 				"Whether to read from the all_variants JSON rather than the different JSONs " +
@@ -66,6 +72,10 @@ public final class RPOConfig {
 	}
 
 	public static final class NetherPortals {
+		@Config.LangKey("randomportals.config.netherPortals.consumeDyesEvenIfSameColor")
+		@Config.Comment("Whether portals should consume dyes even if they are the same color.")
+		public boolean consumeDyesEvenIfSameColor = true;
+
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.enabled")
 		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
@@ -83,6 +93,15 @@ public final class RPOConfig {
 				"This makes mods like Netherless obsolete."
 		})
 		public boolean persistentReceivingPortals = true;
+
+		@Config.LangKey("randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation")
+		@Config.Comment({
+				"Whether user placed portals inside the frame of the same type as the " +
+						"portal should be replaced upon activation.",
+				"Leaving this false is recommended for building purposes, as it allows players " +
+						"to more easily create colored patterns in portals."
+		})
+		public boolean replaceUserPlacedPortalsOnActivation;
 
 		@Config.LangKey("randomportals.config.netherPortals.useAllVariantsJson")
 		@Config.Comment(

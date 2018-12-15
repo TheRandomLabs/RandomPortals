@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -455,7 +455,7 @@ public class Frame {
 		return true;
 	}
 
-	public boolean testInnerBlocks(StatePredicate predicate) {
+	public boolean testInnerBlocks(FrameStatePredicate predicate) {
 		final World world = this.world.get();
 
 		if(world == null) {
@@ -463,7 +463,7 @@ public class Frame {
 		}
 
 		for(BlockPos innerPos : getInnerBlockPositions()) {
-			if(!predicate.test(world, innerPos, world.getBlockState(innerPos))) {
+			if(!predicate.test(world, innerPos, world.getBlockState(innerPos), type)) {
 				return false;
 			}
 		}

@@ -120,7 +120,7 @@ public abstract class FrameDetector {
 
 	protected abstract boolean test(Frame frame);
 
-	protected boolean testInner(World world, BlockPos pos, IBlockState state) {
+	protected boolean testInner(World world, FrameType type, BlockPos pos, IBlockState state) {
 		return true;
 	}
 
@@ -169,7 +169,7 @@ public abstract class FrameDetector {
 				if(test(world, type, checkPos, checkState, side, 1) &&
 						test(world, type, checkPos2, checkState2, previousSide, UNKNOWN)) {
 					possibleCorners.add(checkPos);
-				} else if(!testInner(world, checkPos2, checkState2)) {
+				} else if(!testInner(world, type, checkPos2, checkState2)) {
 					//Then checkState2 is an inner block
 					break;
 				}
@@ -268,7 +268,7 @@ public abstract class FrameDetector {
 					test(world, type, pos, checkState, nextSide, CORNER) &&
 					test(world, type, checkPos2, checkState2, nextSide, 2)) {
 				possibleCorners.add(new AbstractMap.SimpleEntry<>(checkPos, length));
-			} else if(!testInner(world, checkPos2, checkState2)) {
+			} else if(!testInner(world, type, checkPos2, checkState2)) {
 				//Then checkState2 is an inner block
 				break;
 			}

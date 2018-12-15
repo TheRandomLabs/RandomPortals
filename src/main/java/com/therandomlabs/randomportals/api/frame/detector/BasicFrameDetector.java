@@ -9,7 +9,7 @@ import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameSide;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -17,33 +17,33 @@ import net.minecraft.world.World;
 
 public class BasicFrameDetector extends FrameDetector {
 	private final Function<FrameType, FrameSize> defaultSize;
-	private final Supplier<StatePredicate> blockMatcher;
+	private final Supplier<FrameStatePredicate> blockMatcher;
 	private final RequiredCorner requiredCorner;
 	private final Predicate<Frame> framePredicate;
-	private final StatePredicate innerPredicate;
+	private final FrameStatePredicate innerPredicate;
 
 	public BasicFrameDetector(Block block, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
-		this(() -> StatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
+			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate) {
+		this(() -> FrameStatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(Supplier<StatePredicate> blockMatcher, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
+	public BasicFrameDetector(Supplier<FrameStatePredicate> blockMatcher, RequiredCorner requiredCorner,
+			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate) {
 		this(null, blockMatcher, requiredCorner, framePredicate, innerPredicate);
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize, Block block,
 			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
-			StatePredicate innerPredicate) {
+			FrameStatePredicate innerPredicate) {
 		this(
-				defaultSize, () -> StatePredicate.of(block), requiredCorner, framePredicate,
+				defaultSize, () -> FrameStatePredicate.of(block), requiredCorner, framePredicate,
 				innerPredicate
 		);
 	}
 
 	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			Supplier<StatePredicate> blockMatcher, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, StatePredicate innerPredicate) {
+			Supplier<FrameStatePredicate> blockMatcher, RequiredCorner requiredCorner,
+			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate) {
 		this.defaultSize = defaultSize;
 		this.blockMatcher = blockMatcher;
 		this.requiredCorner = requiredCorner;
@@ -68,7 +68,7 @@ public class BasicFrameDetector extends FrameDetector {
 			return requiredCorner.test(world, pos, state);
 		}
 
-		return blockMatcher.get().test(world, pos, state);
+		return blockMatcher.get().test(world, pos, state, type);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class BasicFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected boolean testInner(World world, BlockPos pos, IBlockState state) {
-		return innerPredicate.test(world, pos, state);
+	protected boolean testInner(World world, FrameType type, BlockPos pos, IBlockState state) {
+		return innerPredicate.test(world, pos, state, type);
 	}
 }

@@ -1,23 +1,23 @@
 package com.therandomlabs.randomportals.api.frame;
 
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public enum RequiredCorner {
-	ANY((world, pos, state) -> true),
-	ANY_NON_AIR((world, pos, state) -> state.getBlock() != Blocks.AIR),
+	ANY((world, pos, state, type) -> true),
+	ANY_NON_AIR((world, pos, state, type) -> state.getBlock() != Blocks.AIR),
 	SAME(null);
 
-	private final StatePredicate predicate;
+	private final FrameStatePredicate predicate;
 
-	RequiredCorner(StatePredicate predicate) {
+	RequiredCorner(FrameStatePredicate predicate) {
 		this.predicate = predicate;
 	}
 
-	public StatePredicate getPredicate() {
+	public FrameStatePredicate getPredicate() {
 		return predicate;
 	}
 

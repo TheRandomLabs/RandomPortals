@@ -38,13 +38,25 @@ public class RPOTeleporter extends Teleporter {
 
 	@Override
 	public void placeInPortal(Entity entity, float yaw) {
-		if(NetherPortalTeleportHandler.getTeleportData(entity) != null) {
-			if(!placeInExistingPortal(entity, yaw) && entity instanceof EntityPlayerMP) {
-				makePortal(entity);
-				placeInExistingPortal(entity, yaw);
-			}
+		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
 
-			return;
+		if(data != null) {
+			final NetherPortal portal = data.getPortal();
+			final NetherPortalType type =
+					portal == null ? NetherPortalTypes.getDefault() : portal.getType();
+
+			if(type.teleportToPortal) {
+				if(placeInExistingPortal(entity, yaw)) {
+					return;
+				}
+
+				//Only players can spawn portals for some reason
+				if(entity instanceof EntityPlayerMP && type.spawnPortal) {
+					makePortal(entity);
+					placeInExistingPortal(entity, yaw);
+					return;
+				}
+			}
 		}
 
 		if(world.provider.getDimensionType() != DimensionType.THE_END) {

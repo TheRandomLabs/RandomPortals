@@ -28,7 +28,8 @@ public final class NetherPortalType {
 	public List<Integer> dimensions = new ArrayList<>();
 
 	public int dimensionID;
-	public boolean forcePortal;
+	public boolean spawnPortal = true;
+	public boolean teleportToPortal = true;
 	public FrameSize size = new FrameSize();
 
 	transient String name;

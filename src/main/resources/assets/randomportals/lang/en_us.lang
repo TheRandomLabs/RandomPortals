@@ -6,6 +6,7 @@ randomportals.config.client.rporeloadclientCommand=/rporeloadclient
 randomportals.config.endPortals=End Portals
 randomportals.config.endPortals.tooltip=Options related to End portals.
 randomportals.config.endPortals.enabled=Enabled
+randomportals.config.endPortals.frameHeadVillagerSpawnChance=Frame head villager spawn chance
 randomportals.config.endPortals.useAllVariantsJson=Use all_variants JSON
 
 randomportals.config.misc=Miscellaneous
@@ -14,9 +15,11 @@ randomportals.config.misc.rporeloadCommand=/rporeload
 
 randomportals.config.netherPortals=Nether Portals
 randomportals.config.netherPortals.tooltip=Options related to Nether portals.
+randomportals.config.netherPortals.consumeDyesEvenIfSameColor=Consume dyes even if they are the same color
 randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
 randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
+randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation=Replace user placed portals on activation
 randomportals.config.netherPortals.useAllVariantsJson=Use all_variants JSON
 
 itemGroup.portals=Portals

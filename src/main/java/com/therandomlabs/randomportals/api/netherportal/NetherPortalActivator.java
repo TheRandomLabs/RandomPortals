@@ -1,15 +1,18 @@
 package com.therandomlabs.randomportals.api.netherportal;
 
 import java.util.function.BiFunction;
+import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.api.config.NetherPortalType;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.frame.FrameType;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -117,7 +120,7 @@ public class NetherPortalActivator {
 
 	public NetherPortal activate(World world, BlockPos pos,
 			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
-		final StatePredicate validBlocks;
+		final FrameStatePredicate validBlocks;
 
 		if(forcePortalType == null) {
 			if(portalTypes == null) {
@@ -131,6 +134,7 @@ public class NetherPortalActivator {
 
 		final PortalContainer portal = new PortalContainer();
 		BlockPos framePos = null;
+		FrameType type = FrameType.LATERAL_OR_VERTICAL;
 
 		for(EnumFacing facing : EnumFacing.values()) {
 			final BlockPos offset = pos.offset(facing);
@@ -140,8 +144,8 @@ public class NetherPortalActivator {
 				continue;
 			}
 
-			NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(world, offset, potentialFrame -> {
-				final NetherPortal result = testFrame(potentialFrame, offset, facing.getOpposite());
+			NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(world, offset, type, frame -> {
+				final NetherPortal result = testFrame(frame, offset, facing.getOpposite());
 
 				if(result == null) {
 					return false;
@@ -153,9 +157,15 @@ public class NetherPortalActivator {
 
 			if(portal.portal != null) {
 				framePos = offset;
+				break;
 			}
 
-			break;
+			//Optimization black magic
+			if(facing == EnumFacing.DOWN || facing == EnumFacing.UP) {
+				type = FrameType.LATERAL;
+			} else {
+				break;
+			}
 		}
 
 		if(portal.portal == null) {
@@ -180,11 +190,26 @@ public class NetherPortalActivator {
 		RPOSavedData.get(world).addNetherPortal(portal, userCreated);
 
 		final Frame frame = portal.getFrame();
-		final IBlockState state = portalBlocks.apply(
-				frame.getType().getAxis(), portal.getType().color
-		);
+		final EnumFacing.Axis axis = frame.getType().getAxis();
+		final IBlockState state = portalBlocks.apply(axis, portal.getType().color);
+		final Block block = state.getBlock();
+		final Class<?> blockClass = block.getClass();
+		final BlockNetherPortal portalBlock =
+				block instanceof BlockNetherPortal ? (BlockNetherPortal) block : null;
 
 		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+			//Allow players to create colorful patterns
+			if(portalBlock != null &&
+					!RPOConfig.netherPortals.replaceUserPlacedPortalsOnActivation) {
+				final IBlockState innerState = world.getBlockState(innerPos);
+
+				if(innerState.getBlock().getClass() == blockClass &&
+						innerState.getValue(BlockNetherPortal.USER_PLACED) &&
+						portalBlock.getEffectiveAxis(innerState) == axis) {
+					continue;
+				}
+			}
+
 			world.setBlockState(innerPos, state, 2);
 		}
 	}

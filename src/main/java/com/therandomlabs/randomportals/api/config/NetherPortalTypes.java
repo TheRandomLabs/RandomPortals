@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableMap;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.api.frame.Frame;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.DimensionType;
@@ -34,7 +34,7 @@ public final class NetherPortalTypes {
 	private static final Map<String, NetherPortalType> defaultTypes = new HashMap<>();
 
 	private static ImmutableMap<String, NetherPortalType> types;
-	private static StatePredicate validBlocks;
+	private static FrameStatePredicate validBlocks;
 
 	private NetherPortalTypes() {}
 
@@ -61,15 +61,15 @@ public final class NetherPortalTypes {
 		return types;
 	}
 
-	public static StatePredicate getValidBlocks() {
+	public static FrameStatePredicate getValidBlocks() {
 		return validBlocks;
 	}
 
-	public static StatePredicate getValidBlocks(NetherPortalType... types) {
+	public static FrameStatePredicate getValidBlocks(NetherPortalType... types) {
 		return getValidBlocks(Arrays.asList(types));
 	}
 
-	public static StatePredicate getValidBlocks(Collection<NetherPortalType> types) {
+	public static FrameStatePredicate getValidBlocks(Collection<NetherPortalType> types) {
 		final List<Predicate<IBlockState>> matchers = new ArrayList<>();
 
 		for(NetherPortalType type : types) {
@@ -78,7 +78,7 @@ public final class NetherPortalTypes {
 			}
 		}
 
-		return (world, pos, state) -> {
+		return (world, pos, state, type) -> {
 			for(Predicate<IBlockState> matcher : matchers) {
 				if(matcher.test(state)) {
 					return true;

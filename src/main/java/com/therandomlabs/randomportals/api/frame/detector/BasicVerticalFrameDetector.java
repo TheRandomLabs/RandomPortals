@@ -8,7 +8,7 @@ import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameSide;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -18,19 +18,19 @@ import static net.minecraft.block.BlockHorizontal.FACING;
 public class BasicVerticalFrameDetector extends FrameDetector {
 	private final FrameType defaultType;
 	private final Function<FrameType, FrameSize> defaultSize;
-	private final StatePredicate blockMatcher;
+	private final FrameStatePredicate blockMatcher;
 	private final RequiredCorner requiredCorner;
 	private final EnumFacing facing;
 	private final Predicate<Frame> framePredicate;
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			StatePredicate blockMatcher, RequiredCorner requiredCorner,
+			FrameStatePredicate blockMatcher, RequiredCorner requiredCorner,
 			Predicate<Frame> framePredicate) {
 		this(defaultSize, blockMatcher, requiredCorner, null, framePredicate);
 	}
 
 	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
-			StatePredicate blockMatcher, RequiredCorner requiredCorner,
+			FrameStatePredicate blockMatcher, RequiredCorner requiredCorner,
 			EnumFacing facing, Predicate<Frame> framePredicate) {
 		if(facing == null) {
 			defaultType = FrameType.VERTICAL;

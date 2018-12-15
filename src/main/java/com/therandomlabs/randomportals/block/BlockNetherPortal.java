@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.ImmutableList;
+import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
@@ -14,7 +15,7 @@ import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
-import com.therandomlabs.randomportals.api.util.StatePredicate;
+import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
@@ -44,20 +45,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Mod.EventBusSubscriber(modid = RandomPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
 	public static final class Matcher {
-		public static final StatePredicate LATERAL =
-				StatePredicate.ofBlock(block -> block.getClass() == BlockLateralNetherPortal.class);
+		public static final FrameStatePredicate LATERAL = FrameStatePredicate.ofBlock(
+				block -> block.getClass() == BlockLateralNetherPortal.class
+		);
 
-		public static final StatePredicate VERTICAL_X =
-				StatePredicate.ofBlock(block -> block.getClass() == BlockNetherPortal.class)
-						.where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
+		public static final FrameStatePredicate VERTICAL_X = FrameStatePredicate.ofBlock(
+				block -> block.getClass() == BlockNetherPortal.class
+		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.X);
 
-		public static final StatePredicate VERTICAL_Z =
-				StatePredicate.ofBlock(block -> block.getClass() == BlockNetherPortal.class)
-						.where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
+		public static final FrameStatePredicate VERTICAL_Z = FrameStatePredicate.ofBlock(
+				block -> block.getClass() == BlockNetherPortal.class
+		).where(BlockNetherPortal.AXIS, axis -> axis == EnumFacing.Axis.Z);
 
 		private Matcher() {}
 
-		public static StatePredicate ofType(FrameType type) {
+		public static FrameStatePredicate ofType(FrameType type) {
 			return type.get(LATERAL, VERTICAL_X, VERTICAL_Z);
 		}
 	}
@@ -152,7 +154,15 @@ public class BlockNetherPortal extends BlockPortal {
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
 			BlockPos fromPos) {
-		if(removing.contains(fromPos) || state.getValue(USER_PLACED)) {
+		if(removing.contains(fromPos)) {
+			return;
+		}
+
+		final RPOSavedData savedData = RPOSavedData.get(world);
+		NetherPortal portal = savedData.getNetherPortal(pos);
+
+		//If there is an activated portal here, then ignore userPlaced
+		if(state.getValue(USER_PLACED) && portal == null) {
 			return;
 		}
 
@@ -171,11 +181,16 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final Map.Entry<Boolean, NetherPortal> entry =
-				findFrame(NetherPortalFrames.FRAMES, world, pos);
+		final Map.Entry<Boolean, NetherPortal> entry;
+
+		if(portal == null) {
+			entry = findFrame(NetherPortalFrames.FRAMES, world, pos);
+		} else {
+			entry = new AbstractMap.SimpleEntry<>(true, portal);
+		}
 
 		if(entry != null) {
-			final NetherPortal portal = entry.getValue();
+			portal = entry.getValue();
 			final Frame frame = portal.getFrame();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
@@ -219,7 +234,7 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		removing.clear();
-		RPOSavedData.get(world).removeNetherPortal(pos);
+		savedData.removeNetherPortal(pos);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -291,6 +306,11 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		if(color == newColor) {
+			if(RPOConfig.netherPortals.consumeDyesEvenIfSameColor) {
+				world.removeEntity(entity);
+				return;
+			}
+
 			newColor = null;
 		}
 
@@ -438,7 +458,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final FrameSize size = NetherPortalFrames.SIZE.apply(type);
 		final int maxSize = size.getMaxSize(frameDirection == EnumFacing.DOWN);
 
-		final StatePredicate portalMatcher = Matcher.ofType(type);
+		final FrameStatePredicate portalMatcher = Matcher.ofType(type);
 
 		BlockPos framePos = null;
 		BlockPos checkPos = portalPos;
