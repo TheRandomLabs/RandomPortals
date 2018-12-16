@@ -41,9 +41,7 @@ public class RPOTeleporter extends Teleporter {
 		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
 
 		if(data != null) {
-			final NetherPortal portal = data.getPortal();
-			final NetherPortalType type =
-					portal == null ? NetherPortalTypes.getDefault() : portal.getType();
+			final NetherPortalType type = data.getPortalType();
 
 			if(type.teleportToPortal) {
 				if(placeInExistingPortal(entity, yaw)) {

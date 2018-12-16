@@ -31,6 +31,7 @@ public final class NetherPortalType {
 	public boolean spawnPortal = true;
 	public boolean teleportToPortal = true;
 	public FrameSize size = new FrameSize();
+	public TeleportationDelay teleportationDelay = new TeleportationDelay();
 
 	transient String name;
 
@@ -73,6 +74,7 @@ public final class NetherPortalType {
 		}
 
 		size.ensureCorrect();
+		teleportationDelay.ensureCorrect();
 	}
 
 	public String getName() {

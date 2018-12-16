@@ -9,6 +9,9 @@ import com.therandomlabs.randomportals.api.config.NetherPortalType;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
+import com.therandomlabs.randomportals.block.BlockNetherPortal;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -48,7 +51,7 @@ public final class NetherPortalTeleportHandler {
 			reference = new WeakReference<>(entity);
 		}
 
-		preTeleportData.put(reference, new TeleportData(portal, pos));
+		preTeleportData.put(reference, new TeleportData(portal, pos, world.getBlockState(pos)));
 
 		//In case another mod needs lastPortalPos for whatever reason
 		entity.lastPortalPos = pos;
@@ -121,15 +124,27 @@ public final class NetherPortalTeleportHandler {
 			return;
 		}
 
-		final int maxInPortalTime = entity.getMaxInPortalTime();
+		final NetherPortalType type = data.getPortalType();
+		final IBlockState state = data.getPortalState();
+		final Block block = state.getBlock();
+
+		int maxInPortalTime = 0;
+
+		if(block instanceof BlockNetherPortal) {
+			maxInPortalTime = type.teleportationDelay.get(
+					((BlockNetherPortal) block).getEffectiveAxis(state)
+			);
+		}
+
+		if(maxInPortalTime == 0) {
+			maxInPortalTime = entity.getMaxInPortalTime();
+		}
 
 		if(entity.portalCounter++ < maxInPortalTime) {
 			//Entity decrements this by 4 every tick because inPortal is false
 			entity.portalCounter += 4;
 			return;
 		}
-
-		entity.portalCounter += 4;
 
 		entity.portalCounter = maxInPortalTime;
 		entity.timeUntilPortal = entity.getPortalCooldown();
@@ -139,7 +154,7 @@ public final class NetherPortalTeleportHandler {
 		}
 
 		teleportData.put(reference, data);
-		final NetherPortalType type = data.getPortalType();
+
 		entity.changeDimension(dimension == type.dimensionID ? 0 : type.dimensionID);
 	}
 }
