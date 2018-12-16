@@ -30,7 +30,7 @@ public final class RandomPortals {
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
 	public static final String DEPENDENCIES =
-			"required-after:rpintegration@[1.12.2-1.0.0.0,);before:movingworld";
+			"required-after:rpintegration@[1.12.2-1.1.0.0,);before:movingworld";
 	public static final String UPDATE_JSON =
 			"https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
@@ -62,7 +62,7 @@ public final class RandomPortals {
 		}
 	}
 
-	//Remove when 1.12.2-1.0.0.0 is released:
+	//Remove when 1.12.2-1.2.0.0 is released:
 
 	@SubscribeEvent
 	public static void onMissingBlockMappings(RegistryEvent.MissingMappings<Block> event) {

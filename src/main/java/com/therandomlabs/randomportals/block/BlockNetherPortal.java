@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
@@ -16,6 +17,8 @@ import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
 import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
+import com.therandomlabs.randomportals.client.RPOPortalRenderer;
+import com.therandomlabs.randomportals.client.particle.ParticleRPOPortal;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
@@ -25,15 +28,18 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -105,6 +111,7 @@ public class BlockNetherPortal extends BlockPortal {
 			new EnumMap<>(EnumDyeColor.class);
 
 	private final EnumDyeColor color;
+	private final Class<?> clazz;
 
 	public BlockNetherPortal(EnumDyeColor color) {
 		this(
@@ -136,6 +143,7 @@ public class BlockNetherPortal extends BlockPortal {
 		setRegistryName(registryName);
 		PortalBlockRegistry.register(this);
 		this.color = color;
+		clazz = getClass();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -192,7 +200,6 @@ public class BlockNetherPortal extends BlockPortal {
 		if(entry != null) {
 			portal = entry.getValue();
 			final Frame frame = portal.getFrame(world);
-			final Class<?> clazz = getClass();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
 			//If true, the frame is not guaranteed to still exist, so we call NetherPortalType.test
@@ -319,6 +326,10 @@ public class BlockNetherPortal extends BlockPortal {
 			if(newColor == null) {
 				//On the client, the Nether portal logic is not changed
 				entity.setPortal(pos);
+
+				if(entity == Minecraft.getMinecraft().player) {
+					RPOPortalRenderer.resetSprite(pos, this);
+				}
 			}
 
 			return;
@@ -406,6 +417,66 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		return actuallyRemoved;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random random) {
+		final int x = pos.getX();
+		final int y = pos.getY();
+		final int z = pos.getZ();
+
+		if(random.nextInt(100) == 0) {
+			world.playSound(
+					x + 0.5,
+					y + 0.5,
+					z + 0.5,
+					SoundEvents.BLOCK_PORTAL_AMBIENT,
+					SoundCategory.BLOCKS,
+					0.5F,
+					random.nextFloat() * 0.4F + 0.8F,
+					false
+			);
+		}
+
+		for(int i = 0; i < 4; i++) {
+			final double particleX;
+			final double particleY = y + random.nextDouble();
+			final double particleZ;
+
+			final double xSpeed;
+			final double ySpeed = (random.nextDouble() - 0.5) * 0.5;
+			final double zSpeed;
+
+			final int offset = random.nextInt(2) * 2 - 1;
+
+			if(world.getBlockState(pos.west()).getBlock().getClass() != clazz &&
+					world.getBlockState(pos.east()).getBlock().getClass() != clazz) {
+				particleX = x + 0.5 + 0.25 * offset;
+				particleZ = z + random.nextDouble();
+
+				xSpeed = random.nextDouble() * 2.0 * offset;
+				zSpeed = (random.nextDouble() - 0.5) * 0.5;
+			} else {
+				particleX = x + random.nextDouble();
+				particleZ = z + 0.5 + 0.25 * offset;
+
+				xSpeed = (random.nextDouble() - 0.5) * 0.5;
+				zSpeed = random.nextDouble() * 2.0 * offset;
+			}
+
+
+			Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleRPOPortal(
+					world,
+					particleX,
+					particleY,
+					particleZ,
+					xSpeed,
+					ySpeed,
+					zSpeed,
+					color
+			));
+		}
 	}
 
 	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
