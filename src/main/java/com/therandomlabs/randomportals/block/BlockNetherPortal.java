@@ -347,7 +347,10 @@ public class BlockNetherPortal extends BlockPortal {
 				withProperty(USER_PLACED, state.getValue(USER_PLACED));
 
 		for(BlockPos portalPos : getRelevantPortalBlockPositions(world, pos)) {
-			world.setBlockState(portalPos, newState, 2);
+			//Only replace blocks of the same color
+			if(world.getBlockState(portalPos).getBlock() == this) {
+				world.setBlockState(portalPos, newState, 2);
+			}
 		}
 
 		world.removeEntity(entity);
