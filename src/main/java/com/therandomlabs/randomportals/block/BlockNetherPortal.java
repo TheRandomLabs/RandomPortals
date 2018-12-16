@@ -298,7 +298,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		EnumDyeColor newColor = null;
 
-		if(entity instanceof EntityItem) {
+		if(RPOConfig.netherPortals.dyeablePortals && entity instanceof EntityItem) {
 			final ItemStack stack = ((EntityItem) entity).getItem();
 
 			if(stack.getItem() == Items.DYE) {
@@ -412,7 +412,7 @@ public class BlockNetherPortal extends BlockPortal {
 		return state.getValue(AXIS);
 	}
 
-	public EnumDyeColor getColor() {
+	public final EnumDyeColor getColor() {
 		return color;
 	}
 

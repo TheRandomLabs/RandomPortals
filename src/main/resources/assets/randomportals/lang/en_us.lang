@@ -7,6 +7,7 @@ randomportals.config.endPortals=End Portals
 randomportals.config.endPortals.tooltip=Options related to End portals.
 randomportals.config.endPortals.enabled=Enabled
 randomportals.config.endPortals.frameHeadVillagerSpawnChance=Frame head villager spawn chance
+randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads=Right click villagers to convert to frame heads
 randomportals.config.endPortals.useAllVariantsJson=Use all_variants JSON
 
 randomportals.config.misc=Miscellaneous
@@ -15,7 +16,9 @@ randomportals.config.misc.rporeloadCommand=/rporeload
 
 randomportals.config.netherPortals=Nether Portals
 randomportals.config.netherPortals.tooltip=Options related to Nether portals.
+randomportals.config.netherPortals.coloredPortals=Colored portals
 randomportals.config.netherPortals.consumeDyesEvenIfSameColor=Consume dyes even if they are the same color
+randomportals.config.netherPortals.dyeablePortals=Dyeable portals
 randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
 randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
@@ -33,6 +36,7 @@ tile.endPortalVertical.name=Vertical End Portal
 tile.endPortalFrameUpsideDown.name=Upside Down End Portal Frame
 tile.endPortalUpsideDown.name=Upside Down End Portal
 
+tile.netherPortalVertical.name=Vertical Nether Portal
 tile.netherPortalVerticalWhite.name=White Vertical Nether Portal
 tile.netherPortalVerticalOrange.name=Orange Vertical Nether Portal
 tile.netherPortalVerticalMagenta.name=Magenta Vertical Nether Portal
@@ -50,6 +54,7 @@ tile.netherPortalVerticalGreen.name=Green Vertical Nether Portal
 tile.netherPortalVerticalRed.name=Red Vertical Nether Portal
 tile.netherPortalVerticalBlack.name=Black Vertical Nether Portal
 
+tile.netherPortalLateral.name=Lateral Nether Portal
 tile.netherPortalLateralWhite.name=White Lateral Nether Portal
 tile.netherPortalLateralOrange.name=Orange Lateral Nether Portal
 tile.netherPortalLateralMagenta.name=Magenta Lateral Nether Portal

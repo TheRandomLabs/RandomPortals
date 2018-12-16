@@ -57,6 +57,11 @@ public final class RPOConfig {
 				"their head.")
 		public double frameHeadVillagerSpawnChance = RandomPatches.IS_DEOBFUSCATED ? 0.5 : 0.05;
 
+		@Config.LangKey("randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads")
+		@Config.Comment("Whether players can right click villagers with vertical End portals to " +
+				"put them on their heads.")
+		public boolean rightClickVillagersToConvertToFrameHeads = true;
+
 		@Config.LangKey("randomportals.config.endPortals.useAllVariantsJson")
 		@Config.Comment(
 				"Whether to read from the all_variants JSON rather than the different JSONs " +
@@ -73,9 +78,18 @@ public final class RPOConfig {
 	}
 
 	public static final class NetherPortals {
+		@Config.RequiresMcRestart
+		@Config.LangKey("randomportals.config.netherPortals.coloredPortals")
+		@Config.Comment("Whether to enable colored portals.")
+		public boolean coloredPortals = true;
+
 		@Config.LangKey("randomportals.config.netherPortals.consumeDyesEvenIfSameColor")
 		@Config.Comment("Whether portals should consume dyes even if they are the same color.")
 		public boolean consumeDyesEvenIfSameColor = true;
+
+		@Config.LangKey("randomportals.config.netherPortals.dyeablePortals")
+		@Config.Comment("Whether portals should be dyeable.")
+		public boolean dyeablePortals = true;
 
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.enabled")

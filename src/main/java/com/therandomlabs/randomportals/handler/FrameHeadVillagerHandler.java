@@ -51,14 +51,18 @@ public final class FrameHeadVillagerHandler {
 	}
 
 	@SubscribeEvent
-	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+	public static void onEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
+		if(!RPOConfig.endPortals.rightClickVillagersToConvertToFrameHeads) {
+			return;
+		}
+
 		final ItemStack stack = event.getItemStack();
 
 		if(stack.getItem() != ItemBlock.getItemFromBlock(RPOBlocks.vertical_end_portal_frame)) {
 			return;
 		}
 
-		final Entity entity = event.getEntity();
+		final Entity entity = event.getTarget();
 
 		if(entity.getClass() != EntityVillager.class) {
 			return;

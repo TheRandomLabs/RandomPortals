@@ -103,11 +103,21 @@ public final class RPOBlocks {
 		if(RPOConfig.netherPortals.enabled) {
 			registry.register(new BlockRPOFire());
 
-			for(EnumDyeColor color : EnumDyeColor.values()) {
+			if(RPOConfig.netherPortals.coloredPortals) {
+				for(EnumDyeColor color : EnumDyeColor.values()) {
+					Collections.addAll(
+							blocksWithItems,
+							new BlockNetherPortal(color),
+							new BlockLateralNetherPortal(color)
+					);
+				}
+			} else {
 				Collections.addAll(
 						blocksWithItems,
-						new BlockNetherPortal(color),
-						new BlockLateralNetherPortal(color)
+						new BlockNetherPortal(EnumDyeColor.PURPLE).
+								setTranslationKey("netherPortalVertical"),
+						new BlockLateralNetherPortal(EnumDyeColor.PURPLE).
+								setTranslationKey("netherPortalLateral")
 				);
 			}
 		}
