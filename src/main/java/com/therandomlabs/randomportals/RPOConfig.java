@@ -16,6 +16,7 @@ import blue.endless.jankson.impl.SyntaxError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.therandomlabs.randompatches.RandomPatches;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
@@ -54,7 +55,7 @@ public final class RPOConfig {
 		@Config.LangKey("randomportals.config.endPortals.frameHeadVillagerSpawnChance")
 		@Config.Comment("The chance that a villager spawns with a vertical End portal frame on " +
 				"their head.")
-		public double frameHeadVillagerSpawnChance = 0.05;
+		public double frameHeadVillagerSpawnChance = RandomPatches.IS_DEOBFUSCATED ? 0.5 : 0.05;
 
 		@Config.LangKey("randomportals.config.endPortals.useAllVariantsJson")
 		@Config.Comment(

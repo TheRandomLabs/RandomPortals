@@ -191,7 +191,8 @@ public class BlockNetherPortal extends BlockPortal {
 
 		if(entry != null) {
 			portal = entry.getValue();
-			final Frame frame = portal.getFrame();
+			final Frame frame = portal.getFrame(world);
+			final Class<?> clazz = getClass();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
 			//If true, the frame is not guaranteed to still exist, so we call NetherPortalType.test
@@ -202,7 +203,7 @@ public class BlockNetherPortal extends BlockPortal {
 				final IBlockState innerState = world.getBlockState(innerPos);
 				final Block innerBlock = innerState.getBlock();
 
-				if(innerBlock != this || innerState.getValue(USER_PLACED) ||
+				if(innerBlock.getClass() != clazz ||
 						((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
 					shouldBreak = true;
 					break;
@@ -218,7 +219,7 @@ public class BlockNetherPortal extends BlockPortal {
 				final IBlockState innerState = world.getBlockState(innerPos);
 				final Block innerBlock = innerState.getBlock();
 
-				if(innerBlock == this && !innerState.getValue(USER_PLACED) &&
+				if(innerBlock.getClass() == clazz &&
 						((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) == axis) {
 					removing.add(innerPos);
 				}
