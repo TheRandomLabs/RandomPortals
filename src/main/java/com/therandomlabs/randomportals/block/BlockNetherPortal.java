@@ -384,41 +384,6 @@ public class BlockNetherPortal extends BlockPortal {
 				withProperty(USER_PLACED, userPlaced);
 	}
 
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		final int toAdd = state.getValue(USER_PLACED) ? 3 : 0;
-		return super.getMetaFromState(state) + toAdd;
-	}
-
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, AXIS, USER_PLACED);
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		final EnumFacing.Axis axis = placer.getHorizontalFacing().getAxis();
-		return getDefaultState().withProperty(
-				AXIS,
-				axis == EnumFacing.Axis.X ? EnumFacing.Axis.Z : EnumFacing.Axis.X
-		);
-	}
-
-	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
-			EntityPlayer player, boolean willHarvest) {
-		final boolean actuallyRemoved =
-				super.removedByPlayer(state, world, pos, player, willHarvest);
-
-		if(!world.isRemote) {
-			RPOSavedData.get(world).removeNetherPortal(pos);
-		}
-
-		return actuallyRemoved;
-	}
-
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random random) {
@@ -477,6 +442,41 @@ public class BlockNetherPortal extends BlockPortal {
 					color
 			));
 		}
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		final int toAdd = state.getValue(USER_PLACED) ? 3 : 0;
+		return super.getMetaFromState(state) + toAdd;
+	}
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, AXIS, USER_PLACED);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		final EnumFacing.Axis axis = placer.getHorizontalFacing().getAxis();
+		return getDefaultState().withProperty(
+				AXIS,
+				axis == EnumFacing.Axis.X ? EnumFacing.Axis.Z : EnumFacing.Axis.X
+		);
+	}
+
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
+			EntityPlayer player, boolean willHarvest) {
+		final boolean actuallyRemoved =
+				super.removedByPlayer(state, world, pos, player, willHarvest);
+
+		if(!world.isRemote) {
+			RPOSavedData.get(world).removeNetherPortal(pos);
+		}
+
+		return actuallyRemoved;
 	}
 
 	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {

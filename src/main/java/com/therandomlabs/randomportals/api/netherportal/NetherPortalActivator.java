@@ -104,6 +104,7 @@ public class NetherPortalActivator {
 		});
 	}
 
+	@SuppressWarnings("Duplicates")
 	public NetherPortal activate(World world, BlockPos pos, IBlockState lateralPortal,
 			IBlockState verticalXPortal, IBlockState verticalZPortal) {
 		return activate(world, pos, (axis, color) -> {
