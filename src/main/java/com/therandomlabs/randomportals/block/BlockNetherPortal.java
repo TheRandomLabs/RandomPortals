@@ -430,7 +430,6 @@ public class BlockNetherPortal extends BlockPortal {
 				zSpeed = random.nextDouble() * 2.0 * offset;
 			}
 
-
 			Minecraft.getMinecraft().effectRenderer.addEffect(new ParticleRPOPortal(
 					world,
 					particleX,
