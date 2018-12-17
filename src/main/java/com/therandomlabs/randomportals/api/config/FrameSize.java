@@ -19,8 +19,8 @@ public final class FrameSize {
 			maxHeight = Integer.MAX_VALUE;
 		} else {
 			minWidth = 3;
-			maxWidth = 3;
-			minHeight = 100;
+			maxWidth = 100;
+			minHeight = 3;
 			maxHeight = 100;
 		}
 	}
