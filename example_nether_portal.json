@@ -26,16 +26,32 @@
 	"cornerBlocksContributeToMinimumAmount": true,
 	//Valid values: "LATERAL", "VERTICAL", "VERTICAL_X", "VERTICAL_Z", "LATERAL_OR_VERTICAL"
 	"type": "LATERAL_OR_VERTICAL",
-	//Whether the portal frame is activated when fire is placed inside it
-	//This is essentially useless without an addon mod
-	"canBeActivatedByFire": true,
 	//Whether generated portal frames drop (set to false to prevent frame block farming)
 	//This should also work with other mods such as Block Breakers from OpenBlocks and Exchangers
 	"doGeneratedFramesDrop": true,
+	//Items that can be used to activate the Nether portal
+	"activators": [
+		{
+			"registryName": "minecraft:stick",
+			"meta": 32767
+		}
+	],
+	//What happens when one of the above activators is used. Valid values:
+	//"CONSUME": shrink the activator stack by 1
+	//"DAMAGE": damage the activator stack by 1
+	//"DO_NOTHING": do nothing to the activator stack
+	"activatorConsumeBehavior": "CONSUME",
+	//Whether the portal frame is activated when fire is placed inside it
+	//This is essentially useless without an addon mod
+	"canBeActivatedByFire": true,
 	//Valid values: "WHITE", "ORANGE", "MAGENTA", "LIGHT_BLUE", "YELLOW", "LIME", "PINK", "GRAY",
 	//"SILVER", "CYAN", "PURPLE", "BLUE", "BROWN", "GREEN", "RED", "BLACK"
-	"color": "ORANGE",
-	//If true, the portal cannot be dyed
+	//When the portal is activated, a random color is selected
+	"colors": [
+		"ORANGE",
+		"LIME"
+	],
+	//If true, the portal cannot be dyed to a color not defined above
 	"forceColor": true,
 	//If true, "dimensions" is a whitelist rather than a blacklist
 	"whitelist": false,
