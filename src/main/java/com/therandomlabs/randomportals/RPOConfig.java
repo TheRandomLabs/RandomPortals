@@ -76,6 +76,11 @@ public final class RPOConfig {
 		@Config.Comment("Whether to enable colored portals.")
 		public boolean coloredPortals = true;
 
+		@Config.LangKey("randomportals.config.netherPortals.consumeDyesEvenIfInvalidColor")
+		@Config.Comment("Whether portals should consume dyes even if they are an invalid color " +
+				"(as defined by the Nether portal type).")
+		public boolean consumeDyesEvenIfInvalidColor = true;
+
 		@Config.LangKey("randomportals.config.netherPortals.consumeDyesEvenIfSameColor")
 		@Config.Comment("Whether portals should consume dyes even if they are the same color.")
 		public boolean consumeDyesEvenIfSameColor = true;

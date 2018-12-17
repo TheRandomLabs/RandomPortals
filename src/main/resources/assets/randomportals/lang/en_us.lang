@@ -16,6 +16,7 @@ randomportals.config.misc.rporeloadCommand=/rporeload
 randomportals.config.netherPortals=Nether Portals
 randomportals.config.netherPortals.tooltip=Options related to Nether portals.
 randomportals.config.netherPortals.coloredPortals=Colored portals
+randomportals.config.netherPortals.consumeDyesEvenIfInvalidColor=Consume dyes even if they are an invalid color
 randomportals.config.netherPortals.consumeDyesEvenIfSameColor=Consume dyes even if they are the same color
 randomportals.config.netherPortals.dyeablePortals=Dyeable portals
 randomportals.config.netherPortals.enabled=Enabled
