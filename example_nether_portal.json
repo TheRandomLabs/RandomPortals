@@ -43,14 +43,29 @@
 	"dimensions": [],
 	//The destination dimension ID
 	"dimensionID": 1,
-	//If the destination dimension is the End (ID 1), whether to force spawn a portal rather than an obsidian platform
-	"forcePortal": true,
-	//The values in verticalendportals/nether_portal are checked first and these are checked second
+	//Whether to spawn a receiving portal (only works if teleportToPortal is true)
+	"spawnPortal": true,
+	//Whether to teleport to a receiving portal
+	"teleportToPortal": true,
 	"size": {
-		"minWidth": 4,
-		"maxWidth": 4,
-		"minHeight": 5,
-		"maxHeight": 5
+		"lateral": {
+			"minWidth": 3,
+			"maxWidth": 9000,
+			"minHeight": 3,
+			"maxHeight": 9000
+		},
+		"verticalX": {
+			"minWidth": 3,
+			"maxWidth": 9000,
+			"minHeight": 3,
+			"maxHeight": 9000
+		},
+		"verticalZ": {
+			"minWidth": 3,
+			"maxWidth": 9000,
+			"minHeight": 3,
+			"maxHeight": 9000
+		}
 	},
 	"teleportationDelay": {
 		//How long an entity has to stay in a portal to get teleported
