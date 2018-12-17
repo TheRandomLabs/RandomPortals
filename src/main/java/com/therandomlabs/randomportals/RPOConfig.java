@@ -55,7 +55,7 @@ public final class RPOConfig {
 		@Config.LangKey("randomportals.config.endPortals.frameHeadVillagerSpawnChance")
 		@Config.Comment("The chance that a villager spawns with a vertical End portal frame on " +
 				"their head.")
-		public double frameHeadVillagerSpawnChance = RandomPatches.IS_DEOBFUSCATED ? 0.5 : 0.05;
+		public double frameHeadVillagerSpawnChance = RandomPatches.IS_DEOBFUSCATED ? 0.5 : 0.01;
 
 		@Config.LangKey("randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads")
 		@Config.Comment("Whether players can right click villagers with vertical End portals to " +
