@@ -61,13 +61,6 @@ public final class RPOConfig {
 		@Config.Comment("Whether players can right click villagers with vertical End portals to " +
 				"put them on their heads.")
 		public boolean rightClickVillagersToConvertToFrameHeads = true;
-
-		@Config.LangKey("randomportals.config.endPortals.useAllVariantsJson")
-		@Config.Comment(
-				"Whether to read from the all_variants JSON rather than the different JSONs " +
-						"for the specific frame types."
-		)
-		public boolean useAllVariantsJson = true;
 	}
 
 	public static final class Misc {
@@ -117,13 +110,6 @@ public final class RPOConfig {
 						"to more easily create colored patterns in portals."
 		})
 		public boolean replaceUserPlacedPortalsOnActivation;
-
-		@Config.LangKey("randomportals.config.netherPortals.useAllVariantsJson")
-		@Config.Comment(
-				"Whether to read from the all_variants JSON rather than the different JSONs " +
-						"for the specific frame types."
-		)
-		public boolean useAllVariantsJson = true;
 	}
 
 	@Config.Ignore

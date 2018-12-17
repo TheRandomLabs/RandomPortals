@@ -61,24 +61,21 @@ public enum FrameType {
 	}
 
 	public <T> T get(T lateral, T verticalX, T verticalZ) {
-		if(this == LATERAL) {
-			return lateral;
-		}
+		return get(axis, lateral, verticalX, verticalZ);
+	}
 
-		if(this == VERTICAL_X) {
+	public static <T> T get(EnumFacing.Axis axis, T lateral, T verticalX, T verticalZ) {
+		switch(axis) {
+		case X:
 			return verticalX;
+		case Y:
+			return lateral;
+		default:
+			return verticalZ;
 		}
-
-		return verticalZ;
 	}
 
 	public static FrameType fromAxis(EnumFacing.Axis axis) {
-		for(FrameType type : values()) {
-			if(type.axis == axis) {
-				return type;
-			}
-		}
-
-		return null;
+		return get(axis, LATERAL, VERTICAL_X, VERTICAL_Z);
 	}
 }

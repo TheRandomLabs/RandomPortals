@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableMap;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.api.frame.Frame;
+import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -35,6 +36,7 @@ public final class NetherPortalTypes {
 
 	private static ImmutableMap<String, NetherPortalType> types;
 	private static FrameStatePredicate validBlocks;
+	private static FrameSizeData size;
 
 	private NetherPortalTypes() {}
 
@@ -87,6 +89,14 @@ public final class NetherPortalTypes {
 
 			return false;
 		};
+	}
+
+	public static FrameSizeData getSize() {
+		return size;
+	}
+
+	public static FrameSize getSize(FrameType type) {
+		return size.get(type);
 	}
 
 	public static NetherPortalType get(Frame frame) {
@@ -155,6 +165,11 @@ public final class NetherPortalTypes {
 
 		NetherPortalTypes.types = ImmutableMap.copyOf(types);
 		validBlocks = getValidBlocks(types.values());
+
+		size = new FrameSizeData();
+		size.lateral = loadSize(FrameType.LATERAL);
+		size.verticalX = loadSize(FrameType.VERTICAL_X);
+		size.verticalZ = loadSize(FrameType.VERTICAL_Z);
 	}
 
 	public static void registerBuiltinType(String name, NetherPortalType type) {
@@ -173,5 +188,34 @@ public final class NetherPortalTypes {
 
 	public static void unregisterDefaultType(String name) {
 		defaultTypes.remove(name);
+	}
+
+	private static FrameSize loadSize(FrameType type) {
+		int minWidth = Integer.MAX_VALUE;
+		int maxWidth = 3;
+		int minHeight = Integer.MAX_VALUE;
+		int maxHeight = 3;
+
+		for(NetherPortalType portalType : NetherPortalTypes.getTypes().values()) {
+			final FrameSize size = portalType.size.get(type);
+
+			if(size.minWidth < minWidth) {
+				minWidth = size.minWidth;
+			}
+
+			if(size.maxWidth > maxWidth) {
+				maxWidth = size.maxWidth;
+			}
+
+			if(size.minHeight < minHeight) {
+				minHeight = size.minHeight;
+			}
+
+			if(size.maxHeight > maxHeight) {
+				maxHeight = size.maxHeight;
+			}
+		}
+
+		return new FrameSize(minWidth, maxWidth, minHeight, maxHeight);
 	}
 }

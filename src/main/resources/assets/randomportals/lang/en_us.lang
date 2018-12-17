@@ -8,7 +8,6 @@ randomportals.config.endPortals.tooltip=Options related to End portals.
 randomportals.config.endPortals.enabled=Enabled
 randomportals.config.endPortals.frameHeadVillagerSpawnChance=Frame head villager spawn chance
 randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads=Right click villagers to convert to frame heads
-randomportals.config.endPortals.useAllVariantsJson=Use all_variants JSON
 
 randomportals.config.misc=Miscellaneous
 randomportals.config.misc.tooltip=Options that don't fit into any other categories.
@@ -23,7 +22,6 @@ randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
 randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
 randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation=Replace user placed portals on activation
-randomportals.config.netherPortals.useAllVariantsJson=Use all_variants JSON
 
 itemGroup.portals=Portals
 

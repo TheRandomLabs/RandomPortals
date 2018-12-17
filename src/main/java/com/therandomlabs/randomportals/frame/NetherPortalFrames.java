@@ -1,9 +1,6 @@
 package com.therandomlabs.randomportals.frame;
 
 import java.util.function.Function;
-import com.therandomlabs.randomportals.RPOConfig;
-import com.therandomlabs.randomportals.api.config.FrameSize;
-import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
@@ -19,12 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public final class NetherPortalFrames {
-	public static final Function<FrameType, FrameSize> SIZE = FrameSize.fromJSONs(
-			"nether_portal", () -> RPOConfig.netherPortals.useAllVariantsJson
-	);
-
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
-			SIZE,
+			NetherPortalTypes::getSize,
 			NetherPortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			frame -> true,
@@ -32,7 +25,7 @@ public final class NetherPortalFrames {
 	);
 
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
-			SIZE,
+			NetherPortalTypes::getSize,
 			NetherPortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
@@ -40,7 +33,7 @@ public final class NetherPortalFrames {
 	);
 
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
-			SIZE,
+			NetherPortalTypes::getSize,
 			NetherPortalTypes::getValidBlocks,
 			RequiredCorner.ANY_NON_AIR,
 			NetherPortalFrames::isActivated,
@@ -93,9 +86,5 @@ public final class NetherPortalFrames {
 		}
 
 		return true;
-	}
-
-	public static void registerSizes() {
-		FrameSizes.register("nether_portal");
 	}
 }

@@ -1,5 +1,6 @@
 package com.therandomlabs.randomportals.api.config;
 
+import com.therandomlabs.randomportals.api.frame.FrameType;
 import net.minecraft.util.EnumFacing;
 
 public final class TeleportationDelay {
@@ -22,13 +23,6 @@ public final class TeleportationDelay {
 	}
 
 	public int get(EnumFacing.Axis axis) {
-		switch(axis) {
-		case X:
-			return verticalX;
-		case Y:
-			return lateral;
-		default:
-			return verticalZ;
-		}
+		return FrameType.get(axis, lateral, verticalX, verticalZ);
 	}
 }

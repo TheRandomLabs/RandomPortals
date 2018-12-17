@@ -32,11 +32,11 @@ public final class FrameSizes {
 	}
 
 	public static void register(String species) {
-		register(species, "all_variants", "lateral", "vertical_x", "vertical_z");
+		register(species, "lateral", "vertical_x", "vertical_z");
 	}
 
 	public static void registerVertical(String species) {
-		register(species, "all_variants", "vertical_x", "vertical_z");
+		register(species, "vertical_x", "vertical_z");
 	}
 
 	public static void register(String species, String... names) {

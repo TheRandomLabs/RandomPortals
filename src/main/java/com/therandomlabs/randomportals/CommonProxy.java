@@ -44,7 +44,6 @@ public class CommonProxy {
 		}
 
 		EndPortalFrames.registerSizes();
-		NetherPortalFrames.registerSizes();
 		FrameSizes.reload();
 
 		try {

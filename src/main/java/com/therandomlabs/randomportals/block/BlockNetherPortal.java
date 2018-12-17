@@ -529,7 +529,7 @@ public class BlockNetherPortal extends BlockPortal {
 				EnumFacing.NORTH : EnumFacing.DOWN;
 
 		final FrameType type = FrameType.fromAxis(axis);
-		final FrameSize size = NetherPortalFrames.SIZE.apply(type);
+		final FrameSize size = NetherPortalTypes.getSize(type);
 		final int maxSize = size.getMaxSize(frameDirection == EnumFacing.DOWN);
 
 		final FrameStatePredicate portalMatcher = Matcher.ofType(type);

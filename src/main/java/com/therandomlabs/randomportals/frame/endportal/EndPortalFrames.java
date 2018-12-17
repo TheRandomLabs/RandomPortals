@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.event.EndPortalEvent;
@@ -31,9 +30,8 @@ import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
 public final class EndPortalFrames {
-	public static final Function<FrameType, FrameSize> NORMAL = FrameSize.fromJSONs(
-			"end_portal/normal", () -> RPOConfig.endPortals.useAllVariantsJson
-	);
+	public static final Function<FrameType, FrameSize> NORMAL =
+			FrameSize.fromJSONs("end_portal/normal");
 
 	public static final Function<FrameType, FrameSize> LATERAL_WITH_VERTICAL_FRAMES_SIZE =
 			type -> FrameSizes.get("end_portal", "lateral_with_vertical_frames");
@@ -42,9 +40,7 @@ public final class EndPortalFrames {
 			type -> FrameSizes.get("end_portal", "upside_down");
 
 	public static final Function<FrameType, FrameSize> VERTICAL_INWARDS_FACING_SIZE =
-			FrameSize.fromJSONs(
-					"end_portal/inwards_facing", () -> RPOConfig.endPortals.useAllVariantsJson
-			);
+			FrameSize.fromJSONs("end_portal/inwards_facing");
 
 	public static final ImmutableList<Function<FrameType, FrameSize>> SIZES = ImmutableList.of(
 			EndPortalFrames.NORMAL,

@@ -30,7 +30,7 @@ public final class NetherPortalType {
 	public int dimensionID;
 	public boolean spawnPortal = true;
 	public boolean teleportToPortal = true;
-	public FrameSize size = new FrameSize();
+	public FrameSizeData size = new FrameSizeData();
 	public TeleportationDelay teleportationDelay = new TeleportationDelay();
 
 	transient String name;
@@ -82,7 +82,9 @@ public final class NetherPortalType {
 	}
 
 	public boolean test(Frame frame) {
-		if(!type.test(frame.getType())) {
+		final FrameType frameType = frame.getType();
+
+		if(!type.test(frameType)) {
 			return false;
 		}
 
@@ -99,7 +101,7 @@ public final class NetherPortalType {
 			}
 		}
 
-		if(!size.test(frame.getWidth(), frame.getHeight())) {
+		if(!size.test(frameType, frame.getWidth(), frame.getHeight())) {
 			return false;
 		}
 

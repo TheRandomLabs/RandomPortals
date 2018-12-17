@@ -1,17 +1,29 @@
 package com.therandomlabs.randomportals.api.config;
 
 import java.util.Locale;
-import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import com.therandomlabs.randompatches.RandomPatches;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 
-public class FrameSize {
-	public int minWidth = 3;
-	public int maxWidth = 9000;
-	public int minHeight = 3;
-	public int maxHeight = 9000;
+public final class FrameSize {
+	public int minWidth;
+	public int maxWidth;
+	public int minHeight;
+	public int maxHeight;
 
-	public FrameSize() {}
+	public FrameSize() {
+		if(RandomPatches.IS_DEOBFUSCATED) {
+			minWidth = 3;
+			maxWidth = 3;
+			minHeight = Integer.MAX_VALUE;
+			maxHeight = Integer.MAX_VALUE;
+		} else {
+			minWidth = 3;
+			maxWidth = 3;
+			minHeight = 100;
+			maxHeight = 100;
+		}
+	}
 
 	public FrameSize(int minWidth, int maxWidth, int minHeight, int maxHeight) {
 		this.minWidth = minWidth;
@@ -46,14 +58,7 @@ public class FrameSize {
 		return vertical ? maxHeight : Math.max(maxWidth, maxHeight);
 	}
 
-	public static Function<FrameType, FrameSize> fromJSONs(String species,
-			BooleanSupplier useAllVariants) {
-		return type -> {
-			if(useAllVariants.getAsBoolean()) {
-				return FrameSizes.get(species, "all_variants");
-			}
-
-			return FrameSizes.get(species, type.toString().toLowerCase(Locale.ENGLISH));
-		};
+	public static Function<FrameType, FrameSize> fromJSONs(String species) {
+		return type -> FrameSizes.get(species, type.toString().toLowerCase(Locale.ENGLISH));
 	}
 }
