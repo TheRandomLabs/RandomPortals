@@ -2,7 +2,6 @@ package com.therandomlabs.randomportals.api.config;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.therandomlabs.randomportals.RandomPortals;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
