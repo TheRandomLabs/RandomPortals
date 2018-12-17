@@ -39,9 +39,10 @@ public final class FrameBlock {
 		registryName = block.getRegistryName().toString();
 		this.meta = meta;
 		this.minimumAmount = minimumAmount;
+
 		blockRetrieved = true;
 		this.block = block;
-		this.blocks = new FrameBlock[] {
+		blocks = new FrameBlock[] {
 				this
 		};
 	}
@@ -67,7 +68,7 @@ public final class FrameBlock {
 	}
 
 	public FrameBlock getActualBlock() {
-		return getActualBlocks().length == 0 ? null : blocks[0];
+		return getBlocks().length == 0 ? null : blocks[0];
 	}
 
 	@SuppressWarnings("deprecation")
@@ -86,7 +87,7 @@ public final class FrameBlock {
 	}
 
 	public boolean isValid() {
-		return getActualBlocks() != null;
+		return getBlocks().length != 0;
 	}
 
 	public void ensureCorrect() {
@@ -99,7 +100,7 @@ public final class FrameBlock {
 		final Block block = state.getBlock();
 		final int meta = block.getMetaFromState(state);
 
-		for(FrameBlock frameBlock : getActualBlocks()) {
+		for(FrameBlock frameBlock : getBlocks()) {
 			if(frameBlock.getBlock() == block && (frameBlock.meta == OreDictionary.WILDCARD_VALUE ||
 					frameBlock.meta == meta)) {
 				return true;
@@ -109,7 +110,7 @@ public final class FrameBlock {
 		return false;
 	}
 
-	private FrameBlock[] getActualBlocks() {
+	private FrameBlock[] getBlocks() {
 		if(blocks != null) {
 			return blocks;
 		}

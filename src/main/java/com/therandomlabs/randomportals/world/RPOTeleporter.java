@@ -116,7 +116,7 @@ public class RPOTeleporter extends Teleporter {
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		final NetherPortalType portalType = data.getPortalType();
 		final NetherPortal sendingPortal = data.getPortal();
-		final Frame receivingFrame;
+		Frame receivingFrame;
 
 		if(RPOConfig.netherPortals.persistentReceivingPortals) {
 			receivingFrame = sendingPortal == null ? null : sendingPortal.getReceivingFrame();
@@ -126,6 +126,33 @@ public class RPOTeleporter extends Teleporter {
 
 		NetherPortal receivingPortal = null;
 		BlockPos portalPos = null;
+
+		if(receivingFrame != null) {
+			//Find a portal block on the bottom row since the following code checks
+			//for a frame block below
+			for(BlockPos innerPos : receivingFrame.getInnerRowFromBottom(1)) {
+				if(PortalBlockRegistry.isPortal(world, innerPos)) {
+					portalPos = innerPos;
+					break;
+				}
+			}
+
+			if(portalPos == null) {
+				sendingPortal.setReceivingFrame(null);
+				receivingFrame = null;
+			} else {
+
+				receivingPortal = RPOSavedData.get(world).getNetherPortal(portalPos);
+
+				if(receivingPortal != null && portalType != receivingPortal.getType()) {
+					sendingPortal.setReceivingFrame(null);
+					//setReceivingFrame does not need to be called on receivingPortal since
+					//it would have been created after another was destroyed in the same position,
+					//so the receiving portal would have been reset
+					receivingFrame = null;
+				}
+			}
+		}
 
 		if(receivingFrame == null) {
 			final PortalPosition cachedPos = destinationCoordinateCache.get(entityChunkPos);
@@ -144,28 +171,6 @@ public class RPOTeleporter extends Teleporter {
 			} else {
 				portalPos = cachedPos;
 				cachedPos.lastUpdateTime = world.getTotalWorldTime();
-			}
-		} else {
-			//Find a portal block on the bottom row since the following code checks
-			//for a frame block below
-			for(BlockPos innerPos : receivingFrame.getInnerRowFromBottom(1)) {
-				if(PortalBlockRegistry.isPortal(world, innerPos)) {
-					portalPos = innerPos;
-					break;
-				}
-			}
-
-			if(portalPos == null) {
-				return false;
-			}
-
-			receivingPortal = RPOSavedData.get(world).getNetherPortal(portalPos);
-
-			if(receivingPortal != null && portalType != receivingPortal.getType()) {
-				sendingPortal.setReceivingFrame(null);
-				//setReceivingFrame does not need to be called on receivingPortal since
-				//it was created after another was destroyed in the same position
-				return false;
 			}
 		}
 
@@ -474,7 +479,7 @@ public class RPOTeleporter extends Teleporter {
 		}
 
 		new NetherPortalActivator().forcePortalType(portalType).setUserCreated(false).activate(
-				world, new BlockPos(portalX, portalY, portalZ)
+				world, new BlockPos(portalX, portalY, portalZ), null
 		);
 
 		return true;

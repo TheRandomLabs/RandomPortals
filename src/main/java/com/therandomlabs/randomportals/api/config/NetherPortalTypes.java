@@ -20,6 +20,7 @@ import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.DimensionType;
 
 public final class NetherPortalTypes {
@@ -36,6 +37,7 @@ public final class NetherPortalTypes {
 
 	private static ImmutableMap<String, NetherPortalType> types;
 	private static FrameStatePredicate validBlocks;
+	private static Predicate<ItemStack> validActivators;
 	private static FrameSizeData size;
 
 	private NetherPortalTypes() {}
@@ -83,6 +85,30 @@ public final class NetherPortalTypes {
 		return (world, pos, state, type) -> {
 			for(Predicate<IBlockState> matcher : matchers) {
 				if(matcher.test(state)) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+	}
+
+	public static Predicate<ItemStack> getValidActivators() {
+		return validActivators;
+	}
+
+	public static Predicate<ItemStack> getValidActivators(Collection<NetherPortalType> types) {
+		final List<Predicate<ItemStack>> matchers = new ArrayList<>();
+
+		for(NetherPortalType type : types) {
+			for(FrameActivator activator : type.activators) {
+				matchers.add(activator::test);
+			}
+		}
+
+		return stack -> {
+			for(Predicate<ItemStack> matcher : matchers) {
+				if(matcher.test(stack)) {
 					return true;
 				}
 			}
@@ -164,7 +190,11 @@ public final class NetherPortalTypes {
 		}
 
 		NetherPortalTypes.types = ImmutableMap.copyOf(types);
-		validBlocks = getValidBlocks(types.values());
+
+		final Collection<NetherPortalType> actualTypes = types.values();
+
+		validBlocks = getValidBlocks(actualTypes);
+		validActivators = getValidActivators(actualTypes);
 
 		size = new FrameSizeData();
 		size.lateral = loadSize(FrameType.LATERAL);

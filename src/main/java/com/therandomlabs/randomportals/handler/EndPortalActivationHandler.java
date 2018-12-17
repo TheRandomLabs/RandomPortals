@@ -21,7 +21,7 @@ public final class EndPortalActivationHandler {
 	private static final Random random = new Random();
 
 	@SubscribeEvent
-	public static void onBlockActivated(PlayerInteractEvent.RightClickBlock event) {
+	public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
 		final World world = event.getWorld();
 		final EntityPlayer player = event.getEntityPlayer();
 		final ItemStack stack = event.getItemStack();

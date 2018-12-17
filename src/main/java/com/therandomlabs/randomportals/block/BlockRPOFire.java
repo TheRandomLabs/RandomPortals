@@ -23,7 +23,7 @@ public class BlockRPOFire extends BlockFire {
 
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if(PORTAL_ACTIVATOR.activate(world, pos) != null) {
+		if(PORTAL_ACTIVATOR.activate(world, pos, null) != null) {
 			return;
 		}
 

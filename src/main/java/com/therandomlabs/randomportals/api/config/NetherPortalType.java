@@ -11,17 +11,27 @@ import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public final class NetherPortalType {
+	public enum ConsumeBehavior {
+		CONSUME,
+		DAMAGE,
+		DO_NOTHING
+	}
+
 	public List<FrameBlock> frameBlocks;
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount = true;
 
 	public FrameType type = FrameType.LATERAL_OR_VERTICAL;
-	public boolean canBeActivatedByFire = true;
 	public boolean doGeneratedFramesDrop = true;
+
+	public List<FrameActivator> activators = new ArrayList<>();
+	public ConsumeBehavior activatorConsumeBehavior = ConsumeBehavior.CONSUME;
+	public boolean canBeActivatedByFire;
 
 	public EnumDyeColor[] colors = {
 			EnumDyeColor.PURPLE
@@ -57,24 +67,33 @@ public final class NetherPortalType {
 				"],dimensionID=" + dimensionID + "]";
 	}
 
+	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		final List<String> registryNames = new ArrayList<>();
 
 		for(int i = 0; i < frameBlocks.size(); i++) {
 			final FrameBlock frameBlock = frameBlocks.get(i);
 
-			if(!frameBlock.isValid()) {
-				frameBlocks.remove(i--);
-				continue;
-			}
-
-			if(registryNames.contains(frameBlock.registryName)) {
+			if(!frameBlock.isValid() || registryNames.contains(frameBlock.registryName)) {
 				frameBlocks.remove(i--);
 				continue;
 			}
 
 			registryNames.add(frameBlock.registryName);
 			frameBlock.ensureCorrect();
+		}
+
+		registryNames.clear();
+
+		for(int i = 0; i < activators.size(); i++) {
+			final FrameActivator activator = activators.get(i);
+
+			if(!activator.isValid() || registryNames.contains(activator.registryName)) {
+				activators.remove(i--);
+				continue;
+			}
+
+			registryNames.add(activator.registryName);
 		}
 
 		final Set<EnumDyeColor> colorSet = new HashSet<>();
@@ -99,6 +118,16 @@ public final class NetherPortalType {
 
 	public String getName() {
 		return name == null ? "unknown_type" : name;
+	}
+
+	public boolean testActivator(ItemStack stack) {
+		for(FrameActivator activator : activators) {
+			if(activator.test(stack)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public boolean test(Frame frame) {

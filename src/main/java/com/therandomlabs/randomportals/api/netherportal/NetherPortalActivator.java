@@ -18,6 +18,7 @@ import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -87,8 +88,8 @@ public class NetherPortalActivator {
 		return this;
 	}
 
-	public NetherPortal activate(World world, BlockPos pos) {
-		return activate(world, pos, (axis, color) -> {
+	public NetherPortal activate(World world, BlockPos pos, ItemStack activator) {
+		return activate(world, pos, activator, (axis, color) -> {
 			final IBlockState state;
 
 			switch(axis) {
@@ -108,13 +109,13 @@ public class NetherPortalActivator {
 	}
 
 	@SuppressWarnings("Duplicates")
-	public NetherPortal activate(World world, BlockPos pos, IBlockState lateralPortal,
-			IBlockState verticalXPortal, IBlockState verticalZPortal) {
-		return activate(world, pos, (axis, color) ->
+	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,
+			IBlockState lateralPortal, IBlockState verticalXPortal, IBlockState verticalZPortal) {
+		return activate(world, pos, activator, (axis, color) ->
 				FrameType.get(axis, lateralPortal, verticalXPortal, verticalZPortal));
 	}
 
-	public NetherPortal activate(World world, BlockPos pos,
+	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,
 			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
 		final FrameStatePredicate validBlocks;
 
@@ -141,7 +142,8 @@ public class NetherPortalActivator {
 			}
 
 			NetherPortalFrames.EMPTY_FRAMES.detectWithCondition(world, offset, type, frame -> {
-				final NetherPortal result = testFrame(frame, offset, facing.getOpposite());
+				final NetherPortal result =
+						testFrame(frame, offset, facing.getOpposite(), activator);
 
 				if(result == null) {
 					return false;
@@ -211,7 +213,8 @@ public class NetherPortalActivator {
 		}
 	}
 
-	protected NetherPortal testFrame(Frame frame, BlockPos framePos, EnumFacing inwards) {
+	protected NetherPortal testFrame(Frame frame, BlockPos framePos, EnumFacing inwards,
+			ItemStack activator) {
 		if(!frame.isFacingInwards(framePos, inwards)) {
 			return null;
 		}
@@ -229,7 +232,9 @@ public class NetherPortalActivator {
 		}
 
 		for(NetherPortalType type : types) {
-			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame)) {
+			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame) &&
+					(forcePortalType != null || activator == null ||
+							type.testActivator(activator))) {
 				return new NetherPortal(frame, null, type);
 			}
 		}

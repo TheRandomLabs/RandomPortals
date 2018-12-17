@@ -10,6 +10,7 @@ import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import com.therandomlabs.randomportals.handler.EndPortalActivationHandler;
 import com.therandomlabs.randomportals.handler.FrameHeadVillagerHandler;
+import com.therandomlabs.randomportals.handler.NetherPortalActivationHandler;
 import com.therandomlabs.randomportals.handler.NetherPortalFrameBreakHandler;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.RPOTeleporter;
@@ -40,6 +41,7 @@ public class CommonProxy {
 		if(RPOConfig.netherPortals.enabled) {
 			MinecraftForge.EVENT_BUS.register(NetherPortalTeleportHandler.class);
 			MinecraftForge.EVENT_BUS.register(NetherPortalFrameBreakHandler.class);
+			MinecraftForge.EVENT_BUS.register(NetherPortalActivationHandler.class);
 		}
 
 		EndPortalFrames.registerSizes();
