@@ -14,8 +14,8 @@ public final class FrameSize {
 	public FrameSize() {
 		if(RandomPatches.IS_DEOBFUSCATED) {
 			minWidth = 3;
-			maxWidth = 3;
-			minHeight = Integer.MAX_VALUE;
+			maxWidth = Integer.MAX_VALUE;
+			minHeight = 3;
 			maxHeight = Integer.MAX_VALUE;
 		} else {
 			minWidth = 3;
