@@ -65,6 +65,7 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	public static BlockLateralNetherPortal get(EnumDyeColor color) {
-		return colors.get(color);
+		final BlockLateralNetherPortal block = colors.get(color);
+		return block == null ? RPOBlocks.purple_lateral_nether_portal : block;
 	}
 }

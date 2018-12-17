@@ -34,6 +34,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
@@ -494,7 +495,8 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	public static BlockNetherPortal get(EnumDyeColor color) {
-		return colors.get(color);
+		final BlockNetherPortal block = colors.get(color);
+		return block == null ? (BlockNetherPortal) Blocks.PORTAL : block;
 	}
 
 	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(World world,
