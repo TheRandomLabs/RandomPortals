@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.FrameSize;
+import com.therandomlabs.randomportals.api.config.NetherPortalType;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
@@ -48,6 +49,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.ArrayUtils;
 
 @Mod.EventBusSubscriber(modid = RandomPortals.MOD_ID)
 public class BlockNetherPortal extends BlockPortal {
@@ -337,8 +339,10 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
+		final NetherPortalType type = portal.getType();
 
-		if(newColor == null || (portal != null && portal.getType().forceColor)) {
+		if(newColor == null || (newColor != null && type.forceColor &&
+				!ArrayUtils.contains(type.colors, newColor))) {
 			NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 			return;
 		}

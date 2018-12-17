@@ -1,5 +1,6 @@
 package com.therandomlabs.randomportals.api.netherportal;
 
+import java.util.Random;
 import java.util.function.BiFunction;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.api.config.NetherPortalType;
@@ -26,6 +27,8 @@ public class NetherPortalActivator {
 	private static final class PortalContainer {
 		NetherPortal portal;
 	}
+
+	private static final Random random = new Random();
 
 	private NetherPortalType forcePortalType;
 	private NetherPortalType[] portalTypes;
@@ -184,7 +187,8 @@ public class NetherPortalActivator {
 
 		final Frame frame = portal.getFrame();
 		final EnumFacing.Axis axis = frame.getType().getAxis();
-		final IBlockState state = portalBlocks.apply(axis, portal.getType().color);
+		final EnumDyeColor[] colors = portal.getType().colors;
+		final IBlockState state = portalBlocks.apply(axis, colors[random.nextInt(colors.length)]);
 		final Block block = state.getBlock();
 		final Class<?> blockClass = block.getClass();
 		final BlockNetherPortal portalBlock =

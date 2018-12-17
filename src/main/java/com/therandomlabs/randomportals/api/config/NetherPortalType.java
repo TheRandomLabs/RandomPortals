@@ -2,8 +2,10 @@ package com.therandomlabs.randomportals.api.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
@@ -21,7 +23,9 @@ public final class NetherPortalType {
 	public boolean canBeActivatedByFire = true;
 	public boolean doGeneratedFramesDrop = true;
 
-	public EnumDyeColor color = EnumDyeColor.PURPLE;
+	public EnumDyeColor[] colors = {
+			EnumDyeColor.PURPLE
+	};
 	public boolean forceColor;
 
 	public boolean whitelist;
@@ -71,6 +75,22 @@ public final class NetherPortalType {
 
 			registryNames.add(frameBlock.registryName);
 			frameBlock.ensureCorrect();
+		}
+
+		final Set<EnumDyeColor> colorSet = new HashSet<>();
+
+		for(EnumDyeColor color : colors) {
+			if(color != null) {
+				colorSet.add(color);
+			}
+		}
+
+		if(colorSet.isEmpty()) {
+			colors = new EnumDyeColor[] {
+					EnumDyeColor.PURPLE
+			};
+		} else {
+			colors = colorSet.toArray(new EnumDyeColor[0]);
 		}
 
 		size.ensureCorrect();
