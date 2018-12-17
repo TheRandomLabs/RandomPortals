@@ -107,16 +107,8 @@ public class NetherPortalActivator {
 	@SuppressWarnings("Duplicates")
 	public NetherPortal activate(World world, BlockPos pos, IBlockState lateralPortal,
 			IBlockState verticalXPortal, IBlockState verticalZPortal) {
-		return activate(world, pos, (axis, color) -> {
-			switch(axis) {
-			case X:
-				return verticalXPortal;
-			case Y:
-				return lateralPortal;
-			default:
-				return verticalZPortal;
-			}
-		});
+		return activate(world, pos, (axis, color) ->
+				FrameType.get(axis, lateralPortal, verticalXPortal, verticalZPortal));
 	}
 
 	public NetherPortal activate(World world, BlockPos pos,

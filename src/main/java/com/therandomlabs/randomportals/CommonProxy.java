@@ -7,7 +7,6 @@ import com.elytradev.movingworld.common.config.priority.AssemblePriorityConfig;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
-import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import com.therandomlabs.randomportals.handler.EndPortalActivationHandler;
 import com.therandomlabs.randomportals.handler.FrameHeadVillagerHandler;
