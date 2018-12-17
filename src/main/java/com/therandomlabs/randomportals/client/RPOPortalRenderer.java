@@ -73,6 +73,7 @@ public final class RPOPortalRenderer {
 
 	public static void resetSprite(BlockPos pos, Block block) {
 		if(RPOPortalRenderer.pos == null || pos.distanceSq(RPOPortalRenderer.pos) > 2.0 ||
+				isPlayerCloser(pos) ||
 				(pos.equals(RPOPortalRenderer.pos) && block != RPOPortalRenderer.block)) {
 			//pos is a PooledMutableBlockPos
 			RPOPortalRenderer.pos = new BlockPos(pos.getX(), pos.getY(), pos.getZ());
@@ -117,5 +118,10 @@ public final class RPOPortalRenderer {
 							"This will cause issues with colored Nether portal rendering."
 			);
 		}
+	}
+
+	private static boolean isPlayerCloser(BlockPos pos) {
+		final BlockPos playerPos = mc.player.getPosition();
+		return pos.distanceSq(playerPos) < RPOPortalRenderer.pos.distanceSq(playerPos);
 	}
 }
