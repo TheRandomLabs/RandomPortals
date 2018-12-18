@@ -40,6 +40,7 @@ public final class FrameActivator {
 	public Item getItem() {
 		if(!itemRetrieved && !registryName.startsWith("ore:")) {
 			item = ITEM_REGISTRY.getValue(new ResourceLocation(registryName));
+			registryName = item.getRegistryName().toString();
 			itemRetrieved = true;
 		}
 

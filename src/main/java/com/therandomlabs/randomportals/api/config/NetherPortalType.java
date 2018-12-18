@@ -16,12 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public final class NetherPortalType {
-	public enum ConsumeBehavior {
-		CONSUME,
-		DAMAGE,
-		DO_NOTHING
-	}
-
 	public List<FrameBlock> frameBlocks;
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount = true;
@@ -29,9 +23,7 @@ public final class NetherPortalType {
 	public FrameType type = FrameType.LATERAL_OR_VERTICAL;
 	public boolean doGeneratedFramesDrop = true;
 
-	public List<FrameActivator> activators = new ArrayList<>();
-	public ConsumeBehavior activatorConsumeBehavior = ConsumeBehavior.CONSUME;
-	public boolean canBeActivatedByFire;
+	public ActivationData activation = new ActivationData();
 
 	public EnumDyeColor[] colors = {
 			EnumDyeColor.PURPLE
@@ -69,32 +61,23 @@ public final class NetherPortalType {
 
 	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
-		final List<String> registryNames = new ArrayList<>();
+		final List<RegistryNameAndMeta> blocks = new ArrayList<>();
 
 		for(int i = 0; i < frameBlocks.size(); i++) {
 			final FrameBlock frameBlock = frameBlocks.get(i);
+			final RegistryNameAndMeta registryNameAndMeta =
+					new RegistryNameAndMeta(frameBlock.registryName, frameBlock.meta);
 
-			if(!frameBlock.isValid() || registryNames.contains(frameBlock.registryName)) {
+			if(!frameBlock.isValid() || blocks.contains(registryNameAndMeta)) {
 				frameBlocks.remove(i--);
 				continue;
 			}
 
-			registryNames.add(frameBlock.registryName);
+			blocks.add(registryNameAndMeta);
 			frameBlock.ensureCorrect();
 		}
 
-		registryNames.clear();
-
-		for(int i = 0; i < activators.size(); i++) {
-			final FrameActivator activator = activators.get(i);
-
-			if(!activator.isValid() || registryNames.contains(activator.registryName)) {
-				activators.remove(i--);
-				continue;
-			}
-
-			registryNames.add(activator.registryName);
-		}
+		activation.ensureCorrect();
 
 		final Set<EnumDyeColor> colorSet = new HashSet<>();
 
@@ -121,13 +104,7 @@ public final class NetherPortalType {
 	}
 
 	public boolean testActivator(ItemStack stack) {
-		for(FrameActivator activator : activators) {
-			if(activator.test(stack)) {
-				return true;
-			}
-		}
-
-		return false;
+		return activation.test(stack);
 	}
 
 	public boolean test(Frame frame) {

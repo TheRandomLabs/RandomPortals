@@ -59,6 +59,8 @@ public final class FrameBlock {
 
 			if(block == Blocks.AIR) {
 				block = null;
+			} else {
+				registryName = block.getRegistryName().toString();
 			}
 
 			blockRetrieved = true;

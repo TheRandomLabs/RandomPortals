@@ -101,7 +101,7 @@ public final class NetherPortalTypes {
 		final List<Predicate<ItemStack>> matchers = new ArrayList<>();
 
 		for(NetherPortalType type : types) {
-			for(FrameActivator activator : type.activators) {
+			for(FrameActivator activator : type.activation.activators) {
 				matchers.add(activator::test);
 			}
 		}

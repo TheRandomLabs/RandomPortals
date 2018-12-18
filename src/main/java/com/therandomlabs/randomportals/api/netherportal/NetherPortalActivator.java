@@ -1,5 +1,7 @@
 package com.therandomlabs.randomportals.api.netherportal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 import com.therandomlabs.randomportals.RPOConfig;
@@ -12,6 +14,7 @@ import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
+import com.therandomlabs.randomportals.handler.NetherPortalActivationHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
@@ -35,6 +38,7 @@ public class NetherPortalActivator {
 	private NetherPortalType[] portalTypes;
 	private boolean userCreated = true;
 	private boolean activatedByFire;
+	private boolean activationDelayed;
 
 	public NetherPortalType getForcedPortalType() {
 		return forcePortalType;
@@ -88,6 +92,15 @@ public class NetherPortalActivator {
 		return this;
 	}
 
+	public boolean isActivationDelayed() {
+		return activationDelayed;
+	}
+
+	public NetherPortalActivator setActivationDelayed(boolean flag) {
+		activationDelayed = flag;
+		return this;
+	}
+
 	public NetherPortal activate(World world, BlockPos pos, ItemStack activator) {
 		return activate(world, pos, activator, (axis, color) -> {
 			final IBlockState state;
@@ -116,6 +129,10 @@ public class NetherPortalActivator {
 
 	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,
 			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
+		if(NetherPortalActivationHandler.isDelayedActivationQueued(world, pos)) {
+			return null;
+		}
+
 		final FrameStatePredicate validBlocks;
 
 		if(forcePortalType == null) {
@@ -195,6 +212,8 @@ public class NetherPortalActivator {
 		final BlockNetherPortal portalBlock =
 				block instanceof BlockNetherPortal ? (BlockNetherPortal) block : null;
 
+		final List<BlockPos> portalPositions = new ArrayList<>();
+
 		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 			//Allow players to create colorful patterns
 			if(portalBlock != null &&
@@ -208,7 +227,15 @@ public class NetherPortalActivator {
 				}
 			}
 
-			world.setBlockState(innerPos, state, 2);
+			portalPositions.add(innerPos);
+		}
+
+		if(activationDelayed) {
+			NetherPortalActivationHandler.queueDelayedActivation(world, portalPositions, state);
+		} else {
+			for(BlockPos portalPos : portalPositions) {
+				world.setBlockState(portalPos, state, 2);
+			}
 		}
 	}
 
@@ -231,7 +258,7 @@ public class NetherPortalActivator {
 		}
 
 		for(NetherPortalType type : types) {
-			if((!activatedByFire || type.canBeActivatedByFire) && type.test(frame) &&
+			if((!activatedByFire || type.activation.canBeActivatedByFire) && type.test(frame) &&
 					(forcePortalType != null || activator == null ||
 							type.testActivator(activator))) {
 				return new NetherPortal(frame, null, type);
