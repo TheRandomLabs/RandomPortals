@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.2.0.0": "Improved custom Nether portal types and activators.\nBug fixes and improvements.",
 		"1.12.2-1.1.0.0": "Improved the colored portal textures.\nImproved the portal rendering logic.\nMultiple colors can now be defined for Nether portal types.\nActivators can now be defined for Nether portal types.\nMiscellaneous bug fixes and improvements.",
 		"1.12.2-1.0.0.0": "Added colored portals. Portals are now dyeable.\nWhen portals are activated, user placed portal blocks are no longer replaced, which makes it easier to create colored patterns.\nVillagers now sometimes spawn with vertical End portal frames on their head.\nTeleportation delays can now be specified for custom Nether portal types.\nRemoved the global Nether portal size JSONs and the all_variants size JSONs.\nBug fixes and improvements.",
 		"1.12.2-0.9.0.1": "Fixed MovingWorld compatibility.",
@@ -15,7 +16,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.1.0.0",
-		"1.12.2-recommended": "1.12.2-1.1.0.0"
+		"1.12.2-latest": "1.12.2-1.2.0.0",
+		"1.12.2-recommended": "1.12.2-1.2.0.0"
 	}
 }

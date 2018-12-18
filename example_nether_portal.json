@@ -1,4 +1,3 @@
-//Please note that this format will most likely change before the first release.
 {
 	"frameBlocks": [
 		{
@@ -29,21 +28,29 @@
 	//Whether generated portal frames drop (set to false to prevent frame block farming)
 	//This should also work with other mods such as Block Breakers from OpenBlocks and Exchangers
 	"doGeneratedFramesDrop": true,
-	//Items that can be used to activate the Nether portal
-	"activators": [
-		{
-			"registryName": "minecraft:stick",
-			"meta": 32767
-		}
-	],
-	//What happens when one of the above activators is used. Valid values:
-	//"CONSUME": shrink the activator stack by 1
-	//"DAMAGE": damage the activator stack by 1
-	//"DO_NOTHING": do nothing to the activator stack
-	"activatorConsumeBehavior": "CONSUME",
-	//Whether the portal frame is activated when fire is placed inside it
-	//This is essentially useless without an addon mod
-	"canBeActivatedByFire": true,
+	"activation": {
+		//Whether the portal frame is activated when fire is placed inside it
+		"canBeActivatedByFire": true,
+		//Items that can be used to activate the Nether portal
+		"activators": [
+			{
+				"registryName": "minecraft:diamond_block",
+				"meta": 32767
+			}
+		],
+		//What happens when one of the above activators is used. Valid values:
+		//"CONSUME": shrink the activator stack by 1
+		//"DAMAGE": damage the activator stack by 1
+		//"DO_NOTHING": do nothing to the activator stack
+		"activatorConsumeBehavior": "CONSUME",
+		//Whether fire should be spawned for a tick before the portal is activated
+		"spawnFireBeforeActivating": true,
+		//When one of the above activators is used, a random sound is selected from here
+		//with a random pitch
+		"activationSounds": [
+			"minecraft:entity.enderdragon.death"
+		]
+	},
 	//Valid values: "WHITE", "ORANGE", "MAGENTA", "LIGHT_BLUE", "YELLOW", "LIME", "PINK", "GRAY",
 	//"SILVER", "CYAN", "PURPLE", "BLUE", "BROWN", "GREEN", "RED", "BLACK"
 	//When the portal is activated, a random color is selected
