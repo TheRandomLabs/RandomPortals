@@ -35,6 +35,7 @@ public final class NetherPortalActivationHandler {
 
 	private static final NetherPortalActivator PORTAL_ACTIVATOR =
 			new NetherPortalActivator().setActivationDelayed(true);
+
 	private static final List<DelayedActivation> delayedActivations = new ArrayList<>();
 
 	@SubscribeEvent
@@ -61,6 +62,10 @@ public final class NetherPortalActivationHandler {
 		event.setCanceled(true);
 		event.setCancellationResult(EnumActionResult.SUCCESS);
 
+		if(world.isRemote) {
+			return;
+		}
+
 		final ActivationData activation = portal.getType().activation;
 		final ActivationData.ConsumeBehavior behavior = activation.activatorConsumeBehavior;
 
@@ -76,7 +81,7 @@ public final class NetherPortalActivationHandler {
 
 		if(sounds.length != 0) {
 			world.playSound(
-					player,
+					null,
 					pos,
 					sounds[world.rand.nextInt(sounds.length)],
 					SoundCategory.BLOCKS,
