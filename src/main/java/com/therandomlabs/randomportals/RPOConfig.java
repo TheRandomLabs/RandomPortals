@@ -1,8 +1,6 @@
 package com.therandomlabs.randomportals;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +25,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -117,6 +116,10 @@ public final class RPOConfig {
 		public boolean replaceUserPlacedPortalsOnActivation;
 	}
 
+	private interface PropertyConsumer {
+		void accept(Property property) throws InvocationTargetException, IllegalAccessException;
+	}
+
 	@Config.Ignore
 	public static final String NAME = RandomPortals.MOD_ID + "/" + RandomPortals.MOD_ID;
 
@@ -146,9 +149,10 @@ public final class RPOConfig {
 			ConfigManager.class, "getConfiguration", "getConfiguration", String.class, String.class
 	);
 
-	private static final Field CONFIGS = RPUtils.findField(ConfigManager.class, "CONFIGS");
+	private static final Map<Property, Object> defaultValues = new HashMap<>();
+	private static final Map<Property, String> comments = new HashMap<>();
 
-	private static boolean firstLoad = true;
+	private static boolean firstReload = true;
 
 	@SubscribeEvent
 	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
@@ -158,21 +162,49 @@ public final class RPOConfig {
 	}
 
 	public static void reload() {
-		ConfigManager.sync(RandomPortals.MOD_ID, Config.Type.INSTANCE);
-
 		try {
+			if(defaultValues.isEmpty()) {
+				forEachProperties(property -> {
+					if(property.isList()) {
+						defaultValues.put(property, property.getDefaults());
+					} else {
+						defaultValues.put(property, property.getDefault());
+					}
+				});
+			}
+
+			//reload() is only called by CommonProxy and RTConfig
+			//Forge syncs the config during mod construction, so this first sync is not necessary
+			if(!firstReload) {
+				ConfigManager.sync(RandomPortals.MOD_ID, Config.Type.INSTANCE);
+			}
+
 			modifyConfig();
 			ConfigManager.sync(RandomPortals.MOD_ID, Config.Type.INSTANCE);
+
+			//If Minecraft hasn't loaded yet and ConfigManager.sync is called, the default values
+			//are reset
+			if(!Loader.instance().hasReachedState(LoaderState.AVAILABLE)) {
+				for(Map.Entry<Property, Object> entry : defaultValues.entrySet()) {
+					final Property property = entry.getKey();
+
+					if(property.isList()) {
+						property.setDefaultValues((String[]) entry.getValue());
+					} else {
+						property.setDefaultValue((String) entry.getValue());
+					}
+				}
+			}
+
 			modifyConfig();
 		} catch(Exception ex) {
 			RPUtils.crashReport("Error while modifying config", ex);
 		}
 
-
 		//This method is first called in CommonProxy.preInit
 		//FrameSizes.reload and NetherPortalTypes.reload should first be called in CommonProxy.init
-		if(firstLoad) {
-			firstLoad = false;
+		if(firstReload) {
+			firstReload = false;
 			return;
 		}
 
@@ -187,8 +219,20 @@ public final class RPOConfig {
 
 	public static void reloadFromDisk() {
 		try {
-			final File file = new File(Loader.instance().getConfigDir(), NAME + ".cfg");
-			((Map) CONFIGS.get(null)).remove(file.getAbsolutePath());
+			final Configuration config =
+					(Configuration) GET_CONFIGURATION.invoke(null, RandomPortals.MOD_ID, NAME);
+			final Configuration tempConfig = new Configuration(config.getConfigFile());
+
+			tempConfig.load();
+
+			for(String name : tempConfig.getCategoryNames()) {
+				final Map<String, Property> properties = tempConfig.getCategory(name).getValues();
+
+				for(Map.Entry<String, Property> entry : properties.entrySet()) {
+					config.getCategory(name).get(entry.getKey()).set(entry.getValue().getString());
+				}
+			}
+
 			reload();
 		} catch(Exception ex) {
 			RPUtils.crashReport("Error while modifying config", ex);
@@ -285,12 +329,23 @@ public final class RPOConfig {
 		}
 	}
 
-	private static void modifyConfig() throws IllegalAccessException, InvocationTargetException {
-		final Configuration config = (Configuration) GET_CONFIGURATION.invoke(
-				null, RandomPortals.MOD_ID, NAME
-		);
+	private static void forEachProperties(PropertyConsumer consumer)
+			throws InvocationTargetException, IllegalAccessException {
+		final Configuration config =
+				(Configuration) GET_CONFIGURATION.invoke(null, RandomPortals.MOD_ID, NAME);
 
-		final Map<Property, String> comments = new HashMap<>();
+		for(String name : config.getCategoryNames()) {
+			final Map<String, Property> properties = config.getCategory(name).getValues();
+
+			for(Property property : properties.values()) {
+				consumer.accept(property);
+			}
+		}
+	}
+
+	private static void modifyConfig() throws IllegalAccessException, InvocationTargetException {
+		final Configuration config =
+				(Configuration) GET_CONFIGURATION.invoke(null, RandomPortals.MOD_ID, NAME);
 
 		//Remove old elements
 		for(String name : config.getCategoryNames()) {
@@ -304,9 +359,14 @@ public final class RPOConfig {
 					return;
 				}
 
-				//Add default value to comment
-				comments.put(property, comment);
-				property.setComment(comment + "\nDefault: " + property.getDefault());
+				String newComment = comments.get(property);
+
+				if(newComment == null) {
+					newComment = comment + "\nDefault: " + property.getDefault();
+					comments.put(property, newComment);
+				}
+
+				property.setComment(newComment);
 			});
 
 			if(category.getValues().isEmpty() || category.getComment() == null) {
@@ -316,11 +376,22 @@ public final class RPOConfig {
 
 		config.save();
 
-		//Remove default values from comments so they don't show up in the configuration GUI
-		for(String name : config.getCategoryNames()) {
-			config.getCategory(name).getValues().forEach(
-					(key, property) -> property.setComment(comments.get(property))
-			);
-		}
+		//Remove default values, min/max values and valid values from the comments so
+		//they don't show up twice in the configuration GUI
+		forEachProperties(property -> {
+			final String[] comment = property.getComment().split("\n");
+			final StringBuilder prunedComment = new StringBuilder();
+
+			for(String line : comment) {
+				if(line.startsWith("Default:") || line.startsWith("Min:")) {
+					break;
+				}
+
+				prunedComment.append(line).append("\n");
+			}
+
+			final String commentString = prunedComment.toString();
+			property.setComment(commentString.substring(0, commentString.length() - 1));
+		});
 	}
 }

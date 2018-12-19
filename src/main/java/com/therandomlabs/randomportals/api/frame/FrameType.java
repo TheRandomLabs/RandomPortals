@@ -57,7 +57,7 @@ public enum FrameType {
 			return true;
 		}
 
-		return type == VERTICAL && (type == VERTICAL_X || type == VERTICAL_Z);
+		return this == VERTICAL && (type == VERTICAL_X || type == VERTICAL_Z);
 	}
 
 	public <T> T get(T lateral, T verticalX, T verticalZ) {
