@@ -9,6 +9,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -44,6 +45,11 @@ public final class RandomPortals {
 			serverSide = "com.therandomlabs.randomportals.CommonProxy"
 	)
 	public static CommonProxy proxy;
+
+	@Mod.EventHandler
+	public static void construct(FMLConstructionEvent event) {
+		proxy.construct();
+	}
 
 	@Mod.EventHandler
 	public static void preInit(FMLPreInitializationEvent event) {

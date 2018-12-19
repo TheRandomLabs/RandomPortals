@@ -173,7 +173,7 @@ public final class RPOConfig {
 				});
 			}
 
-			//reload() is only called by CommonProxy and RTConfig
+			//reload() is only called by CommonProxy and RPOConfig
 			//Forge syncs the config during mod construction, so this first sync is not necessary
 			if(!firstReload) {
 				ConfigManager.sync(RandomPortals.MOD_ID, Config.Type.INSTANCE);

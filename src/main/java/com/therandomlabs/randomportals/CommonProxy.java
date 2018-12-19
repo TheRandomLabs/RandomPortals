@@ -19,8 +19,11 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 
 public class CommonProxy {
-	public void preInit() {
+	public void construct() {
 		RPOConfig.reload();
+	}
+
+	public void preInit() {
 		RPOTeleporter.register();
 	}
 
