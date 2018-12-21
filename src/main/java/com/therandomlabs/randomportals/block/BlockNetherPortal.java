@@ -341,7 +341,8 @@ public class BlockNetherPortal extends BlockPortal {
 		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
 
 		if(newColor != null) {
-			final NetherPortalType type = portal.getType();
+			final NetherPortalType type =
+					portal == null ? NetherPortalTypes.getDefault() : portal.getType();
 
 			if(type.forceColor && !ArrayUtils.contains(type.colors, newColor)) {
 				if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor) {
