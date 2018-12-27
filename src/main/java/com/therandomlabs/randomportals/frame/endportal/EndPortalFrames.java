@@ -43,10 +43,10 @@ public final class EndPortalFrames {
 			FrameSize.fromJSONs("end_portal/inwards_facing");
 
 	public static final ImmutableList<Function<FrameType, FrameSize>> SIZES = ImmutableList.of(
-			EndPortalFrames.NORMAL,
-			EndPortalFrames.LATERAL_WITH_VERTICAL_FRAMES_SIZE,
-			EndPortalFrames.UPSIDE_DOWN_SIZE,
-			EndPortalFrames.VERTICAL_INWARDS_FACING_SIZE
+			NORMAL,
+			LATERAL_WITH_VERTICAL_FRAMES_SIZE,
+			UPSIDE_DOWN_SIZE,
+			VERTICAL_INWARDS_FACING_SIZE
 	);
 
 	public static final FrameDetector LATERAL =

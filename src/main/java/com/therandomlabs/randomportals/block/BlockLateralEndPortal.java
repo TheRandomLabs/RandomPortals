@@ -103,10 +103,14 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		int maxSize = 0;
 
 		for(Function<FrameType, FrameSize> sizeFunction : EndPortalFrames.SIZES) {
-			final int size = sizeFunction.apply(type).getMaxSize(frameDirection == EnumFacing.DOWN);
+			final FrameSize frameSize = sizeFunction.apply(type);
 
-			if(size > maxSize) {
-				maxSize = size;
+			if(frameSize != null) {
+				final int size = frameSize.getMaxSize(frameDirection == EnumFacing.DOWN);
+
+				if(size > maxSize) {
+					maxSize = size;
+				}
 			}
 		}
 
