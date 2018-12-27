@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.4.0.0": "Added more portal events.\nRenamed \"nether_portal_types\" to \"portal_types\". Any preexisting portal types will be migrated to the new directory.\nMiscellaneous improvements.",
 		"1.12.2-1.3.0.1": "Fixed a crash.",
 		"1.12.2-1.3.0.0": "Improved the configuration.",
 		"1.12.2-1.2.0.0": "Improved custom Nether portal types and activators.\nBug fixes and improvements.",
@@ -18,7 +19,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.3.0.1",
-		"1.12.2-recommended": "1.12.2-1.3.0.1"
+		"1.12.2-latest": "1.12.2-1.4.0.0",
+		"1.12.2-recommended": "1.12.2-1.4.0.0"
 	}
 }
