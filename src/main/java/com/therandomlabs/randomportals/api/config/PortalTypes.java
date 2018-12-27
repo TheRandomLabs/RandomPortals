@@ -143,7 +143,17 @@ public final class PortalTypes {
 		final Path oldDirectory = RPOConfig.getDirectory("nether_portal_types");
 
 		if(Files.isDirectory(oldDirectory)) {
-			Files.move(oldDirectory, directory, StandardCopyOption.REPLACE_EXISTING);
+			try(final Stream<Path> pathStream = Files.list(oldDirectory)) {
+				for(Path path : pathStream.collect(Collectors.toList())) {
+					Files.move(
+							path,
+							directory.resolve(path.getFileName()),
+							StandardCopyOption.REPLACE_EXISTING
+					);
+				}
+			}
+
+			Files.delete(oldDirectory);
 		}
 
 		List<Path> paths;

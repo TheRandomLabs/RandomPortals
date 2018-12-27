@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
@@ -23,7 +24,7 @@ public final class NetherPortalTeleportHandler {
 	private static final Map<WeakReference<Entity>, TeleportData> preTeleportData = new HashMap<>();
 	private static final Map<WeakReference<Entity>, TeleportData> teleportData = new HashMap<>();
 
-	public static void setPortal(Entity entity, NetherPortal portal, BlockPos pos) {
+	public static void setPortal(Entity entity, @Nullable NetherPortal portal, BlockPos pos) {
 		final World world = entity.getEntityWorld();
 
 		if(!world.getMinecraftServer().getAllowNether()) {

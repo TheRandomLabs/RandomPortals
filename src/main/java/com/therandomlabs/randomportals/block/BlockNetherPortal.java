@@ -12,6 +12,7 @@ import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
+import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
@@ -46,6 +47,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -201,27 +203,34 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		if(entry != null) {
+			final boolean retrievedFromSavedData = entry.getKey();
 			portal = entry.getValue();
 			final Frame frame = portal.getFrame();
 
-			//entry.getKey() returns whether the frame was retrieved from saved data
-			//If true, the frame is not guaranteed to still exist, so we call PortalType.test
+			//If the frame was retrieved from saved data, the frame is not guaranteed to still
+			//exist, so we call PortalType.test
 			//The following loop then ensures that the inner blocks are all portal blocks
-			boolean shouldBreak = entry.getKey() && !portal.getType().test(frame);
+			boolean shouldBreak = retrievedFromSavedData && !portal.getType().test(frame);
 
-			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
-				final IBlockState innerState = world.getBlockState(innerPos);
-				final Block innerBlock = innerState.getBlock();
+			if(!shouldBreak) {
+				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+					final IBlockState innerState = world.getBlockState(innerPos);
+					final Block innerBlock = innerState.getBlock();
 
-				if(innerBlock.getClass() != clazz ||
-						((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
-					shouldBreak = true;
-					break;
+					if(innerBlock.getClass() != clazz ||
+							((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
+						shouldBreak = true;
+						break;
+					}
 				}
 			}
 
-
 			if(!shouldBreak) {
+				if(!retrievedFromSavedData) {
+					//Then add it to the saved data
+					savedData.addNetherPortal(portal, true);
+				}
+
 				return;
 			}
 
@@ -307,9 +316,11 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		EnumDyeColor newColor = null;
+		EntityItem dyeEntity = null;
 
 		if(RPOConfig.netherPortals.dyeablePortals && entity instanceof EntityItem) {
-			final ItemStack stack = ((EntityItem) entity).getItem();
+			dyeEntity = (EntityItem) entity;
+			final ItemStack stack = dyeEntity.getItem();
 
 			if(stack.getItem() == Items.DYE) {
 				newColor = EnumDyeColor.byDyeDamage(stack.getMetadata());
@@ -318,7 +329,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		if(color == newColor) {
 			if(RPOConfig.netherPortals.consumeDyesEvenIfSameColor) {
-				world.removeEntity(entity);
+				world.removeEntity(dyeEntity);
 				return;
 			}
 
@@ -346,7 +357,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 			if(type.forceColor && !ArrayUtils.contains(type.colors, newColor)) {
 				if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor) {
-					world.removeEntity(entity);
+					world.removeEntity(dyeEntity);
 					return;
 				}
 
@@ -359,18 +370,40 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
+		final List<BlockPos> relevantPositions = getRelevantPortalBlockPositions(
+				world, pos, portal == null ? null : portal.getFrame()
+		);
+
+		final List<BlockPos> dyedPortalPositions = new ArrayList<>(relevantPositions.size());
+
+		for(BlockPos portalPos : relevantPositions) {
+			//Only replace blocks of the same color
+			if(world.getBlockState(portalPos).getBlock() == this) {
+				dyedPortalPositions.add(portalPos);
+			}
+		}
+
+		final NetherPortalEvent.Dye.Pre event = new NetherPortalEvent.Dye.Pre(
+				world, portal, dyedPortalPositions, color, newColor, dyeEntity
+		);
+
+		if(MinecraftForge.EVENT_BUS.post(event)) {
+			return;
+		}
+
 		final IBlockState newState = getByColor(newColor).getDefaultState().
 				withProperty(AXIS, state.getValue(AXIS)).
 				withProperty(USER_PLACED, state.getValue(USER_PLACED));
 
-		for(BlockPos portalPos : getRelevantPortalBlockPositions(world, pos)) {
-			//Only replace blocks of the same color
-			if(world.getBlockState(portalPos).getBlock() == this) {
-				world.setBlockState(portalPos, newState, 2);
-			}
+		for(BlockPos portalPos : dyedPortalPositions) {
+			world.setBlockState(portalPos, newState, 2);
 		}
 
 		world.removeEntity(entity);
+
+		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Dye.Post(
+				world, portal, dyedPortalPositions, color, newColor
+		));
 	}
 
 	@Override
@@ -517,15 +550,24 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(World world,
 			BlockPos portalPos) {
+		return getRelevantPortalBlockPositions(world, portalPos, null);
+	}
+
+	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(World world,
+			BlockPos portalPos, Frame frame) {
 		final IBlockState state = world.getBlockState(portalPos);
 		final BlockNetherPortal block = (BlockNetherPortal) state.getBlock();
 		final EnumFacing.Axis axis = block.getEffectiveAxis(state);
 
-		final Map.Entry<Boolean, NetherPortal> entry =
-				findFrame(NetherPortalFrames.FRAMES, world, portalPos);
+		if(frame == null) {
+			final Map.Entry<Boolean, NetherPortal> entry =
+					findFrame(NetherPortalFrames.FRAMES, world, portalPos);
 
-		if(entry != null) {
-			return entry.getValue().getFrame().getInnerBlockPositions();
+			if(entry != null) {
+				return entry.getValue().getFrame().getInnerBlockPositions();
+			}
+		} else {
+			return frame.getInnerBlockPositions();
 		}
 
 		return getConnectedPortals(world, portalPos, block, axis, state.getValue(USER_PLACED));

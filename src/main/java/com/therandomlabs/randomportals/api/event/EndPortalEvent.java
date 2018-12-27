@@ -30,12 +30,36 @@ public class EndPortalEvent extends Event {
 		}
 	}
 
-	@Cancelable
+	public static class Add extends EndPortalEvent {
+		public Add(World world, Frame frame) {
+			super(world, frame);
+		}
+
+		@Nonnull
+		@Override
+		public Frame getFrame() {
+			return frame;
+		}
+	}
+
 	public static class Teleport extends EndPortalEvent {
+		@Cancelable
+		public static class Pre extends Teleport {
+			public Pre(Frame frame, Entity entity, BlockPos portalPos) {
+				super(frame, entity, portalPos);
+			}
+		}
+
+		public static class Post extends Teleport {
+			public Post(Frame frame, Entity entity, BlockPos portalPos) {
+				super(frame, entity, portalPos);
+			}
+		}
+
 		private final Entity entity;
 		private final BlockPos portalPos;
 
-		public Teleport(Frame frame, Entity entity, BlockPos portalPos) {
+		protected Teleport(Frame frame, Entity entity, BlockPos portalPos) {
 			super(entity.getEntityWorld(), frame);
 			this.entity = entity;
 			this.portalPos = portalPos;

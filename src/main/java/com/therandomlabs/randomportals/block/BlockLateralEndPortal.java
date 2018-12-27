@@ -31,7 +31,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		this("minecraft:end_portal");
 	}
 
-	public BlockLateralEndPortal(String registryName) {
+	protected BlockLateralEndPortal(String registryName) {
 		super(Material.PORTAL);
 		setHardness(-1.0F);
 		setResistance(6000000.0F);
@@ -52,10 +52,9 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 			return;
 		}
 
-		final EndPortalEvent.Teleport event =
-				new EndPortalEvent.Teleport(findFrame(world, pos), entity, pos);
+		final Frame frame = findFrame(world, pos);
 
-		if(MinecraftForge.EVENT_BUS.post(event)) {
+		if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Teleport.Pre(frame, entity, pos))) {
 			return;
 		}
 
@@ -64,6 +63,8 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		} else {
 			entity.changeDimension(DimensionType.THE_END.getId());
 		}
+
+		MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Teleport.Post(frame, entity, pos));
 	}
 
 	@Override

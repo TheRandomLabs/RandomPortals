@@ -245,12 +245,9 @@ public class RPOTeleporter extends Teleporter {
 				entity.getHorizontalFacing().getHorizontalIndex() * 90.0F +
 				forwards.getHorizontalIndex() * 90.0F;
 
-		final NetherPortalEvent.Teleport.DestinationFound found =
-				new NetherPortalEvent.Teleport.DestinationFound(
-						entity, data, frame, x, y, z, yaw, entity.rotationPitch
-				);
-
-		if(MinecraftForge.EVENT_BUS.post(found)) {
+		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport.DestinationFound(
+				entity, data, frame, x, y, z, newYaw, entity.rotationPitch
+		))) {
 			return true;
 		}
 
@@ -261,6 +258,8 @@ public class RPOTeleporter extends Teleporter {
 		} else {
 			entity.setLocationAndAngles(x, y, z, newYaw, entity.rotationPitch);
 		}
+
+		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport.Post(entity, data, frame));
 
 		return true;
 	}

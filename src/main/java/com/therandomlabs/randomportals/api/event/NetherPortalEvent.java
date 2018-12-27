@@ -1,11 +1,15 @@
 package com.therandomlabs.randomportals.api.event;
 
+import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
@@ -52,6 +56,33 @@ public class NetherPortalEvent extends Event {
 		}
 	}
 
+	public static class Add extends NetherPortalEvent {
+		private final NetherPortal portal;
+		private final boolean userCreated;
+
+		public Add(World world, NetherPortal portal, boolean userCreated) {
+			super(world, portal.getFrame());
+			this.portal = portal;
+			this.userCreated = userCreated;
+		}
+
+		@Override
+		@Nonnull
+		public Frame getFrame() {
+			return frame;
+		}
+
+		@Nonnull
+		public NetherPortal getPortal() {
+			return portal;
+		}
+
+		public boolean isUserCreated() {
+			return userCreated;
+		}
+	}
+
+	@SuppressWarnings("Duplicates")
 	public static class Teleport extends NetherPortalEvent {
 		@Cancelable
 		public static class Pre extends Teleport {
@@ -120,6 +151,20 @@ public class NetherPortalEvent extends Event {
 			}
 		}
 
+		public static class Post extends Teleport {
+			private final Frame receivingFrame;
+
+			public Post(Entity entity, TeleportData data, Frame receivingFrame) {
+				super(entity, data);
+				this.receivingFrame = receivingFrame;
+			}
+
+			@Nonnull
+			public Frame getReceivingFrame() {
+				return receivingFrame;
+			}
+		}
+
 		protected final Entity entity;
 		protected final TeleportData data;
 
@@ -147,6 +192,65 @@ public class NetherPortalEvent extends Event {
 		@Nonnull
 		public TeleportData getData() {
 			return data;
+		}
+	}
+
+	public static class Dye extends NetherPortalEvent {
+		@Cancelable
+		public static class Pre extends Dye {
+			private final EntityItem dyeEntity;
+
+			public Pre(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
+					EnumDyeColor oldColor, EnumDyeColor newColor, EntityItem dyeEntity) {
+				super(world, portal, dyedPortalPositions, oldColor, newColor);
+				this.dyeEntity = dyeEntity;
+			}
+
+			@Nonnull
+			public EntityItem getDyeEntity() {
+				return dyeEntity;
+			}
+		}
+
+		public static class Post extends Dye {
+			public Post(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
+					EnumDyeColor oldColor, EnumDyeColor newColor) {
+				super(world, portal, dyedPortalPositions, oldColor, newColor);
+			}
+		}
+
+		private final NetherPortal portal;
+		private final ImmutableList<BlockPos> dyedPortalPositions;
+		private final EnumDyeColor oldColor;
+		private final EnumDyeColor newColor;
+
+		protected Dye(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
+				EnumDyeColor oldColor, EnumDyeColor newColor) {
+			super(world, portal == null ? null : portal.getFrame());
+			this.portal = portal;
+			this.dyedPortalPositions = ImmutableList.copyOf(dyedPortalPositions);
+			this.oldColor = oldColor;
+			this.newColor = newColor;
+		}
+
+		@Nullable
+		public NetherPortal getPortal() {
+			return portal;
+		}
+
+		@Nonnull
+		public ImmutableList<BlockPos> getDyedPortalPositions() {
+			return dyedPortalPositions;
+		}
+
+		@Nonnull
+		public EnumDyeColor getOldColor() {
+			return oldColor;
+		}
+
+		@Nonnull
+		public EnumDyeColor getNewColor() {
+			return newColor;
 		}
 	}
 

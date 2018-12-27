@@ -43,18 +43,21 @@ public class RPOSavedData extends WorldSavedData {
 
 	private static final FrameType[] TYPES = FrameType.values();
 
+	private static World currentWorld;
+
 	private final Map<BlockPos, NetherPortal> netherPortals = new HashMap<>();
 	private final Map<String, Set<BlockPos>> generatedNetherPortalFrames = new HashMap<>();
 	private final Map<BlockPos, Frame> endPortals = new HashMap<>();
 
-	private World world;
+	private final World world;
 
 	public RPOSavedData() {
-		super(ID);
+		this(ID);
 	}
 
 	public RPOSavedData(String name) {
 		super(name);
+		world = currentWorld;
 	}
 
 	@Override
@@ -196,6 +199,8 @@ public class RPOSavedData extends WorldSavedData {
 		}
 
 		markDirty();
+
+		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Add(world, portal, userCreated));
 	}
 
 	public NetherPortal removeNetherPortal(BlockPos portalPos) {
@@ -242,6 +247,7 @@ public class RPOSavedData extends WorldSavedData {
 	public void addEndPortal(Frame frame) {
 		endPortals.put(frame.getTopLeft(), frame);
 		markDirty();
+		MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Add(world, frame));
 	}
 
 	public Frame removeEndPortal(BlockPos portalPos) {
@@ -330,6 +336,8 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	public static RPOSavedData get(World world) {
+		currentWorld = world;
+
 		final MapStorage storage = world.getPerWorldStorage();
 		RPOSavedData instance =
 				(RPOSavedData) storage.getOrLoadData(RPOSavedData.class, ID);
@@ -339,7 +347,8 @@ public class RPOSavedData extends WorldSavedData {
 			storage.setData(ID, instance);
 		}
 
-		instance.world = world;
+		currentWorld = null;
+
 		return instance;
 	}
 }
