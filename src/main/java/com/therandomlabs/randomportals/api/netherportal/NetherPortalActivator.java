@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 import com.therandomlabs.randomportals.RPOConfig;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
@@ -34,31 +34,31 @@ public class NetherPortalActivator {
 
 	private static final Random random = new Random();
 
-	private NetherPortalType forcePortalType;
-	private NetherPortalType[] portalTypes;
+	private PortalType forcePortalType;
+	private PortalType[] portalTypes;
 	private boolean userCreated = true;
 	private boolean activatedByFire;
 	private boolean activationDelayed;
 
-	public NetherPortalType getForcedPortalType() {
+	public PortalType getForcedPortalType() {
 		return forcePortalType;
 	}
 
-	public NetherPortalActivator forcePortalType(NetherPortalType type) {
+	public NetherPortalActivator forcePortalType(PortalType type) {
 		forcePortalType = type;
 		return this;
 	}
 
-	public NetherPortalType[] getPortalTypes() {
+	public PortalType[] getPortalTypes() {
 		return portalTypes == null ? null : portalTypes.clone();
 	}
 
-	public NetherPortalActivator setPortalTypes(NetherPortalType... portalTypes) {
+	public NetherPortalActivator setPortalTypes(PortalType... portalTypes) {
 		if(portalTypes.length == 0) {
 			portalTypes = null;
 		}
 
-		for(NetherPortalType type : portalTypes) {
+		for(PortalType type : portalTypes) {
 			if(type == null) {
 				throw new NullPointerException("portalTypes");
 			}
@@ -137,12 +137,12 @@ public class NetherPortalActivator {
 
 		if(forcePortalType == null) {
 			if(portalTypes == null) {
-				validBlocks = NetherPortalTypes.getValidBlocks();
+				validBlocks = PortalTypes.getValidBlocks();
 			} else {
-				validBlocks = NetherPortalTypes.getValidBlocks(portalTypes);
+				validBlocks = PortalTypes.getValidBlocks(portalTypes);
 			}
 		} else {
-			validBlocks = NetherPortalTypes.getValidBlocks(forcePortalType);
+			validBlocks = PortalTypes.getValidBlocks(forcePortalType);
 		}
 
 		final PortalContainer portal = new PortalContainer();
@@ -249,15 +249,15 @@ public class NetherPortalActivator {
 			return new NetherPortal(frame, null, forcePortalType);
 		}
 
-		final NetherPortalType[] types;
+		final PortalType[] types;
 
 		if(portalTypes == null) {
-			types = NetherPortalTypes.getTypes().values().toArray(new NetherPortalType[0]);
+			types = PortalTypes.getTypes().values().toArray(new PortalType[0]);
 		} else {
 			types = portalTypes;
 		}
 
-		for(NetherPortalType type : types) {
+		for(PortalType type : types) {
 			if((!activatedByFire || type.activation.canBeActivatedByFire) && type.test(frame) &&
 					(forcePortalType != null || activator == null ||
 							type.testActivator(activator))) {

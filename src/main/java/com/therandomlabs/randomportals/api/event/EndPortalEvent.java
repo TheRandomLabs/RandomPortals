@@ -20,6 +20,7 @@ public class EndPortalEvent extends Event {
 		}
 
 		@Nonnull
+		@Override
 		public Frame getFrame() {
 			return frame;
 		}
@@ -40,17 +41,24 @@ public class EndPortalEvent extends Event {
 			this.portalPos = portalPos;
 		}
 
-		@Nullable
-		public Frame getFrame() {
-			return frame;
-		}
-
 		public Entity getEntity() {
 			return entity;
 		}
 
 		public BlockPos getPortalPos() {
 			return portalPos;
+		}
+	}
+
+	public static class Remove extends EndPortalEvent {
+		public Remove(Frame frame) {
+			super(frame.getWorld(), frame);
+		}
+
+		@Nonnull
+		@Override
+		public Frame getFrame() {
+			return super.getFrame();
 		}
 	}
 
@@ -65,5 +73,10 @@ public class EndPortalEvent extends Event {
 	@Nonnull
 	public World getWorld() {
 		return world;
+	}
+
+	@Nullable
+	public Frame getFrame() {
+		return frame;
 	}
 }

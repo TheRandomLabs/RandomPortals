@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public final class NetherPortalType {
+public final class PortalType {
 	public List<FrameBlock> frameBlocks;
 	public RequiredCorner requiredCorner = RequiredCorner.ANY_NON_AIR;
 	public boolean cornerBlocksContributeToMinimumAmount = true;
@@ -41,13 +41,13 @@ public final class NetherPortalType {
 
 	transient String name;
 
-	public NetherPortalType() {}
+	public PortalType() {}
 
-	public NetherPortalType(List<FrameBlock> frameBlocks, int dimensionID) {
+	public PortalType(List<FrameBlock> frameBlocks, int dimensionID) {
 		this(null, frameBlocks, dimensionID);
 	}
 
-	public NetherPortalType(String name, List<FrameBlock> frameBlocks, int dimensionID) {
+	public PortalType(String name, List<FrameBlock> frameBlocks, int dimensionID) {
 		this.name = name;
 		this.frameBlocks = frameBlocks;
 		this.dimensionID = dimensionID;
@@ -55,7 +55,7 @@ public final class NetherPortalType {
 
 	@Override
 	public String toString() {
-		return "NetherPortalType[name=" + getName() + ",frameBlocks=" + frameBlocks +
+		return "PortalType[name=" + getName() + ",frameBlocks=" + frameBlocks +
 				"],dimensionID=" + dimensionID + "]";
 	}
 

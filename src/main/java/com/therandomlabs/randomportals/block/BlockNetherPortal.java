@@ -10,8 +10,8 @@ import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.FrameSize;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
@@ -170,7 +170,7 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		final RPOSavedData savedData = RPOSavedData.get(world);
-		NetherPortal portal = savedData.getNetherPortal(pos);
+		NetherPortal portal = savedData.getNetherPortalByInner(pos);
 
 		//If there is an activated portal here, then ignore userPlaced
 		if(state.getValue(USER_PLACED) && portal == null) {
@@ -202,10 +202,10 @@ public class BlockNetherPortal extends BlockPortal {
 
 		if(entry != null) {
 			portal = entry.getValue();
-			final Frame frame = portal.getFrame(world);
+			final Frame frame = portal.getFrame();
 
 			//entry.getKey() returns whether the frame was retrieved from saved data
-			//If true, the frame is not guaranteed to still exist, so we call NetherPortalType.test
+			//If true, the frame is not guaranteed to still exist, so we call PortalType.test
 			//The following loop then ensures that the inner blocks are all portal blocks
 			boolean shouldBreak = entry.getKey() && !portal.getType().test(frame);
 
@@ -338,11 +338,11 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final NetherPortal portal = RPOSavedData.get(world).getNetherPortal(world, pos);
+		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(pos);
 
 		if(newColor != null) {
-			final NetherPortalType type =
-					portal == null ? NetherPortalTypes.getDefault() : portal.getType();
+			final PortalType type =
+					portal == null ? PortalTypes.getDefault() : portal.getType();
 
 			if(type.forceColor && !ArrayUtils.contains(type.colors, newColor)) {
 				if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor) {
@@ -533,8 +533,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
-		final NetherPortal portal =
-				RPOSavedData.get(world).getNetherPortal(world, portalPos);
+		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(portalPos);
 
 		if(portal != null) {
 			return new AbstractMap.SimpleEntry<>(true, portal);
@@ -547,7 +546,7 @@ public class BlockNetherPortal extends BlockPortal {
 				EnumFacing.NORTH : EnumFacing.DOWN;
 
 		final FrameType type = FrameType.fromAxis(axis);
-		final FrameSize size = NetherPortalTypes.getSize(type);
+		final FrameSize size = PortalTypes.getSize(type);
 		final int maxSize = size.getMaxSize(frameDirection == EnumFacing.DOWN);
 
 		final FrameStatePredicate portalMatcher = Matcher.ofType(type);
@@ -562,7 +561,7 @@ public class BlockNetherPortal extends BlockPortal {
 			final Block checkBlock = checkState.getBlock();
 
 			//If the frame block is a portal, the portal must be user-placed
-			if(NetherPortalTypes.getValidBlocks().test(world, checkPos, state) &&
+			if(PortalTypes.getValidBlocks().test(world, checkPos, state) &&
 					(!(checkBlock instanceof BlockNetherPortal) ||
 							checkState.getValue(USER_PLACED))) {
 				framePos = checkPos;
@@ -584,7 +583,7 @@ public class BlockNetherPortal extends BlockPortal {
 		);
 
 		return new AbstractMap.SimpleEntry<>(false, new NetherPortal(
-				frame, null, NetherPortalTypes.get(frame)
+				frame, null, PortalTypes.get(frame)
 		));
 	}
 

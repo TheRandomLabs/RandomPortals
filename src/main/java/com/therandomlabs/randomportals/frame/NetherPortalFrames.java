@@ -1,7 +1,7 @@
 package com.therandomlabs.randomportals.frame;
 
 import java.util.function.Function;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
@@ -17,24 +17,24 @@ import net.minecraft.world.World;
 
 public final class NetherPortalFrames {
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
-			NetherPortalTypes::getSize,
-			NetherPortalTypes::getValidBlocks,
+			PortalTypes::getSize,
+			PortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			frame -> true,
 			(world, pos, state, type) -> true
 	);
 
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
-			NetherPortalTypes::getSize,
-			NetherPortalTypes::getValidBlocks,
+			PortalTypes::getSize,
+			PortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
 			NetherPortalFrames::isEmpty
 	);
 
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
-			NetherPortalTypes::getSize,
-			NetherPortalTypes::getValidBlocks,
+			PortalTypes::getSize,
+			PortalTypes::getValidBlocks,
 			RequiredCorner.ANY_NON_AIR,
 			NetherPortalFrames::isActivated,
 			(world, pos, state, type) -> state.getBlock() instanceof BlockNetherPortal

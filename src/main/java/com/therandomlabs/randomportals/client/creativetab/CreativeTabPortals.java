@@ -1,4 +1,4 @@
-package com.therandomlabs.randomportals.item;
+package com.therandomlabs.randomportals.client.creativetab;
 
 import java.lang.reflect.Field;
 import com.therandomlabs.randompatches.util.RPUtils;

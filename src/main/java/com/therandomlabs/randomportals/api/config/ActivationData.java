@@ -21,7 +21,7 @@ public final class ActivationData {
 	public boolean spawnFireBeforeActivating = true;
 
 	public String[] activationSounds = {
-			"minecraft:item.flintandsteel.use"
+			"minecraft:creativetab.flintandsteel.use"
 	};
 
 	private transient SoundEvent[] activationSoundEvents;

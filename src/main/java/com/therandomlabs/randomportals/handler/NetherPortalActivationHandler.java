@@ -3,7 +3,7 @@ package com.therandomlabs.randomportals.handler;
 import java.util.ArrayList;
 import java.util.List;
 import com.therandomlabs.randomportals.api.config.ActivationData;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
 import net.minecraft.block.state.IBlockState;
@@ -46,8 +46,8 @@ public final class NetherPortalActivationHandler {
 		final EntityPlayer player = event.getEntityPlayer();
 		final EnumFacing face = event.getFace();
 
-		if(!NetherPortalTypes.getValidActivators().test(stack) ||
-				!NetherPortalTypes.getValidBlocks().test(world, pos, world.getBlockState(pos)) ||
+		if(!PortalTypes.getValidActivators().test(stack) ||
+				!PortalTypes.getValidBlocks().test(world, pos, world.getBlockState(pos)) ||
 				!player.canPlayerEdit(pos, face, stack)) {
 			return;
 		}

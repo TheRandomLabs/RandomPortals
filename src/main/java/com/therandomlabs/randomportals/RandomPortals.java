@@ -68,7 +68,7 @@ public final class RandomPortals {
 		}
 	}
 
-	//Remove when 1.12.2-1.2.0.0 is released:
+	//TODO Remove eventually
 
 	@SubscribeEvent
 	public static void onMissingBlockMappings(RegistryEvent.MissingMappings<Block> event) {

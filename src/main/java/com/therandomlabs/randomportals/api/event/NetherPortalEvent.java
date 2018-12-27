@@ -150,6 +150,26 @@ public class NetherPortalEvent extends Event {
 		}
 	}
 
+	public static class Remove extends NetherPortalEvent {
+		private final NetherPortal portal;
+
+		public Remove(NetherPortal portal) {
+			super(portal.getFrame().getWorld(), portal.getFrame());
+			this.portal = portal;
+		}
+
+		@Nonnull
+		@Override
+		public Frame getFrame() {
+			return super.getFrame();
+		}
+
+		@Nonnull
+		public NetherPortal getPortal() {
+			return portal;
+		}
+	}
+
 	protected final World world;
 	protected final Frame frame;
 
@@ -158,13 +178,13 @@ public class NetherPortalEvent extends Event {
 		this.frame = frame;
 	}
 
-	@Nullable
-	public Frame getFrame() {
-		return frame;
-	}
-
 	@Nonnull
 	public World getWorld() {
 		return world;
+	}
+
+	@Nullable
+	public Frame getFrame() {
+		return frame;
 	}
 }

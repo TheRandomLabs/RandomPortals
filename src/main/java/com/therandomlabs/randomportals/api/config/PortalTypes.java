@@ -3,6 +3,7 @@ package com.therandomlabs.randomportals.api.config;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,36 +24,36 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.DimensionType;
 
-public final class NetherPortalTypes {
+public final class PortalTypes {
 	public static final String VANILLA_NETHER_PORTAL_NAME = "vanilla_nether_portal";
 
-	public static final NetherPortalType VANILLA_NETHER_PORTAL = new NetherPortalType(
+	public static final PortalType VANILLA_NETHER_PORTAL = new PortalType(
 			VANILLA_NETHER_PORTAL_NAME,
 			Collections.singletonList(new FrameBlock(Blocks.OBSIDIAN, 0)),
 			DimensionType.NETHER.getId()
 	);
 
-	private static final Map<String, NetherPortalType> builtinTypes = new HashMap<>();
-	private static final Map<String, NetherPortalType> defaultTypes = new HashMap<>();
+	private static final Map<String, PortalType> builtinTypes = new HashMap<>();
+	private static final Map<String, PortalType> defaultTypes = new HashMap<>();
 
-	private static ImmutableMap<String, NetherPortalType> types;
+	private static ImmutableMap<String, PortalType> types;
 	private static FrameStatePredicate validBlocks;
 	private static Predicate<ItemStack> validActivators;
 	private static FrameSizeData size;
 
-	private NetherPortalTypes() {}
+	private PortalTypes() {}
 
 	public static boolean hasType(String name) {
 		return types.containsKey(name);
 	}
 
-	public static NetherPortalType get(String name) {
-		final NetherPortalType type = types.get(name);
+	public static PortalType get(String name) {
+		final PortalType type = types.get(name);
 		return type == null ? getDefault() : type;
 	}
 
-	public static NetherPortalType getDefault() {
-		final NetherPortalType type = types.get("vanilla_nether_portal");
+	public static PortalType getDefault() {
+		final PortalType type = types.get("vanilla_nether_portal");
 
 		if(type != null) {
 			return type;
@@ -61,7 +62,7 @@ public final class NetherPortalTypes {
 		return types.values().asList().get(0);
 	}
 
-	public static ImmutableMap<String, NetherPortalType> getTypes() {
+	public static ImmutableMap<String, PortalType> getTypes() {
 		return types;
 	}
 
@@ -69,14 +70,14 @@ public final class NetherPortalTypes {
 		return validBlocks;
 	}
 
-	public static FrameStatePredicate getValidBlocks(NetherPortalType... types) {
+	public static FrameStatePredicate getValidBlocks(PortalType... types) {
 		return getValidBlocks(Arrays.asList(types));
 	}
 
-	public static FrameStatePredicate getValidBlocks(Collection<NetherPortalType> types) {
+	public static FrameStatePredicate getValidBlocks(Collection<PortalType> types) {
 		final List<Predicate<IBlockState>> matchers = new ArrayList<>();
 
-		for(NetherPortalType type : types) {
+		for(PortalType type : types) {
 			for(FrameBlock frameBlock : type.frameBlocks) {
 				matchers.add(frameBlock::test);
 			}
@@ -97,10 +98,10 @@ public final class NetherPortalTypes {
 		return validActivators;
 	}
 
-	public static Predicate<ItemStack> getValidActivators(Collection<NetherPortalType> types) {
+	public static Predicate<ItemStack> getValidActivators(Collection<PortalType> types) {
 		final List<Predicate<ItemStack>> matchers = new ArrayList<>();
 
-		for(NetherPortalType type : types) {
+		for(PortalType type : types) {
 			for(FrameActivator activator : type.activation.activators) {
 				matchers.add(activator::test);
 			}
@@ -125,8 +126,8 @@ public final class NetherPortalTypes {
 		return size.get(type);
 	}
 
-	public static NetherPortalType get(Frame frame) {
-		for(NetherPortalType type : types.values()) {
+	public static PortalType get(Frame frame) {
+		for(PortalType type : types.values()) {
 			if(type.test(frame)) {
 				return type;
 			}
@@ -136,14 +137,22 @@ public final class NetherPortalTypes {
 	}
 
 	public static void reload() throws IOException {
-		final Path directory = RPOConfig.getDirectory("nether_portal_types");
+		final Path directory = RPOConfig.getDirectory("portal_types");
+
+		//TODO remove eventually
+		final Path oldDirectory = RPOConfig.getDirectory("nether_portal_types");
+
+		if(Files.isDirectory(oldDirectory)) {
+			Files.move(oldDirectory, directory, StandardCopyOption.REPLACE_EXISTING);
+		}
+
 		List<Path> paths;
 
 		try(final Stream<Path> pathStream = Files.list(directory)) {
 			paths = pathStream.collect(Collectors.toList());
 		}
 
-		final Map<String, NetherPortalType> types = new HashMap<>(paths.size());
+		final Map<String, PortalType> types = new HashMap<>(paths.size());
 
 		for(int i = 0; i < paths.size(); i++) {
 			final Path path = paths.get(i);
@@ -155,7 +164,7 @@ public final class NetherPortalTypes {
 				continue;
 			}
 
-			final NetherPortalType type = RPOConfig.readJson(path, NetherPortalType.class);
+			final PortalType type = RPOConfig.readJson(path, PortalType.class);
 
 			if(type == null) {
 				Files.delete(path);
@@ -181,7 +190,7 @@ public final class NetherPortalTypes {
 
 		types.putAll(builtinTypes);
 
-		for(Map.Entry<String, NetherPortalType> entry : defaultTypes.entrySet()) {
+		for(Map.Entry<String, PortalType> entry : defaultTypes.entrySet()) {
 			final String name = entry.getKey();
 
 			if(!types.containsKey(name)) {
@@ -189,9 +198,9 @@ public final class NetherPortalTypes {
 			}
 		}
 
-		NetherPortalTypes.types = ImmutableMap.copyOf(types);
+		PortalTypes.types = ImmutableMap.copyOf(types);
 
-		final Collection<NetherPortalType> actualTypes = types.values();
+		final Collection<PortalType> actualTypes = types.values();
 
 		validBlocks = getValidBlocks(actualTypes);
 		validActivators = getValidActivators(actualTypes);
@@ -202,7 +211,7 @@ public final class NetherPortalTypes {
 		size.verticalZ = loadSize(FrameType.VERTICAL_Z);
 	}
 
-	public static void registerBuiltinType(String name, NetherPortalType type) {
+	public static void registerBuiltinType(String name, PortalType type) {
 		type.name = name;
 		builtinTypes.put(name, type);
 	}
@@ -211,7 +220,7 @@ public final class NetherPortalTypes {
 		builtinTypes.remove(name);
 	}
 
-	public static void registerDefaultType(String name, NetherPortalType type) {
+	public static void registerDefaultType(String name, PortalType type) {
 		type.name = name;
 		defaultTypes.put(name, type);
 	}
@@ -226,7 +235,7 @@ public final class NetherPortalTypes {
 		int minHeight = Integer.MAX_VALUE;
 		int maxHeight = 3;
 
-		for(NetherPortalType portalType : NetherPortalTypes.getTypes().values()) {
+		for(PortalType portalType : PortalTypes.getTypes().values()) {
 			final FrameSize size = portalType.size.get(type);
 
 			if(size.minWidth < minWidth) {

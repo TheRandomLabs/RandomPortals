@@ -1,8 +1,6 @@
 package com.therandomlabs.randomportals.api.frame;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +18,9 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 
 public class Frame {
+	private final World world;
+	private final DimensionType dimensionType;
+
 	private final FrameType type;
 
 	private final int width;
@@ -32,9 +33,6 @@ public class Frame {
 	private final BlockPos topRight;
 	private final BlockPos bottomLeft;
 	private final BlockPos bottomRight;
-
-	private WeakReference<World> world;
-	private DimensionType dimensionType;
 
 	private ImmutableList<BlockPos> topBlocks;
 	private ImmutableList<BlockPos> rightBlocks;
@@ -57,10 +55,8 @@ public class Frame {
 
 	private Frame(World world, FrameType type, BlockPos topLeft, BlockPos topRight,
 			BlockPos bottomLeft, BlockPos bottomRight, int width, int height) {
-		if(world != null) {
-			this.world = new WeakReference<>(world);
-			dimensionType = world.provider.getDimensionType();
-		}
+		this.world = world;
+		dimensionType = world.provider.getDimensionType();
 
 		this.type = type;
 
@@ -110,17 +106,7 @@ public class Frame {
 	}
 
 	public World getWorld() {
-		return world == null ? null : world.get();
-	}
-
-	public void setWorld(World world) {
-		if(world == null) {
-			this.world = null;
-			dimensionType = null;
-		} else {
-			this.world = new WeakReference<>(world);
-			dimensionType = world.provider.getDimensionType();
-		}
+		return world;
 	}
 
 	public DimensionType getDimensionType() {
@@ -157,12 +143,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getCornerBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return Lists.newArrayList(
 				world.getBlockState(topLeft),
 				world.getBlockState(topRight),
@@ -200,12 +180,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getTopBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return getTopBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
 	}
@@ -223,12 +197,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getRightBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return getRightBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
 	}
@@ -246,12 +214,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getBottomBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return getBottomBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
 	}
@@ -269,12 +231,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getLeftBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return getLeftBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
 	}
@@ -308,12 +264,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getFrameBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return getFrameBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
 	}
@@ -342,12 +292,6 @@ public class Frame {
 	}
 
 	public List<IBlockState> getInnerBlocks() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return Collections.emptyList();
-		}
-
 		return getInnerBlockPositions().stream().map(world::getBlockState).
 				collect(Collectors.toList());
 	}
@@ -432,12 +376,6 @@ public class Frame {
 	}
 
 	public boolean isEmpty() {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return false;
-		}
-
 		for(BlockPos innerPos : getInnerBlockPositions()) {
 			final IBlockState state = world.getBlockState(innerPos);
 
@@ -456,12 +394,6 @@ public class Frame {
 	}
 
 	public boolean testInnerBlocks(FrameStatePredicate predicate) {
-		final World world = this.world.get();
-
-		if(world == null) {
-			return false;
-		}
-
 		for(BlockPos innerPos : getInnerBlockPositions()) {
 			if(!predicate.test(world, innerPos, world.getBlockState(innerPos), type)) {
 				return false;

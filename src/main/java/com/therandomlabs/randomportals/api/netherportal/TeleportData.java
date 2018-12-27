@@ -2,8 +2,8 @@ package com.therandomlabs.randomportals.api.netherportal;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -31,8 +31,8 @@ public class TeleportData {
 	}
 
 	@Nullable
-	public NetherPortalType getPortalType() {
-		return portal == null ? NetherPortalTypes.getDefault() : portal.getType();
+	public PortalType getPortalType() {
+		return portal == null ? PortalTypes.getDefault() : portal.getType();
 	}
 
 	@Nonnull

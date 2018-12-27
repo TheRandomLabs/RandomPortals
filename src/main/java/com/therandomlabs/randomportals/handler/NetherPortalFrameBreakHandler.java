@@ -3,7 +3,7 @@ package com.therandomlabs.randomportals.handler;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
+import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public final class NetherPortalFrameBreakHandler {
-	private static final Map<Map.Entry<World, BlockPos>, NetherPortalType> positions =
+	private static final Map<Map.Entry<World, BlockPos>, PortalType> positions =
 			new HashMap<>();
 
 	@SubscribeEvent
@@ -39,7 +39,7 @@ public final class NetherPortalFrameBreakHandler {
 
 	@SubscribeEvent
 	public static void onBlockDrops(BlockEvent.HarvestDropsEvent event) {
-		final NetherPortalType type = positions.get(new AbstractMap.SimpleEntry<>(
+		final PortalType type = positions.get(new AbstractMap.SimpleEntry<>(
 				event.getWorld(), event.getPos()
 		));
 
@@ -56,9 +56,9 @@ public final class NetherPortalFrameBreakHandler {
 
 		final RPOSavedData savedData = RPOSavedData.get(event.world);
 
-		for(Map.Entry<Map.Entry<World, BlockPos>, NetherPortalType> entry :
+		for(Map.Entry<Map.Entry<World, BlockPos>, PortalType> entry :
 				positions.entrySet()) {
-			final NetherPortalType type = entry.getValue();
+			final PortalType type = entry.getValue();
 
 			if(type == null) {
 				continue;

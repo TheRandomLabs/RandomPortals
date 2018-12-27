@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
+import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
@@ -124,7 +124,7 @@ public final class NetherPortalTeleportHandler {
 			return;
 		}
 
-		final NetherPortalType type = data.getPortalType();
+		final PortalType type = data.getPortalType();
 		final IBlockState state = data.getPortalState();
 		final Block block = state.getBlock();
 

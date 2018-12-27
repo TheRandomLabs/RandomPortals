@@ -4,8 +4,8 @@ import com.therandomlabs.randompatches.integration.RPIStaticConfig;
 import com.therandomlabs.randompatches.integration.world.RPITeleporter;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
@@ -41,7 +41,7 @@ public class RPOTeleporter extends Teleporter {
 		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
 
 		if(data != null) {
-			final NetherPortalType type = data.getPortalType();
+			final PortalType type = data.getPortalType();
 
 			if(type.teleportToPortal) {
 				if(placeInExistingPortal(entity, yaw)) {
@@ -114,7 +114,7 @@ public class RPOTeleporter extends Teleporter {
 		);
 
 		final RPOSavedData savedData = RPOSavedData.get(world);
-		final NetherPortalType portalType = data.getPortalType();
+		final PortalType portalType = data.getPortalType();
 		final NetherPortal sendingPortal = data.getPortal();
 		Frame receivingFrame;
 
@@ -142,7 +142,7 @@ public class RPOTeleporter extends Teleporter {
 				receivingFrame = null;
 			} else {
 
-				receivingPortal = RPOSavedData.get(world).getNetherPortal(portalPos);
+				receivingPortal = RPOSavedData.get(world).getNetherPortalByInner(portalPos);
 
 				if(receivingPortal != null && portalType != receivingPortal.getType()) {
 					sendingPortal.setReceivingFrame(null);
@@ -178,7 +178,7 @@ public class RPOTeleporter extends Teleporter {
 		BlockPos framePos = portalPos.down();
 		final IBlockState frameState = world.getBlockState(framePos);
 
-		if(NetherPortalTypes.getValidBlocks().test(world, framePos, frameState)) {
+		if(PortalTypes.getValidBlocks().test(world, framePos, frameState)) {
 			final BlockPos required = portalPos;
 			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
 					world, framePos,
@@ -203,7 +203,7 @@ public class RPOTeleporter extends Teleporter {
 				sendingPortal.setReceivingFrame(frame);
 
 				if(receivingPortal == null) {
-					receivingPortal = savedData.getNetherPortal(portalPos);
+					receivingPortal = savedData.getNetherPortalByInner(portalPos);
 				}
 
 				if(receivingPortal != null) {
@@ -433,7 +433,7 @@ public class RPOTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		final NetherPortalType portalType =
+		final PortalType portalType =
 				NetherPortalTeleportHandler.getTeleportData(entity).getPortalType();
 
 		if(distance < 0.0) {
@@ -497,7 +497,7 @@ public class RPOTeleporter extends Teleporter {
 	}
 
 	private BlockPos findExistingPortal(RPOSavedData savedData, Entity entity,
-			NetherPortalType portalType) {
+			PortalType portalType) {
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
 
@@ -518,7 +518,7 @@ public class RPOTeleporter extends Teleporter {
 					checkPos = portalPos.down();
 
 					if(PortalBlockRegistry.isPortal(world, portalPos)) {
-						final NetherPortal portal = savedData.getNetherPortal(portalPos);
+						final NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
 						if(portal != null && portal.getType() == portalType) {
 							for(checkPos = portalPos.down();

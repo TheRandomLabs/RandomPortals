@@ -6,7 +6,7 @@ import com.elytradev.movingworld.MovingWorldMod;
 import com.elytradev.movingworld.common.config.priority.AssemblePriorityConfig;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import com.therandomlabs.randomportals.handler.EndPortalActivationHandler;
 import com.therandomlabs.randomportals.handler.FrameHeadVillagerHandler;
@@ -51,7 +51,7 @@ public class CommonProxy {
 		FrameSizes.reload();
 
 		try {
-			NetherPortalTypes.reload();
+			PortalTypes.reload();
 		} catch(IOException ex) {
 			RPUtils.crashReport("Error while reloading Nether portal types", ex);
 		}

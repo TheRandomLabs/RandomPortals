@@ -72,7 +72,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 	}
 
 	public static Frame findFrame(World world, BlockPos portalPos) {
-		Frame frame = RPOSavedData.get(world).getEndPortal(portalPos);
+		Frame frame = RPOSavedData.get(world).getEndPortalByInner(portalPos);
 
 		if(frame != null) {
 			return frame;

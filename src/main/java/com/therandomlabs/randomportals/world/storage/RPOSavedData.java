@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import com.therandomlabs.randomportals.api.config.NetherPortalType;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
+import com.therandomlabs.randomportals.api.event.EndPortalEvent;
+import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
@@ -18,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 
 public class RPOSavedData extends WorldSavedData {
@@ -44,6 +47,8 @@ public class RPOSavedData extends WorldSavedData {
 	private final Map<String, Set<BlockPos>> generatedNetherPortalFrames = new HashMap<>();
 	private final Map<BlockPos, Frame> endPortals = new HashMap<>();
 
+	private World world;
+
 	public RPOSavedData() {
 		super(ID);
 	}
@@ -61,16 +66,17 @@ public class RPOSavedData extends WorldSavedData {
 		for(NBTBase tag : nbt.getTagList(NETHER_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
 			final NBTTagCompound compound = (NBTTagCompound) tag;
 
-			final Frame frame = readFrame(compound.getCompoundTag(FRAME_KEY));
+			final Frame frame = readFrame(world, compound.getCompoundTag(FRAME_KEY));
 
 			//Saved with old version - remove when 1.12.2-1.0.0.0 is released
 			if(frame == null) {
 				continue;
 			}
 
-			final Frame receivingFrame = readFrame(compound.getCompoundTag(RECEIVING_FRAME_KEY));
-			final NetherPortalType type =
-					NetherPortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
+			final Frame receivingFrame =
+					readFrame(world, compound.getCompoundTag(RECEIVING_FRAME_KEY));
+			final PortalType type =
+					PortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
 
 			netherPortals.put(frame.getTopLeft(), new NetherPortal(frame, receivingFrame, type));
 		}
@@ -87,7 +93,7 @@ public class RPOSavedData extends WorldSavedData {
 
 			generatedNetherPortalFrames.merge(
 					//If the type name is invalid, the default type's name is returned
-					NetherPortalTypes.get(typeName).getName(),
+					PortalTypes.get(typeName).getName(),
 					positions,
 					(a, b) -> {
 						a.addAll(b);
@@ -97,7 +103,7 @@ public class RPOSavedData extends WorldSavedData {
 		}
 
 		for(NBTBase tag : nbt.getTagList(END_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
-			final Frame frame = readFrame((NBTTagCompound) tag);
+			final Frame frame = readFrame(world, (NBTTagCompound) tag);
 			endPortals.put(frame.getTopLeft(), frame);
 		}
 	}
@@ -133,7 +139,7 @@ public class RPOSavedData extends WorldSavedData {
 
 			generatedPortalFramesTag.setTag(
 					//If the type name is invalid, the default type's name is returned
-					NetherPortalTypes.get(entry.getKey()).getName(),
+					PortalTypes.get(entry.getKey()).getName(),
 					positionList
 			);
 		}
@@ -151,41 +157,23 @@ public class RPOSavedData extends WorldSavedData {
 		return nbt;
 	}
 
-	public Map<BlockPos, NetherPortal> getNetherPortals() {
+	public Map<BlockPos, NetherPortal> getUserCreatedNetherPortals() {
 		return netherPortals;
 	}
 
-	public Map<BlockPos, NetherPortal> getUserCreatedNetherPortals(World world) {
-		if(world != null) {
-			for(NetherPortal portal : netherPortals.values()) {
-				portal.getFrame().setWorld(world);
-			}
-		}
-
-		return netherPortals;
+	public NetherPortal getNetherPortalByInner(BlockPos portalPos) {
+		return getNetherPortal(frame -> frame.isInnerBlock(portalPos), portalPos);
 	}
 
-	public NetherPortal getNetherPortal(BlockPos portalPos) {
-		return getNetherPortal(null, portalPos);
-	}
-
-	public NetherPortal getNetherPortal(World world, BlockPos portalPos) {
-		return getNetherPortal(frame -> frame.isInnerBlock(portalPos), world, portalPos);
-	}
-
-	public NetherPortal getNetherPortalByFrame(BlockPos portalPos) {
-		return getNetherPortalByFrame(null, portalPos);
-	}
-
-	public NetherPortal getNetherPortalByFrame(World world, BlockPos framePos) {
-		return getNetherPortal(frame -> frame.isFrameBlock(framePos), world, framePos);
+	public NetherPortal getNetherPortalByFrame(BlockPos framePos) {
+		return getNetherPortal(frame -> frame.isFrameBlock(framePos), framePos);
 	}
 
 	public NetherPortal getNetherPortalByTopLeft(BlockPos topLeft) {
 		return netherPortals.get(topLeft);
 	}
 
-	public NetherPortal addNetherPortal(Frame frame, NetherPortalType type, boolean userCreated) {
+	public NetherPortal addNetherPortal(Frame frame, PortalType type, boolean userCreated) {
 		final NetherPortal portal = new NetherPortal(frame, null, type);
 		addNetherPortal(portal, userCreated);
 		return portal;
@@ -218,10 +206,10 @@ public class RPOSavedData extends WorldSavedData {
 		return removeNetherPortal(frame -> frame.isFrameBlock(portalPos), portalPos);
 	}
 
-	public NetherPortalType getGeneratedNetherPortalType(BlockPos framePos) {
+	public PortalType getGeneratedNetherPortalType(BlockPos framePos) {
 		for(Map.Entry<String, Set<BlockPos>> entry : generatedNetherPortalFrames.entrySet()) {
 			if(entry.getValue().contains(framePos)) {
-				return NetherPortalTypes.get(entry.getKey());
+				return PortalTypes.get(entry.getKey());
 			}
 		}
 
@@ -239,21 +227,12 @@ public class RPOSavedData extends WorldSavedData {
 	public Map<BlockPos, Frame> getEndPortals() {
 		return endPortals;
 	}
-
-	public Frame getEndPortal(BlockPos portalPos) {
-		return getEndPortal(null, portalPos);
+	public Frame getEndPortalByInner(BlockPos portalPos) {
+		return getEndPortal(frame -> frame.isInnerBlock(portalPos), portalPos);
 	}
 
-	public Frame getEndPortal(World world, BlockPos portalPos) {
-		return getEndPortal(frame -> frame.isInnerBlock(portalPos), world, portalPos);
-	}
-
-	public Frame getEndPortalByFrame(BlockPos portalPos) {
-		return getEndPortalByFrame(null, portalPos);
-	}
-
-	public Frame getEndPortalByFrame(World world, BlockPos framePos) {
-		return getEndPortal(frame -> frame.isFrameBlock(framePos), world, framePos);
+	public Frame getEndPortalByFrame(BlockPos framePos) {
+		return getEndPortal(frame -> frame.isFrameBlock(framePos), framePos);
 	}
 
 	public Frame getEndPortalByTopLeft(BlockPos topLeft) {
@@ -273,15 +252,11 @@ public class RPOSavedData extends WorldSavedData {
 		return removeEndPortal(frame -> frame.isFrameBlock(portalPos), portalPos);
 	}
 
-	private NetherPortal getNetherPortal(Predicate<Frame> predicate, World world, BlockPos pos) {
+	private NetherPortal getNetherPortal(Predicate<Frame> predicate, BlockPos pos) {
 		for(NetherPortal portal : netherPortals.values()) {
 			final Frame frame = portal.getFrame();
 
 			if(predicate.test(frame)) {
-				if(world != null) {
-					frame.setWorld(world);
-				}
-
 				return portal;
 			}
 		}
@@ -296,6 +271,7 @@ public class RPOSavedData extends WorldSavedData {
 			if(predicate.test(portal.getFrame())) {
 				netherPortals.remove(entry.getKey());
 				markDirty();
+				MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Remove(portal));
 				return portal;
 			}
 		}
@@ -303,13 +279,9 @@ public class RPOSavedData extends WorldSavedData {
 		return null;
 	}
 
-	private Frame getEndPortal(Predicate<Frame> predicate, World world, BlockPos pos) {
+	private Frame getEndPortal(Predicate<Frame> predicate, BlockPos pos) {
 		for(Frame frame : endPortals.values()) {
 			if(predicate.test(frame)) {
-				if(world != null) {
-					frame.setWorld(world);
-				}
-
 				return frame;
 			}
 		}
@@ -324,6 +296,7 @@ public class RPOSavedData extends WorldSavedData {
 			if(predicate.test(frame)) {
 				endPortals.remove(entry.getKey());
 				markDirty();
+				MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Remove(frame));
 				return frame;
 			}
 		}
@@ -331,11 +304,11 @@ public class RPOSavedData extends WorldSavedData {
 		return null;
 	}
 
-	public static Frame readFrame(NBTTagCompound compound) {
+	public static Frame readFrame(World world, NBTTagCompound compound) {
 		final int width = compound.getInteger(WIDTH_KEY);
 
 		return width == 0 ? null : new Frame(
-				null,
+				world,
 				TYPES[compound.getInteger(FRAME_TYPE_KEY)],
 				NBTUtil.getPosFromTag(compound.getCompoundTag(TOP_LEFT_KEY)),
 				width,
@@ -366,6 +339,7 @@ public class RPOSavedData extends WorldSavedData {
 			storage.setData(ID, instance);
 		}
 
+		instance.world = world;
 		return instance;
 	}
 }

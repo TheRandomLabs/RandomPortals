@@ -17,7 +17,7 @@ import com.google.gson.JsonSyntaxException;
 import com.therandomlabs.randompatches.RandomPatches;
 import com.therandomlabs.randompatches.util.RPUtils;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
-import com.therandomlabs.randomportals.api.config.NetherPortalTypes;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
@@ -202,7 +202,7 @@ public final class RPOConfig {
 		}
 
 		//This method is first called in CommonProxy.preInit
-		//FrameSizes.reload and NetherPortalTypes.reload should first be called in CommonProxy.init
+		//FrameSizes.reload and PortalTypes.reload should first be called in CommonProxy.init
 		if(firstReload) {
 			firstReload = false;
 			return;
@@ -211,7 +211,7 @@ public final class RPOConfig {
 		FrameSizes.reload();
 
 		try {
-			NetherPortalTypes.reload();
+			PortalTypes.reload();
 		} catch(IOException ex) {
 			RPUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
