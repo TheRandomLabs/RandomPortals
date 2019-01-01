@@ -73,7 +73,8 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 	}
 
 	public static Frame findFrame(World world, BlockPos portalPos) {
-		Frame frame = RPOSavedData.get(world).getEndPortalByInner(portalPos);
+		final RPOSavedData savedData = RPOSavedData.get(world);
+		Frame frame = savedData.getEndPortalByInner(portalPos);
 
 		if(frame != null) {
 			return frame;
@@ -152,6 +153,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		}
 
 		if(frame != null) {
+			savedData.addEndPortal(frame);
 			return frame;
 		}
 
@@ -161,12 +163,19 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 			);
 
 			if(frame != null) {
+				savedData.addEndPortal(frame);
 				return frame;
 			}
 		}
 
-		return EndPortalFrames.VERTICAL_INWARDS_FACING.detectWithCondition(
+		frame = EndPortalFrames.VERTICAL_INWARDS_FACING.detectWithCondition(
 				world, framePos, condition
 		);
+
+		if(frame != null) {
+			savedData.addEndPortal(frame);
+		}
+
+		return frame;
 	}
 }
