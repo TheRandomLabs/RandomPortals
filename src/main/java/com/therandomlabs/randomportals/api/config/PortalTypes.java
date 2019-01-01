@@ -168,17 +168,13 @@ public final class PortalTypes {
 			final Path path = paths.get(i);
 			final String fileName = path.getFileName().toString();
 
-			if(!fileName.endsWith(".json")) {
-				Files.delete(path);
-				paths.remove(i--);
-				continue;
-			}
-
-			final PortalType type = RPOConfig.readJson(path, PortalType.class);
+			final PortalType type =
+					fileName.endsWith(".json") ? RPOConfig.readJson(path, PortalType.class) : null;
 
 			if(type == null) {
 				Files.delete(path);
 				paths.remove(i--);
+				continue;
 			}
 
 			type.ensureCorrect();

@@ -12,6 +12,11 @@ final class RegistryNameAndMeta {
 	}
 
 	@Override
+	public int hashCode() {
+		return registryName.hashCode() * meta;
+	}
+
+	@Override
 	public boolean equals(Object object) {
 		if(this == object) {
 			return true;
@@ -24,10 +29,5 @@ final class RegistryNameAndMeta {
 		}
 
 		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return registryName.hashCode() * meta;
 	}
 }

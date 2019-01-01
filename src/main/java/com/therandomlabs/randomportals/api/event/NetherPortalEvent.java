@@ -82,7 +82,6 @@ public class NetherPortalEvent extends Event {
 		}
 	}
 
-	@SuppressWarnings("Duplicates")
 	public static class Teleport extends NetherPortalEvent {
 		@Cancelable
 		public static class Pre extends Teleport {

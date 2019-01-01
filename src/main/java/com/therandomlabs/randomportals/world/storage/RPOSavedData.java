@@ -236,6 +236,7 @@ public class RPOSavedData extends WorldSavedData {
 	public Map<BlockPos, Frame> getEndPortals() {
 		return endPortals;
 	}
+
 	public Frame getEndPortalByInner(BlockPos portalPos) {
 		return getEndPortal(frame -> frame.isInnerBlock(portalPos), portalPos);
 	}
