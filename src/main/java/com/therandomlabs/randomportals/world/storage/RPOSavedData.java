@@ -203,12 +203,16 @@ public class RPOSavedData extends WorldSavedData {
 		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Add(world, portal, userCreated));
 	}
 
-	public NetherPortal removeNetherPortal(BlockPos portalPos) {
-		return removeNetherPortal(frame -> frame.isInnerBlock(portalPos), portalPos);
+	public NetherPortal removeNetherPortalByInner(BlockPos portalPos) {
+		return removeNetherPortal(frame -> frame.isInnerBlock(portalPos));
 	}
 
-	public NetherPortal removeNetherPortalByFrame(BlockPos portalPos) {
-		return removeNetherPortal(frame -> frame.isFrameBlock(portalPos), portalPos);
+	public NetherPortal removeNetherPortalByFrame(BlockPos framePos) {
+		return removeNetherPortal(frame -> frame.isFrameBlock(framePos));
+	}
+
+	public NetherPortal removeNetherPortalByTopLeft(BlockPos topLeft) {
+		return removeNetherPortal(frame -> topLeft.equals(frame.getTopLeft()));
 	}
 
 	public PortalType getGeneratedNetherPortalType(BlockPos framePos) {
@@ -250,12 +254,16 @@ public class RPOSavedData extends WorldSavedData {
 		MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Add(world, frame));
 	}
 
-	public Frame removeEndPortal(BlockPos portalPos) {
-		return removeEndPortal(frame -> frame.isInnerBlock(portalPos), portalPos);
+	public Frame removeEndPortalByInner(BlockPos portalPos) {
+		return removeEndPortal(frame -> frame.isInnerBlock(portalPos));
 	}
 
-	public Frame removeEndPortalByFrame(BlockPos portalPos) {
-		return removeEndPortal(frame -> frame.isFrameBlock(portalPos), portalPos);
+	public Frame removeEndPortalByFrame(BlockPos framePos) {
+		return removeEndPortal(frame -> frame.isFrameBlock(framePos));
+	}
+
+	public Frame removeEndPortalByTopLeft(BlockPos topLeft) {
+		return removeEndPortal(frame -> topLeft.equals(frame.getTopLeft()));
 	}
 
 	private NetherPortal getNetherPortal(Predicate<Frame> predicate, BlockPos pos) {
@@ -270,7 +278,7 @@ public class RPOSavedData extends WorldSavedData {
 		return null;
 	}
 
-	private NetherPortal removeNetherPortal(Predicate<Frame> predicate, BlockPos pos) {
+	private NetherPortal removeNetherPortal(Predicate<Frame> predicate) {
 		for(Map.Entry<BlockPos, NetherPortal> entry : netherPortals.entrySet()) {
 			final NetherPortal portal = entry.getValue();
 
@@ -295,7 +303,7 @@ public class RPOSavedData extends WorldSavedData {
 		return null;
 	}
 
-	private Frame removeEndPortal(Predicate<Frame> predicate, BlockPos pos) {
+	private Frame removeEndPortal(Predicate<Frame> predicate) {
 		for(Map.Entry<BlockPos, Frame> entry : endPortals.entrySet()) {
 			final Frame frame = entry.getValue();
 

@@ -203,14 +203,13 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		if(entry != null) {
-			final boolean retrievedFromSavedData = entry.getKey();
 			portal = entry.getValue();
 			final Frame frame = portal.getFrame();
 
-			//If the frame was retrieved from saved data, the frame is not guaranteed to still
-			//exist, so we call PortalType.test
+			//If the frame was retrieved from saved data (entry.getKey()),
+			// the frame is not guaranteed to still exist, so we call PortalType.test
 			//The following loop then ensures that the inner blocks are all portal blocks
-			boolean shouldBreak = retrievedFromSavedData && !portal.getType().test(frame);
+			boolean shouldBreak = entry.getKey() && !portal.getType().test(frame);
 
 			if(!shouldBreak) {
 				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
@@ -226,11 +225,6 @@ public class BlockNetherPortal extends BlockPortal {
 			}
 
 			if(!shouldBreak) {
-				if(!retrievedFromSavedData) {
-					//Then add it to the saved data
-					savedData.addNetherPortal(portal, true);
-				}
-
 				return;
 			}
 
@@ -243,6 +237,8 @@ public class BlockNetherPortal extends BlockPortal {
 					removing.add(innerPos);
 				}
 			}
+
+			savedData.removeNetherPortalByTopLeft(frame.getTopLeft());
 		} else {
 			removing.addAll(getConnectedPortals(
 					world, pos, this, axis, state.getValue(USER_PLACED)
@@ -254,7 +250,6 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		removing.clear();
-		savedData.removeNetherPortal(pos);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -525,7 +520,7 @@ public class BlockNetherPortal extends BlockPortal {
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
 		if(!world.isRemote) {
-			RPOSavedData.get(world).removeNetherPortal(pos);
+			RPOSavedData.get(world).removeNetherPortalByInner(pos);
 		}
 
 		return actuallyRemoved;
@@ -575,7 +570,8 @@ public class BlockNetherPortal extends BlockPortal {
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
 			World world, BlockPos portalPos) {
-		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(portalPos);
+		final RPOSavedData savedData = RPOSavedData.get(world);
+		NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
 		if(portal != null) {
 			return new AbstractMap.SimpleEntry<>(true, portal);
@@ -624,9 +620,9 @@ public class BlockNetherPortal extends BlockPortal {
 				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
 		);
 
-		return new AbstractMap.SimpleEntry<>(false, new NetherPortal(
-				frame, null, PortalTypes.get(frame)
-		));
+		portal = new NetherPortal(frame, null, PortalTypes.get(frame));
+		savedData.addNetherPortal(portal, true);
+		return new AbstractMap.SimpleEntry<>(false, portal);
 	}
 
 	private static ImmutableList<BlockPos> getConnectedPortals(World world, BlockPos portalPos,
