@@ -67,7 +67,7 @@ public abstract class FrameDetector {
 			Function<FrameType, FrameSize> size, Predicate<Frame> frameCondition) {
 		final IBlockState state = getState(world, pos);
 
-		if(type == FrameType.LATERAL || type == FrameType.LATERAL_OR_VERTICAL) {
+		if(type.test(FrameType.LATERAL)) {
 			final Frame frame = detect(
 					FrameType.LATERAL, world, pos, state, size.apply(FrameType.LATERAL),
 					frameCondition
@@ -78,8 +78,7 @@ public abstract class FrameDetector {
 			}
 		}
 
-		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_X ||
-				type == FrameType.LATERAL_OR_VERTICAL) {
+		if(type.test(FrameType.VERTICAL_X)) {
 			final Frame frame = detect(
 					FrameType.VERTICAL_X, world, pos, state, size.apply(FrameType.VERTICAL_X),
 					frameCondition
@@ -90,16 +89,11 @@ public abstract class FrameDetector {
 			}
 		}
 
-		if(type == FrameType.VERTICAL || type == FrameType.VERTICAL_Z ||
-				type == FrameType.LATERAL_OR_VERTICAL) {
-			final Frame frame = detect(
+		if(type.test(FrameType.VERTICAL_Z)) {
+			return detect(
 					FrameType.VERTICAL_Z, world, pos, state, size.apply(FrameType.VERTICAL_Z),
 					frameCondition
 			);
-
-			if(frame != null) {
-				return frame;
-			}
 		}
 
 		return null;

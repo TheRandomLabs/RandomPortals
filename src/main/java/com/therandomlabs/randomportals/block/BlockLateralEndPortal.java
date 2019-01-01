@@ -16,6 +16,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -70,6 +71,19 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 	@Override
 	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
 		return new ItemStack(this);
+	}
+
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
+			EntityPlayer player, boolean willHarvest) {
+		final boolean actuallyRemoved =
+				super.removedByPlayer(state, world, pos, player, willHarvest);
+
+		if(actuallyRemoved && !world.isRemote) {
+			RPOSavedData.get(world).removeEndPortalByInner(pos);
+		}
+
+		return actuallyRemoved;
 	}
 
 	public static Frame findFrame(World world, BlockPos portalPos) {
@@ -139,8 +153,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 			return null;
 		}
 
-		final Predicate<Frame> condition =
-				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos);
+		final Predicate<Frame> condition = potentialFrame -> potentialFrame.isInnerBlock(portalPos);
 
 		if(frameBlock == Blocks.END_PORTAL_FRAME) {
 			frame = EndPortalFrames.LATERAL.detectWithCondition(world, framePos, condition);

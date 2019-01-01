@@ -182,7 +182,7 @@ public class RPOTeleporter extends Teleporter {
 			final BlockPos required = portalPos;
 			frame = NetherPortalFrames.ACTIVATED_FRAMES.detectWithCondition(
 					world, framePos,
-					potentialFrame -> potentialFrame.getInnerBlockPositions().contains(required)
+					potentialFrame -> potentialFrame.isInnerBlock(required)
 			);
 		} else {
 			frame = BlockNetherPortal.findFrame(

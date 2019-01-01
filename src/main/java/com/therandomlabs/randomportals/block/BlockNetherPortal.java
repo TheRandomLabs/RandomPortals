@@ -197,7 +197,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final Map.Entry<Boolean, NetherPortal> entry;
 
 		if(portal == null) {
-			entry = findFrame(NetherPortalFrames.FRAMES, world, pos);
+			entry = findFrame(world, pos);
 		} else {
 			entry = new AbstractMap.SimpleEntry<>(true, portal);
 		}
@@ -344,6 +344,7 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
+		//Don't call findFrame because this method is called every tick an entity is in a portal
 		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(pos);
 
 		if(newColor != null) {
@@ -519,7 +520,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final boolean actuallyRemoved =
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
-		if(!world.isRemote) {
+		if(actuallyRemoved && !world.isRemote) {
 			RPOSavedData.get(world).removeNetherPortalByInner(pos);
 		}
 
@@ -555,8 +556,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final EnumFacing.Axis axis = block.getEffectiveAxis(state);
 
 		if(frame == null) {
-			final Map.Entry<Boolean, NetherPortal> entry =
-					findFrame(NetherPortalFrames.FRAMES, world, portalPos);
+			final Map.Entry<Boolean, NetherPortal> entry = findFrame(world, portalPos);
 
 			if(entry != null) {
 				return entry.getValue().getFrame().getInnerBlockPositions();
@@ -566,6 +566,10 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		return getConnectedPortals(world, portalPos, block, axis, state.getValue(USER_PLACED));
+	}
+
+	public static Map.Entry<Boolean, NetherPortal> findFrame(World world, BlockPos portalPos) {
+		return findFrame(NetherPortalFrames.FRAMES, world, portalPos);
 	}
 
 	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
@@ -599,7 +603,7 @@ public class BlockNetherPortal extends BlockPortal {
 			final Block checkBlock = checkState.getBlock();
 
 			//If the frame block is a portal, the portal must be user-placed
-			if(PortalTypes.getValidBlocks().test(world, checkPos, state) &&
+			if(PortalTypes.getValidBlocks().test(world, checkPos, checkState) &&
 					(!(checkBlock instanceof BlockNetherPortal) ||
 							checkState.getValue(USER_PLACED))) {
 				framePos = checkPos;
@@ -617,8 +621,12 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final Frame frame = detector.detectWithCondition(
 				world, framePos, type,
-				potentialFrame -> potentialFrame.getInnerBlockPositions().contains(portalPos)
+				potentialFrame -> potentialFrame.isInnerBlock(portalPos)
 		);
+
+		if(frame == null) {
+			return null;
+		}
 
 		portal = new NetherPortal(frame, null, PortalTypes.get(frame));
 		savedData.addNetherPortal(portal, true);
