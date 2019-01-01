@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import com.google.common.collect.ImmutableSet;
+import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
@@ -36,6 +37,10 @@ public final class PortalBlockRegistry {
 
 	public static boolean isPortal(World world, BlockPos pos) {
 		return isPortal(world.getBlockState(pos));
+	}
+
+	public static boolean isPortal(World world, BlockPos pos, IBlockState state, FrameType type) {
+		return isPortal(world, pos);
 	}
 
 	public static IBlockState getState(Block block, EnumFacing.Axis axis, boolean userPlaced) {

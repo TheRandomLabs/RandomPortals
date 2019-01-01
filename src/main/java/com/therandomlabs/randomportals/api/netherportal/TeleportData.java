@@ -24,7 +24,6 @@ public class TeleportData {
 		return portal;
 	}
 
-	//If frame is not null, frame.getWorld() is not null
 	@Nullable
 	public Frame getFrame() {
 		return portal == null ? null : portal.getFrame();

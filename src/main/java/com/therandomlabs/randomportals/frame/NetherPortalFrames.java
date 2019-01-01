@@ -7,6 +7,7 @@ import com.therandomlabs.randomportals.api.frame.FrameDetector;
 import com.therandomlabs.randomportals.api.frame.FrameType;
 import com.therandomlabs.randomportals.api.frame.RequiredCorner;
 import com.therandomlabs.randomportals.api.frame.detector.BasicFrameDetector;
+import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
 import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import net.minecraft.block.Block;
@@ -35,9 +36,9 @@ public final class NetherPortalFrames {
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
 			PortalTypes::getSize,
 			PortalTypes::getValidBlocks,
-			RequiredCorner.ANY_NON_AIR,
+			RequiredCorner.ANY,
 			NetherPortalFrames::isActivated,
-			(world, pos, state, type) -> state.getBlock() instanceof BlockNetherPortal
+			PortalBlockRegistry::isPortal
 	);
 
 	private NetherPortalFrames() {}
