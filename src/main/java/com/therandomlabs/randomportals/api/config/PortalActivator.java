@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public final class FrameActivator {
+public final class PortalActivator {
 	private static final IForgeRegistry<Item> ITEM_REGISTRY = GameRegistry.findRegistry(Item.class);
 
 	public String registryName;
@@ -17,24 +17,24 @@ public final class FrameActivator {
 
 	private transient boolean itemRetrieved;
 	private transient Item item;
-	private transient FrameActivator[] items;
+	private transient PortalActivator[] items;
 
-	public FrameActivator() {}
+	public PortalActivator() {}
 
-	public FrameActivator(Item item, int meta) {
+	public PortalActivator(Item item, int meta) {
 		registryName = item.getRegistryName().toString();
 		this.meta = meta;
 
 		itemRetrieved = true;
 		this.item = item;
-		items = new FrameActivator[] {
+		items = new PortalActivator[] {
 				this
 		};
 	}
 
 	@Override
 	public String toString() {
-		return "FrameActivator[registryName=" + registryName + ",meta=" + meta + "]";
+		return "PortalActivator[registryName=" + registryName + ",meta=" + meta + "]";
 	}
 
 	public Item getItem() {
@@ -51,7 +51,7 @@ public final class FrameActivator {
 		return item;
 	}
 
-	public FrameActivator getActualItem() {
+	public PortalActivator getActualItem() {
 		return getItems().length == 0 ? null : items[0];
 	}
 
@@ -63,9 +63,9 @@ public final class FrameActivator {
 		final Item item = stack.getItem();
 		final int meta = stack.getMetadata();
 
-		for(FrameActivator activator : getItems()) {
-			if(activator.getItem() == item && (activator.meta == OreDictionary.WILDCARD_VALUE ||
-					activator.meta == meta)) {
+		for(PortalActivator activator : getItems()) {
+			if(activator.getItem() == item &&
+					(activator.meta == OreDictionary.WILDCARD_VALUE || activator.meta == meta)) {
 				return true;
 			}
 		}
@@ -73,18 +73,18 @@ public final class FrameActivator {
 		return false;
 	}
 
-	private FrameActivator[] getItems() {
+	private PortalActivator[] getItems() {
 		if(items != null) {
 			return items;
 		}
 
 		if(!registryName.startsWith("ore:")) {
 			if(getItem() == null) {
-				items = new FrameActivator[0];
+				items = new PortalActivator[0];
 				return items;
 			}
 
-			items = new FrameActivator[] {
+			items = new PortalActivator[] {
 					this
 			};
 			return items;
@@ -93,17 +93,17 @@ public final class FrameActivator {
 		final List<ItemStack> ores = OreDictionary.getOres(registryName.substring(4));
 
 		if(ores.isEmpty()) {
-			items = new FrameActivator[0];
+			items = new PortalActivator[0];
 			return items;
 		}
 
-		final List<FrameActivator> items = new ArrayList<>(ores.size());
+		final List<PortalActivator> items = new ArrayList<>(ores.size());
 
 		for(ItemStack ore : ores) {
-			items.add(new FrameActivator(ore.getItem(), ore.getMetadata()));
+			items.add(new PortalActivator(ore.getItem(), ore.getMetadata()));
 		}
 
-		this.items = items.toArray(new FrameActivator[0]);
+		this.items = items.toArray(new PortalActivator[0]);
 		return this.items;
 	}
 }

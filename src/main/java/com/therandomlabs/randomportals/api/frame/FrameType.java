@@ -1,5 +1,8 @@
 package com.therandomlabs.randomportals.api.frame;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import net.minecraft.util.EnumFacing;
 
 public enum FrameType {
@@ -28,7 +31,9 @@ public enum FrameType {
 			EnumFacing.UP,
 			true
 	),
-	LATERAL_OR_VERTICAL(null, null, null, null, null, false);
+	LATERAL_OR_VERTICAL(null, null, null, null, null, false),
+	LATERAL_OR_VERTICAL_X(null, null, null, null, null, false),
+	LATERAL_OR_VERTICAL_Z(null, null, null, null, null, false);
 
 	final EnumFacing[] rightDownLeftUp;
 
@@ -48,6 +53,19 @@ public enum FrameType {
 		return axis;
 	}
 
+	public List<FrameType> getTypes() {
+		switch(this) {
+		case LATERAL_OR_VERTICAL:
+			return Arrays.asList(LATERAL, VERTICAL_X, VERTICAL_Z);
+		case LATERAL_OR_VERTICAL_X:
+			return Arrays.asList(LATERAL, VERTICAL_X);
+		case LATERAL_OR_VERTICAL_Z:
+			return Arrays.asList(LATERAL, VERTICAL_Z);
+		default:
+			return Collections.singletonList(this);
+		}
+	}
+
 	public boolean isVertical() {
 		return vertical;
 	}
@@ -57,7 +75,19 @@ public enum FrameType {
 			return true;
 		}
 
-		return this == VERTICAL && (type == VERTICAL_X || type == VERTICAL_Z);
+		if(this == VERTICAL) {
+			return type == VERTICAL_X || type == VERTICAL_Z;
+		}
+
+		if(this == LATERAL_OR_VERTICAL_X) {
+			return type == LATERAL || type == VERTICAL_X;
+		}
+
+		if(this == LATERAL_OR_VERTICAL_Z) {
+			return type == LATERAL || type == VERTICAL_Z;
+		}
+
+		return false;
 	}
 
 	public <T> T get(T lateral, T verticalX, T verticalZ) {

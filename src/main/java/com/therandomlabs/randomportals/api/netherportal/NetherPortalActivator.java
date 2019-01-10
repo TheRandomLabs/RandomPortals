@@ -205,7 +205,7 @@ public class NetherPortalActivator {
 
 		final Frame frame = portal.getFrame();
 		final EnumFacing.Axis axis = frame.getType().getAxis();
-		final EnumDyeColor[] colors = portal.getType().colors;
+		final EnumDyeColor[] colors = portal.getType().color.colors;
 		final IBlockState state = portalBlocks.apply(axis, colors[random.nextInt(colors.length)]);
 		final Block block = state.getBlock();
 		final Class<?> blockClass = block.getClass();
@@ -252,7 +252,10 @@ public class NetherPortalActivator {
 		final PortalType[] types;
 
 		if(portalTypes == null) {
-			types = PortalTypes.getTypes().values().toArray(new PortalType[0]);
+			final int dimensionID = frame.getWorld().provider.getDimension();
+			types = PortalTypes.getTypes().values().stream().
+					map(group -> group.getType(dimensionID)).
+					toArray(PortalType[]::new);
 		} else {
 			types = portalTypes;
 		}

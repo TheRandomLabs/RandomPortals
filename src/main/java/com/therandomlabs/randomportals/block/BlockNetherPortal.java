@@ -9,6 +9,7 @@ import java.util.Random;
 import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
+import com.therandomlabs.randomportals.api.config.ColorData;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
@@ -349,9 +350,12 @@ public class BlockNetherPortal extends BlockPortal {
 
 		if(newColor != null) {
 			final PortalType type =
-					portal == null ? PortalTypes.getDefault() : portal.getType();
+					portal == null ? PortalTypes.getDefault(world) : portal.getType();
 
-			if(type.forceColor && !ArrayUtils.contains(type.colors, newColor)) {
+			if(type.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
+				newColor = null;
+			} else if(type.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
+					!ArrayUtils.contains(type.color.colors, newColor)) {
 				if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor) {
 					world.removeEntity(dyeEntity);
 					return;
@@ -588,7 +592,7 @@ public class BlockNetherPortal extends BlockPortal {
 				EnumFacing.NORTH : EnumFacing.DOWN;
 
 		final FrameType type = FrameType.fromAxis(axis);
-		final FrameSize size = PortalTypes.getSize(type);
+		final FrameSize size = PortalTypes.getMaximumSize(type);
 		final int maxSize = size.getMaxSize(frameDirection == EnumFacing.DOWN);
 
 		final FrameStatePredicate portalMatcher = Matcher.ofType(type);

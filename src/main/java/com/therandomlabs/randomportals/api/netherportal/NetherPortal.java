@@ -9,18 +9,18 @@ import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 public final class NetherPortal {
 	private final Frame frame;
 	private Frame receivingFrame;
-	private String type;
+	private String typeID;
 
 	public NetherPortal(Frame frame, Frame receivingFrame, PortalType type) {
 		this.frame = frame;
 		this.receivingFrame = receivingFrame;
-		this.type = type.getName();
+		typeID = type.toString();
 	}
 
 	@Override
 	public String toString() {
 		return "NetherPortal[frame=" + frame + ",receivingFrame=" + receivingFrame +
-				",type=" + type + "]";
+				",typeID=" + typeID + "]";
 	}
 
 	@Nullable
@@ -42,8 +42,8 @@ public final class NetherPortal {
 	}
 
 	public PortalType getType() {
-		final PortalType type = PortalTypes.get(this.type);
-		this.type = type.getName();
+		final PortalType type = PortalTypes.getSpecific(typeID);
+		typeID = type.toString();
 		return type;
 	}
 }

@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public final class NetherPortalFrames {
 	public static final FrameDetector FRAMES = new BasicFrameDetector(
-			PortalTypes::getSize,
+			PortalTypes::getMaximumSize,
 			PortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			frame -> true,
@@ -26,7 +26,7 @@ public final class NetherPortalFrames {
 	);
 
 	public static final FrameDetector EMPTY_FRAMES = new BasicFrameDetector(
-			PortalTypes::getSize,
+			PortalTypes::getMaximumSize,
 			PortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			frame -> frame.testInnerBlocks(NetherPortalFrames::isEmpty),
@@ -34,7 +34,7 @@ public final class NetherPortalFrames {
 	);
 
 	public static final FrameDetector ACTIVATED_FRAMES = new BasicFrameDetector(
-			PortalTypes::getSize,
+			PortalTypes::getMaximumSize,
 			PortalTypes::getValidBlocks,
 			RequiredCorner.ANY,
 			NetherPortalFrames::isActivated,

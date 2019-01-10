@@ -43,7 +43,7 @@ public final class NetherPortalFrameBreakHandler {
 				event.getWorld(), event.getPos()
 		));
 
-		if(type != null && !type.doGeneratedFramesDrop) {
+		if(type != null && !type.frame.doGeneratedFramesDrop) {
 			event.getDrops().clear();
 		}
 	}
@@ -56,8 +56,7 @@ public final class NetherPortalFrameBreakHandler {
 
 		final RPOSavedData savedData = RPOSavedData.get(event.world);
 
-		for(Map.Entry<Map.Entry<World, BlockPos>, PortalType> entry :
-				positions.entrySet()) {
+		for(Map.Entry<Map.Entry<World, BlockPos>, PortalType> entry : positions.entrySet()) {
 			final PortalType type = entry.getValue();
 
 			if(type == null) {
@@ -67,7 +66,7 @@ public final class NetherPortalFrameBreakHandler {
 			final Map.Entry<World, BlockPos> key = entry.getKey();
 
 			if(key.getKey() == event.world) {
-				savedData.removeGeneratedNetherPortalFramePos(type.getName(), key.getValue());
+				savedData.removeGeneratedNetherPortalFramePos(type.toString(), key.getValue());
 			}
 		}
 	}

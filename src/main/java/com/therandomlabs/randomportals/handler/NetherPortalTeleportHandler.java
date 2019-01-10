@@ -52,7 +52,9 @@ public final class NetherPortalTeleportHandler {
 			reference = new WeakReference<>(entity);
 		}
 
-		preTeleportData.put(reference, new TeleportData(portal, pos, world.getBlockState(pos)));
+		preTeleportData.put(
+				reference, new TeleportData(world, portal, pos, world.getBlockState(pos))
+		);
 
 		//In case another mod needs lastPortalPos for whatever reason
 		entity.lastPortalPos = pos;
@@ -120,7 +122,7 @@ public final class NetherPortalTeleportHandler {
 	}
 
 	private static void handle(WeakReference<Entity> reference, Entity entity, TeleportData data,
-			int dimension) {
+			int dimensionID) {
 		if(entity.isRiding()) {
 			return;
 		}
@@ -156,6 +158,9 @@ public final class NetherPortalTeleportHandler {
 
 		teleportData.put(reference, data);
 
-		entity.changeDimension(dimension == type.dimensionID ? 0 : type.dimensionID);
+		entity.changeDimension(
+				dimensionID == type.destination.dimensionID ?
+						type.group.defaultDimensionID : type.destination.dimensionID
+		);
 	}
 }

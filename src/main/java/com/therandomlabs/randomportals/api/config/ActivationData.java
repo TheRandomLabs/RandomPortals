@@ -2,6 +2,7 @@ package com.therandomlabs.randomportals.api.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.therandomlabs.randomportals.util.RegistryNameAndMeta;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -15,7 +16,7 @@ public final class ActivationData {
 
 	public boolean canBeActivatedByFire = true;
 
-	public List<FrameActivator> activators = new ArrayList<>();
+	public List<PortalActivator> activators = new ArrayList<>();
 
 	public ConsumeBehavior activatorConsumeBehavior = ConsumeBehavior.CONSUME;
 	public boolean spawnFireBeforeActivating = true;
@@ -31,9 +32,10 @@ public final class ActivationData {
 		final List<RegistryNameAndMeta> items = new ArrayList<>();
 
 		for(int i = 0; i < activators.size(); i++) {
-			final FrameActivator activator = activators.get(i);
-			final RegistryNameAndMeta registryNameAndMeta =
-					new RegistryNameAndMeta(activator.registryName, activator.meta);
+			final PortalActivator activator = activators.get(i);
+			final RegistryNameAndMeta registryNameAndMeta = new RegistryNameAndMeta(
+					activator.registryName, activator.meta
+			);
 
 			if(!activator.isValid() || items.contains(registryNameAndMeta)) {
 				activators.remove(i--);
@@ -75,7 +77,7 @@ public final class ActivationData {
 	}
 
 	public boolean test(ItemStack stack) {
-		for(FrameActivator activator : activators) {
+		for(PortalActivator activator : activators) {
 			if(activator.test(stack)) {
 				return true;
 			}

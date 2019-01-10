@@ -1,11 +1,6 @@
 package com.therandomlabs.randomportals;
 
-import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.command.CommandRPOReload;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -13,8 +8,6 @@ import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,38 +58,6 @@ public final class RandomPortals {
 	public static void serverStarting(FMLServerStartingEvent event) {
 		if(RPOConfig.misc.rporeloadCommand) {
 			event.registerServerCommand(new CommandRPOReload(Side.SERVER));
-		}
-	}
-
-	//TODO Remove eventually
-
-	@SubscribeEvent
-	public static void onMissingBlockMappings(RegistryEvent.MissingMappings<Block> event) {
-		for(RegistryEvent.MissingMappings.Mapping<Block> mapping : event.getAllMappings()) {
-			if(mapping.key.getNamespace().equals("verticalendportals")) {
-				mapping.remap(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(
-						MOD_ID, mapping.key.getPath()
-				)));
-			}
-
-			if(mapping.key.getPath().equals("lateral_nether_portal")) {
-				mapping.remap(RPOBlocks.purple_lateral_nether_portal);
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public static void onMissingItemMappings(RegistryEvent.MissingMappings<Item> event) {
-		for(RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getAllMappings()) {
-			if(mapping.key.getNamespace().equals("verticalendportals")) {
-				mapping.remap(ForgeRegistries.ITEMS.getValue(new ResourceLocation(
-						MOD_ID, mapping.key.getPath()
-				)));
-			}
-
-			if(mapping.key.getPath().equals("lateral_nether_portal")) {
-				mapping.remap(Item.getItemFromBlock(RPOBlocks.purple_lateral_nether_portal));
-			}
 		}
 	}
 }

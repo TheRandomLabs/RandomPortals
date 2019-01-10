@@ -71,23 +71,22 @@ public class RPOSavedData extends WorldSavedData {
 
 			final Frame frame = readFrame(world, compound.getCompoundTag(FRAME_KEY));
 
-			//Saved with old version - remove when 1.12.2-1.0.0.0 is released
 			if(frame == null) {
 				continue;
 			}
 
 			final Frame receivingFrame =
 					readFrame(world, compound.getCompoundTag(RECEIVING_FRAME_KEY));
-			final PortalType type =
-					PortalTypes.get(compound.getString(PORTAL_TYPE_KEY));
+
+			final PortalType type = PortalTypes.getSpecific(compound.getString(PORTAL_TYPE_KEY));
 
 			netherPortals.put(frame.getTopLeft(), new NetherPortal(frame, receivingFrame, type));
 		}
 
 		final NBTTagCompound compound = nbt.getCompoundTag(GENERATED_NETHER_PORTAL_FRAMES_KEY);
 
-		for(String typeName : compound.getKeySet()) {
-			final NBTTagList list = compound.getTagList(typeName, Constants.NBT.TAG_COMPOUND);
+		for(String typeID : compound.getKeySet()) {
+			final NBTTagList list = compound.getTagList(typeID, Constants.NBT.TAG_COMPOUND);
 			final Set<BlockPos> positions = new HashSet<>(list.tagCount());
 
 			for(NBTBase tag : list) {
@@ -96,7 +95,7 @@ public class RPOSavedData extends WorldSavedData {
 
 			generatedNetherPortalFrames.merge(
 					//If the type name is invalid, the default type's name is returned
-					PortalTypes.get(typeName).getName(),
+					PortalTypes.getSpecific(typeID).toString(),
 					positions,
 					(a, b) -> {
 						a.addAll(b);
@@ -124,7 +123,7 @@ public class RPOSavedData extends WorldSavedData {
 
 			compound.setTag(FRAME_KEY, frame);
 			compound.setTag(RECEIVING_FRAME_KEY, receivingFrame);
-			compound.setString(PORTAL_TYPE_KEY, portal.getType().getName());
+			compound.setString(PORTAL_TYPE_KEY, portal.getType().toString());
 
 			netherPortalList.appendTag(compound);
 		}
@@ -142,7 +141,7 @@ public class RPOSavedData extends WorldSavedData {
 
 			generatedPortalFramesTag.setTag(
 					//If the type name is invalid, the default type's name is returned
-					PortalTypes.get(entry.getKey()).getName(),
+					PortalTypes.getSpecific(entry.getKey()).toString(),
 					positionList
 			);
 		}
@@ -189,7 +188,7 @@ public class RPOSavedData extends WorldSavedData {
 
 		if(!userCreated) {
 			generatedNetherPortalFrames.merge(
-					portal.getType().getName(),
+					portal.getType().toString(),
 					new HashSet<>(frame.getFrameBlockPositions()),
 					(a, b) -> {
 						a.addAll(b);
@@ -218,15 +217,15 @@ public class RPOSavedData extends WorldSavedData {
 	public PortalType getGeneratedNetherPortalType(BlockPos framePos) {
 		for(Map.Entry<String, Set<BlockPos>> entry : generatedNetherPortalFrames.entrySet()) {
 			if(entry.getValue().contains(framePos)) {
-				return PortalTypes.get(entry.getKey());
+				return PortalTypes.getSpecific(entry.getKey());
 			}
 		}
 
 		return null;
 	}
 
-	public void removeGeneratedNetherPortalFramePos(String typeName, BlockPos framePos) {
-		final Set<BlockPos> positions = generatedNetherPortalFrames.get(typeName);
+	public void removeGeneratedNetherPortalFramePos(String typeID, BlockPos framePos) {
+		final Set<BlockPos> positions = generatedNetherPortalFrames.get(typeID);
 
 		if(positions != null) {
 			markDirty();

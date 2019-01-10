@@ -43,13 +43,13 @@ public class RPOTeleporter extends Teleporter {
 		if(data != null) {
 			final PortalType type = data.getPortalType();
 
-			if(type.teleportToPortal) {
+			if(type.destination.teleportToPortal) {
 				if(placeInExistingPortal(entity, yaw)) {
 					return;
 				}
 
 				//Only players can spawn portals for some reason
-				if(entity instanceof EntityPlayerMP && type.spawnPortal) {
+				if(entity instanceof EntityPlayerMP && type.destination.generatePortalIfNotFound) {
 					makePortal(entity);
 					placeInExistingPortal(entity, yaw);
 					return;
@@ -141,7 +141,6 @@ public class RPOTeleporter extends Teleporter {
 				sendingPortal.setReceivingFrame(null);
 				receivingFrame = null;
 			} else {
-
 				receivingPortal = RPOSavedData.get(world).getNetherPortalByInner(portalPos);
 
 				if(receivingPortal != null && portalType != receivingPortal.getType()) {
@@ -432,8 +431,12 @@ public class RPOTeleporter extends Teleporter {
 
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		final PortalType portalType =
+		PortalType portalType =
 				NetherPortalTeleportHandler.getTeleportData(entity).getPortalType();
+
+		if(portalType.destination.generateUsingReceivingDimensionPortalType) {
+			portalType = portalType.group.getType(portalType.destination.dimensionID);
+		}
 
 		if(distance < 0.0) {
 			portalY = MathHelper.clamp(portalY, 70, world.getActualHeight() - 10);
@@ -444,8 +447,8 @@ public class RPOTeleporter extends Teleporter {
 						final IBlockState state;
 
 						if(yOffset == -1) {
-							final int index = random.nextInt(portalType.frameBlocks.size());
-							state = portalType.frameBlocks.get(index).getActualState();
+							final int index = random.nextInt(portalType.frame.blocks.size());
+							state = portalType.frame.blocks.get(index).getActualState();
 						} else {
 							state = air;
 						}
@@ -466,13 +469,13 @@ public class RPOTeleporter extends Teleporter {
 						horzOffset == -1 || horzOffset == 2 || yOffset == -1 || yOffset == 3;
 
 				if(frame) {
-					final int index = random.nextInt(portalType.frameBlocks.size());
+					final int index = random.nextInt(portalType.frame.blocks.size());
 
 					world.setBlockState(new BlockPos(
 							portalX + horzOffset * xMultiplier,
 							portalY + yOffset,
 							portalZ + horzOffset * zMultiplier
-					), portalType.frameBlocks.get(index).getActualState(), 2);
+					), portalType.frame.blocks.get(index).getActualState(), 2);
 				}
 			}
 		}
@@ -500,6 +503,8 @@ public class RPOTeleporter extends Teleporter {
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
 
+		final String id = portalType.group.toString();
+
 		BlockPos pos = null;
 		double distanceSq = -1.0;
 
@@ -519,7 +524,7 @@ public class RPOTeleporter extends Teleporter {
 					if(PortalBlockRegistry.isPortal(world, portalPos)) {
 						final NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
-						if(portal != null && portal.getType() == portalType) {
+						if(portal != null && id.equals(portal.getType().group.toString())) {
 							for(checkPos = portalPos.down();
 								PortalBlockRegistry.isPortal(world, checkPos);
 								checkPos = checkPos.down()) {

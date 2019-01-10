@@ -1,12 +1,12 @@
-package com.therandomlabs.randomportals.api.config;
+package com.therandomlabs.randomportals.util;
 
 import net.minecraftforge.oredict.OreDictionary;
 
-final class RegistryNameAndMeta {
-	final String registryName;
-	final int meta;
+public final class RegistryNameAndMeta {
+	public final String registryName;
+	public final int meta;
 
-	RegistryNameAndMeta(String registryName, int meta) {
+	public RegistryNameAndMeta(String registryName, int meta) {
 		this.registryName = registryName;
 		this.meta = meta;
 	}
