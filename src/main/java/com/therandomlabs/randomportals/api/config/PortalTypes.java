@@ -201,6 +201,8 @@ public final class PortalTypes {
 				continue;
 			}
 
+			RPOConfig.writeJson(groupData, group);
+
 			group.id = id;
 
 			List<Path> typePaths;
