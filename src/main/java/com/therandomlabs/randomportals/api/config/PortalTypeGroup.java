@@ -2,10 +2,11 @@ package com.therandomlabs.randomportals.api.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.ArrayUtils;
 
 public final class PortalTypeGroup {
-	public boolean useActivationDimensionsBlacklist = true;
-	public int[] activationDimensionsBlacklist = new int[0];
+	public boolean blacklistAllUndefinedActivationDimensions;
+	public int[] activationDimensionIDBlacklist = new int[0];
 
 	public int defaultDimensionID;
 
@@ -28,6 +29,14 @@ public final class PortalTypeGroup {
 
 	public boolean isValid() {
 		return types.containsKey(defaultDimensionID);
+	}
+
+	public boolean testActivationDimensionID(int dimensionID) {
+		if(blacklistAllUndefinedActivationDimensions) {
+			return types.containsKey(dimensionID);
+		}
+
+		return !ArrayUtils.contains(activationDimensionIDBlacklist, dimensionID);
 	}
 
 	public PortalType getType(int dimensionID) {

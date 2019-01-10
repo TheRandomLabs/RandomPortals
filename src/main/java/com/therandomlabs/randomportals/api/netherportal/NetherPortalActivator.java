@@ -1,11 +1,13 @@
 package com.therandomlabs.randomportals.api.netherportal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypeGroup;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
@@ -249,15 +251,19 @@ public class NetherPortalActivator {
 			return new NetherPortal(frame, null, forcePortalType);
 		}
 
-		final PortalType[] types;
+		final List<PortalType> types;
 
 		if(portalTypes == null) {
 			final int dimensionID = frame.getWorld().provider.getDimension();
-			types = PortalTypes.getTypes().values().stream().
-					map(group -> group.getType(dimensionID)).
-					toArray(PortalType[]::new);
+			types = new ArrayList<>();
+
+			for(PortalTypeGroup group : PortalTypes.getTypes().values()) {
+				if(group.testActivationDimensionID(dimensionID)) {
+					types.addAll(group.types.values());
+				}
+			}
 		} else {
-			types = portalTypes;
+			types = Arrays.asList(portalTypes);
 		}
 
 		for(PortalType type : types) {
