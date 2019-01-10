@@ -30,10 +30,10 @@ public final class PortalTypes {
 	public static final PortalTypeGroup VANILLA_NETHER_PORTAL =
 			new PortalTypeGroup(VANILLA_NETHER_PORTAL_ID);
 
+	private static final Map<String, PortalTypeGroup> builtinGroups = new HashMap<>();
 	private static final Map<String, PortalTypeGroup> builtinTypes = new HashMap<>();
-	private static final Map<String, PortalTypeGroup> defaultTypes = new HashMap<>();
 
-	private static ImmutableMap<String, PortalTypeGroup> types;
+	private static ImmutableMap<String, PortalTypeGroup> groups;
 	private static FrameStatePredicate validBlocks;
 	private static Predicate<ItemStack> validActivators;
 	private static FrameSizeData maximumSize;
@@ -47,17 +47,17 @@ public final class PortalTypes {
 
 	private PortalTypes() {}
 
-	public static boolean hasType(String id) {
-		return types.containsKey(id);
+	public static boolean hasGroup(String id) {
+		return groups.containsKey(id);
 	}
 
-	public static PortalTypeGroup get(String id) {
-		final PortalTypeGroup type = types.get(id);
-		return type == null ? getDefault() : type;
+	public static PortalTypeGroup getGroup(String id) {
+		final PortalTypeGroup type = groups.get(id);
+		return type == null ? getDefaultGroup() : type;
 	}
 
 	public static PortalType get(int dimensionID, String id) {
-		return get(id).getType(dimensionID);
+		return getGroup(id).getType(dimensionID);
 	}
 
 	public static PortalType get(World world, String id) {
@@ -68,33 +68,28 @@ public final class PortalTypes {
 		final String[] split = StringUtils.split(id, ':');
 
 		if(split.length == 1) {
-			final PortalTypeGroup group = get(id);
+			final PortalTypeGroup group = getGroup(id);
 			return group.types.get(group.defaultDimensionID);
 		}
 
-		return get(split[0]).getType(Integer.parseInt(split[1]));
+		return getGroup(split[0]).getType(Integer.parseInt(split[1]));
 	}
 
-	public static PortalTypeGroup getDefault() {
-		final PortalTypeGroup type = types.get("vanilla_nether_portal");
-
-		if(type != null) {
-			return type;
-		}
-
-		return types.values().asList().get(0);
+	public static PortalTypeGroup getDefaultGroup() {
+		final PortalTypeGroup group = groups.get(VANILLA_NETHER_PORTAL_ID);
+		return group == null ? groups.values().asList().get(0) : group;
 	}
 
 	public static PortalType getDefault(int dimensionID) {
-		return getDefault().getType(dimensionID);
+		return getDefaultGroup().getType(dimensionID);
 	}
 
 	public static PortalType getDefault(World world) {
 		return getDefault(world.provider.getDimension());
 	}
 
-	public static ImmutableMap<String, PortalTypeGroup> getTypes() {
-		return types;
+	public static ImmutableMap<String, PortalTypeGroup> getGroups() {
+		return groups;
 	}
 
 	public static FrameStatePredicate getValidBlocks() {
@@ -158,7 +153,7 @@ public final class PortalTypes {
 	}
 
 	public static PortalType get(Frame frame) {
-		for(PortalTypeGroup group : types.values()) {
+		for(PortalTypeGroup group : groups.values()) {
 			for(PortalType type : group.types.values()) {
 				if(type.test(frame)) {
 					return type;
@@ -166,7 +161,7 @@ public final class PortalTypes {
 			}
 		}
 
-		final PortalTypeGroup defaultGroup = getDefault();
+		final PortalTypeGroup defaultGroup = getDefaultGroup();
 		return defaultGroup.types.get(defaultGroup.defaultDimensionID);
 	}
 
@@ -264,9 +259,9 @@ public final class PortalTypes {
 			write(directory, VANILLA_NETHER_PORTAL);
 		}
 
-		types.putAll(builtinTypes);
+		types.putAll(builtinGroups);
 
-		for(Map.Entry<String, PortalTypeGroup> entry : defaultTypes.entrySet()) {
+		for(Map.Entry<String, PortalTypeGroup> entry : builtinTypes.entrySet()) {
 			final String name = entry.getKey();
 
 			if(!types.containsKey(name)) {
@@ -276,7 +271,7 @@ public final class PortalTypes {
 			}
 		}
 
-		PortalTypes.types = ImmutableMap.copyOf(types);
+		PortalTypes.groups = ImmutableMap.copyOf(types);
 
 		final Collection<PortalTypeGroup> groups = types.values();
 		final List<PortalType> actualTypes = new ArrayList<>();
@@ -292,22 +287,22 @@ public final class PortalTypes {
 		maximumSize.verticalZ = loadMaximumSize(FrameType.VERTICAL_Z);
 	}
 
-	public static void registerBuiltinType(String name, PortalTypeGroup type) {
-		type.id = name;
-		builtinTypes.put(name, type);
+	public static void registerBuiltinGroup(String name, PortalTypeGroup group) {
+		group.id = name;
+		builtinGroups.put(name, group);
 	}
 
-	public static void unregisterBuiltinType(String name) {
+	public static void unregisterBuiltinGroup(String name) {
+		builtinGroups.remove(name);
+	}
+
+	public static void registerDefaultGroup(String name, PortalTypeGroup group) {
+		group.id = name;
+		builtinTypes.put(name, group);
+	}
+
+	public static void unregisterDefaultGroup(String name) {
 		builtinTypes.remove(name);
-	}
-
-	public static void registerDefaultType(String name, PortalTypeGroup type) {
-		type.id = name;
-		defaultTypes.put(name, type);
-	}
-
-	public static void unregisterDefaultType(String name) {
-		defaultTypes.remove(name);
 	}
 
 	private static void write(Path directory, PortalTypeGroup group) throws IOException {
@@ -335,7 +330,7 @@ public final class PortalTypes {
 		int minHeight = Integer.MAX_VALUE;
 		int maxHeight = 3;
 
-		for(PortalTypeGroup group : PortalTypes.getTypes().values()) {
+		for(PortalTypeGroup group : PortalTypes.getGroups().values()) {
 			for(PortalType portalType : group.types.values()) {
 				final FrameSize size = portalType.frame.size.get(type);
 

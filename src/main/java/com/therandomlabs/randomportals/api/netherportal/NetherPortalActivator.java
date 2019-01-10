@@ -257,7 +257,7 @@ public class NetherPortalActivator {
 			final int dimensionID = frame.getWorld().provider.getDimension();
 			types = new ArrayList<>();
 
-			for(PortalTypeGroup group : PortalTypes.getTypes().values()) {
+			for(PortalTypeGroup group : PortalTypes.getGroups().values()) {
 				if(group.testActivationDimensionID(dimensionID)) {
 					types.addAll(group.types.values());
 				}
