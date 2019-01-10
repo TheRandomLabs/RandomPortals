@@ -55,17 +55,6 @@ public final class FrameData {
 		}
 
 		final World world = frame.getWorld();
-		/*final int dimension = world.provider.getDimension();
-
-		if(activationDimensionsWhitelist) {
-			if(!dimensions.contains(dimension)) {
-				return false;
-			}
-		} else {
-			if(dimensions.contains(dimension)) {
-				return false;
-			}
-		}*/
 
 		if(!size.test(frameType, frame.getWidth(), frame.getHeight())) {
 			return false;
