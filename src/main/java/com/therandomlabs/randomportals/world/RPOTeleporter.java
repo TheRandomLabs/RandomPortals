@@ -114,7 +114,7 @@ public class RPOTeleporter extends Teleporter {
 		);
 
 		final RPOSavedData savedData = RPOSavedData.get(world);
-		final PortalType portalType = data.getPortalType();
+		final String portalTypeID = data.getPortalType().group.toString();
 		final NetherPortal sendingPortal = data.getPortal();
 		Frame receivingFrame;
 
@@ -143,7 +143,8 @@ public class RPOTeleporter extends Teleporter {
 			} else {
 				receivingPortal = RPOSavedData.get(world).getNetherPortalByInner(portalPos);
 
-				if(receivingPortal != null && portalType != receivingPortal.getType()) {
+				if(receivingPortal != null &&
+						!portalTypeID.equals(receivingPortal.getType().group.toString())) {
 					sendingPortal.setReceivingFrame(null);
 					//setReceivingFrame does not need to be called on receivingPortal since
 					//it would have been created after another was destroyed in the same position,
@@ -157,7 +158,7 @@ public class RPOTeleporter extends Teleporter {
 			final PortalPosition cachedPos = destinationCoordinateCache.get(entityChunkPos);
 
 			if(cachedPos == null) {
-				portalPos = findExistingPortal(savedData, entity, portalType);
+				portalPos = findExistingPortal(savedData, entity, portalTypeID);
 
 				if(portalPos == null) {
 					return false;
@@ -499,11 +500,9 @@ public class RPOTeleporter extends Teleporter {
 	}
 
 	private BlockPos findExistingPortal(RPOSavedData savedData, Entity entity,
-			PortalType portalType) {
+			String portalTypeID) {
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
-
-		final String id = portalType.group.toString();
 
 		BlockPos pos = null;
 		double distanceSq = -1.0;
@@ -524,7 +523,8 @@ public class RPOTeleporter extends Teleporter {
 					if(PortalBlockRegistry.isPortal(world, portalPos)) {
 						final NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
-						if(portal != null && id.equals(portal.getType().group.toString())) {
+						if(portal != null &&
+								portalTypeID.equals(portal.getType().group.toString())) {
 							for(checkPos = portalPos.down();
 								PortalBlockRegistry.isPortal(world, checkPos);
 								checkPos = checkPos.down()) {

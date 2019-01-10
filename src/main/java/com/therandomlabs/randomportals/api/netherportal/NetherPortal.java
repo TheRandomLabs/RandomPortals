@@ -1,5 +1,6 @@
 package com.therandomlabs.randomportals.api.netherportal;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
@@ -41,6 +42,7 @@ public final class NetherPortal {
 		}
 	}
 
+	@Nonnull
 	public PortalType getType() {
 		final PortalType type = PortalTypes.getSpecific(typeID);
 		typeID = type.toString();

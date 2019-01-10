@@ -12,6 +12,7 @@ public final class DestinationData {
 
 	public FrameType generatedFrameType = FrameType.VERTICAL;
 	public FrameSizeData generatedFrameSize = new FrameSizeData();
+	public boolean randomizeGeneratedFrameBlocks = true;
 
 	public DestinationData() {
 		generatedFrameSize.lateral = new FrameSize(4, 4, 5, 5);
