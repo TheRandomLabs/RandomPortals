@@ -114,7 +114,7 @@ public class RPOTeleporter extends Teleporter {
 		);
 
 		final RPOSavedData savedData = RPOSavedData.get(world);
-		final String portalTypeID = data.getPortalType().group.toString();
+		final String typeID = data.getPortalType().group.toString();
 		final NetherPortal sendingPortal = data.getPortal();
 		Frame receivingFrame;
 
@@ -144,7 +144,7 @@ public class RPOTeleporter extends Teleporter {
 				receivingPortal = RPOSavedData.get(world).getNetherPortalByInner(portalPos);
 
 				if(receivingPortal != null &&
-						!portalTypeID.equals(receivingPortal.getType().group.toString())) {
+						!typeID.equals(receivingPortal.getType().group.toString())) {
 					sendingPortal.setReceivingFrame(null);
 					//setReceivingFrame does not need to be called on receivingPortal since
 					//it would have been created after another was destroyed in the same position,
@@ -158,7 +158,7 @@ public class RPOTeleporter extends Teleporter {
 			final PortalPosition cachedPos = destinationCoordinateCache.get(entityChunkPos);
 
 			if(cachedPos == null) {
-				portalPos = findExistingPortal(savedData, entity, portalTypeID);
+				portalPos = findExistingPortal(savedData, entity, typeID);
 
 				if(portalPos == null) {
 					return false;
@@ -499,12 +499,12 @@ public class RPOTeleporter extends Teleporter {
 		return false;
 	}
 
-	private BlockPos findExistingPortal(RPOSavedData savedData, Entity entity,
-			String portalTypeID) {
+	private BlockPos findExistingPortal(RPOSavedData savedData, Entity entity, String typeID) {
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
 
 		BlockPos pos = null;
+		BlockPos posWithoutReceivingFrame = null;
 		double distanceSq = -1.0;
 
 		for(int xOffset = -128; xOffset <= 128; xOffset++) {
@@ -523,8 +523,7 @@ public class RPOTeleporter extends Teleporter {
 					if(PortalBlockRegistry.isPortal(world, portalPos)) {
 						final NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
-						if(portal != null &&
-								portalTypeID.equals(portal.getType().group.toString())) {
+						if(portal != null && typeID.equals(portal.getType().group.toString())) {
 							for(checkPos = portalPos.down();
 								PortalBlockRegistry.isPortal(world, checkPos);
 								checkPos = checkPos.down()) {
@@ -536,6 +535,10 @@ public class RPOTeleporter extends Teleporter {
 							if(distanceSq == -1.0 || newDistance < distanceSq) {
 								distanceSq = newDistance;
 								pos = portalPos;
+
+								if(portal.getReceivingFrame() == null) {
+									posWithoutReceivingFrame = pos;
+								}
 							}
 						}
 					}
@@ -543,7 +546,8 @@ public class RPOTeleporter extends Teleporter {
 			}
 		}
 
-		return pos;
+		//Prefer portals without a saved receiving frame
+		return posWithoutReceivingFrame == null ? pos : posWithoutReceivingFrame;
 	}
 
 	public static void register() {
