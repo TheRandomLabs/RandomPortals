@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import com.google.common.collect.Sets;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
@@ -222,6 +223,17 @@ public class RPOSavedData extends WorldSavedData {
 
 	public NetherPortal removeNetherPortalByTopLeft(BlockPos topLeft) {
 		return removeNetherPortal(frame -> topLeft.equals(frame.getTopLeft()));
+	}
+
+	public void addGeneratedNetherPortalFrame(BlockPos framePos, PortalType portalType) {
+		generatedNetherPortalFrames.merge(
+				portalType.toString(),
+				Sets.newHashSet(framePos),
+				(a, b) -> {
+					a.addAll(b);
+					return a;
+				}
+		);
 	}
 
 	public PortalType getGeneratedNetherPortalType(BlockPos framePos) {

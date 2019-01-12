@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
+import com.therandomlabs.randomportals.api.netherportal.FunctionType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
@@ -29,7 +30,7 @@ public final class NetherPortalTeleportHandler {
 	public static void setPortal(Entity entity, @Nullable NetherPortal portal, BlockPos pos) {
 		final World world = entity.getEntityWorld();
 
-		if(portal != null && portal.isDecorative()) {
+		if(portal != null && portal.getFunctionType() != FunctionType.NORMAL) {
 			return;
 		}
 

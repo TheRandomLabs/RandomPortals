@@ -50,13 +50,17 @@ public final class RPOConfig {
 
 		@Config.RangeDouble(min = 0.0, max = 1.0)
 		@Config.LangKey("randomportals.config.endPortals.frameHeadVillagerSpawnChance")
-		@Config.Comment("The chance that a villager spawns with a vertical End portal frame on " +
-				"their head.")
+		@Config.Comment(
+				"The chance that a villager spawns with a vertical End portal frame on " +
+						"their head."
+		)
 		public double frameHeadVillagerSpawnChance = RandomPatches.IS_DEOBFUSCATED ? 0.5 : 0.01;
 
 		@Config.LangKey("randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads")
-		@Config.Comment("Whether players can right click villagers with vertical End portals to " +
-				"put them on their heads.")
+		@Config.Comment(
+				"Whether players can right click villagers with vertical End portals to " +
+						"put them on their heads."
+		)
 		public boolean rightClickVillagersToConvertToFrameHeads = true;
 	}
 
@@ -74,8 +78,10 @@ public final class RPOConfig {
 		public boolean coloredPortals = true;
 
 		@Config.LangKey("randomportals.config.netherPortals.consumeDyesEvenIfInvalidColor")
-		@Config.Comment("Whether portals should consume dyes even if they are an invalid color " +
-				"(as defined by the Nether portal type).")
+		@Config.Comment(
+				"Whether portals should consume dyes even if they are invalid colors " +
+						"(as defined by the Nether portal type)."
+		)
 		public boolean consumeDyesEvenIfInvalidColor;
 
 		@Config.LangKey("randomportals.config.netherPortals.consumeDyesEvenIfSameColor")
@@ -88,13 +94,18 @@ public final class RPOConfig {
 
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.enabled")
-		@Config.Comment("Enables lateral Nether portals and a variety of Nether portal tweaks.")
+		@Config.Comment(
+				"Enables lateral Nether portals, custom portal types and a variety of " +
+						"Nether portal tweaks and improvements."
+		)
 		public boolean enabled = true;
 
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.forceCreateVanillaType")
-		@Config.Comment("Whether to always create the \"vanilla_nether_portal\" Nether portal " +
-				"type when it doesn't exist.")
+		@Config.Comment(
+				"Whether to always create the \"vanilla_nether_portal\" Nether portal " +
+						"type when it doesn't exist."
+		)
 		public boolean forceCreateVanillaType = true;
 
 		@Config.LangKey("randomportals.config.netherPortals.persistentReceivingPortals")
