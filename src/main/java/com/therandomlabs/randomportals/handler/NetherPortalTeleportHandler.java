@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.therandomlabs.randomportals.api.config.PortalType;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
@@ -15,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,8 +29,17 @@ public final class NetherPortalTeleportHandler {
 	public static void setPortal(Entity entity, @Nullable NetherPortal portal, BlockPos pos) {
 		final World world = entity.getEntityWorld();
 
-		if(!world.getMinecraftServer().getAllowNether()) {
+		if(portal != null && portal.isDecorative()) {
 			return;
+		}
+
+		if(!world.getMinecraftServer().getAllowNether()) {
+			final PortalType type =
+					portal == null ? PortalTypes.getDefault(world) : portal.getType();
+
+			if(type.destination.dimensionID == DimensionType.NETHER.getId()) {
+				return;
+			}
 		}
 
 		if(entity.timeUntilPortal > 0) {

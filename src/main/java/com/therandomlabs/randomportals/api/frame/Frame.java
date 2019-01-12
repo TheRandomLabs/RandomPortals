@@ -63,8 +63,8 @@ public class Frame {
 		this.width = width;
 		this.height = height;
 
-		widthDirection = type.rightDownLeftUp[0];
-		heightDirection = type.rightDownLeftUp[1];
+		widthDirection = type.getWidthDirection();
+		heightDirection = type.getHeightDirection();
 
 		this.topLeft = topLeft;
 

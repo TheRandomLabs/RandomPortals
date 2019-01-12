@@ -10,6 +10,8 @@ public final class PortalType {
 	public DestinationData destination = new DestinationData();
 	public TeleportationDelay teleportationDelay = new TeleportationDelay();
 
+	public boolean decorative;
+
 	public transient PortalTypeGroup group;
 	public transient int dimensionID;
 

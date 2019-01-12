@@ -49,6 +49,14 @@ public enum FrameType {
 		this.vertical = vertical;
 	}
 
+	public EnumFacing getWidthDirection() {
+		return rightDownLeftUp[0];
+	}
+
+	public EnumFacing getHeightDirection() {
+		return rightDownLeftUp[1];
+	}
+
 	public EnumFacing.Axis getAxis() {
 		return axis;
 	}

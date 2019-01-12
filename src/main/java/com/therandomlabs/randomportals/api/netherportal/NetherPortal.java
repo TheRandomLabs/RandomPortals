@@ -11,17 +11,29 @@ public final class NetherPortal {
 	private final Frame frame;
 	private Frame receivingFrame;
 	private String typeID;
+	private FunctionType functionType;
 
 	public NetherPortal(Frame frame, Frame receivingFrame, PortalType type) {
+		this(frame, receivingFrame, type, null);
+	}
+
+	public NetherPortal(Frame frame, Frame receivingFrame, PortalType type,
+			FunctionType functionType) {
 		this.frame = frame;
 		this.receivingFrame = receivingFrame;
 		typeID = type.toString();
+
+		if(functionType == null) {
+			this.functionType = type.decorative ? FunctionType.DECORATIVE : FunctionType.NORMAL;
+		} else {
+			this.functionType = functionType;
+		}
 	}
 
 	@Override
 	public String toString() {
 		return "NetherPortal[frame=" + frame + ",receivingFrame=" + receivingFrame +
-				",typeID=" + typeID + "]";
+				",typeID=" + typeID + ",functionType=" + functionType + "]";
 	}
 
 	@Nullable
@@ -47,5 +59,18 @@ public final class NetherPortal {
 		final PortalType type = PortalTypes.getSpecific(typeID);
 		typeID = type.toString();
 		return type;
+	}
+
+	@Nonnull
+	public FunctionType getFunctionType() {
+		return functionType;
+	}
+
+	public void setFunctionType(FunctionType type) {
+		functionType = type;
+
+		if(frame != null) {
+			RPOSavedData.get(frame.getWorld()).markDirty();
+		}
 	}
 }

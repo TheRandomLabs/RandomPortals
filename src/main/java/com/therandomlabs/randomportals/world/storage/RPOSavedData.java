@@ -5,12 +5,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.EndPortalEvent;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
+import com.therandomlabs.randomportals.api.netherportal.FunctionType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,13 +26,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 
 public class RPOSavedData extends WorldSavedData {
-	public static final String ID = "randomportals";
+	public static final String ID = RandomPortals.MOD_ID;
 
 	public static final String NETHER_PORTALS_KEY = "NetherPortals";
 
 	public static final String FRAME_KEY = "Frame";
 	public static final String RECEIVING_FRAME_KEY = "ReceivingFrame";
 	public static final String PORTAL_TYPE_KEY = "PortalType";
+	public static final String FUNCTION_TYPE_KEY = "FunctionType";
 
 	public static final String FRAME_TYPE_KEY = "FrameType";
 	public static final String TOP_LEFT_KEY = "TopLeft";
@@ -42,6 +45,7 @@ public class RPOSavedData extends WorldSavedData {
 	public static final String END_PORTALS_KEY = "EndPortals";
 
 	private static final FrameType[] TYPES = FrameType.values();
+	private static final FunctionType[] FUNCTION_TYPES = FunctionType.values();
 
 	private static World currentWorld;
 
@@ -80,7 +84,12 @@ public class RPOSavedData extends WorldSavedData {
 
 			final PortalType type = PortalTypes.getSpecific(compound.getString(PORTAL_TYPE_KEY));
 
-			netherPortals.put(frame.getTopLeft(), new NetherPortal(frame, receivingFrame, type));
+			final FunctionType functionType =
+					FUNCTION_TYPES[compound.getInteger(FUNCTION_TYPE_KEY)];
+
+			netherPortals.put(frame.getTopLeft(), new NetherPortal(
+					frame, receivingFrame, type, functionType
+			));
 		}
 
 		final NBTTagCompound compound = nbt.getCompoundTag(GENERATED_NETHER_PORTAL_FRAMES_KEY);
@@ -124,6 +133,7 @@ public class RPOSavedData extends WorldSavedData {
 			compound.setTag(FRAME_KEY, frame);
 			compound.setTag(RECEIVING_FRAME_KEY, receivingFrame);
 			compound.setString(PORTAL_TYPE_KEY, portal.getType().toString());
+			compound.setInteger(FUNCTION_TYPE_KEY, portal.getFunctionType().ordinal());
 
 			netherPortalList.appendTag(compound);
 		}

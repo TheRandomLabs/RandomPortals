@@ -1,14 +1,18 @@
 package com.therandomlabs.randomportals.world;
 
+import java.util.List;
 import com.therandomlabs.randompatches.integration.RPIStaticConfig;
 import com.therandomlabs.randompatches.integration.world.RPITeleporter;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
+import com.therandomlabs.randomportals.api.config.DestinationData;
+import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
+import com.therandomlabs.randomportals.api.netherportal.FunctionType;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
 import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
@@ -264,8 +268,6 @@ public class RPOTeleporter extends Teleporter {
 		return true;
 	}
 
-	//My attempt to decipher the black magic that is Teleporter.makePortal
-	//TODO rewrite, use information from PortalType.destination
 	/*
 	Looking for the closest suitable location to place a portal, within 16 blocks horizontally
 	(but any distance vertically) of the player's destination coordinates. A valid location is
@@ -285,22 +287,199 @@ public class RPOTeleporter extends Teleporter {
 	Overworld). When a portal is forced in this way, a 2*3 platform of obsidian with air 3 high
 	above is created at the target location, overwriting whatever might be there.
 	*/
-	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean makePortal(Entity entity) {
-		double distance = -1.0;
+		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
+		PortalType portalType = data.getPortalType();
 
-		final int x = MathHelper.floor(entity.posX);
-		final int y = MathHelper.floor(entity.posY);
-		final int z = MathHelper.floor(entity.posZ);
+		final Frame frame = data.getFrame();
 
-		int portalX = x;
-		int portalY = y;
-		int portalZ = z;
+		final FrameType type;
 
-		int unknownI = 0;
-		final int randomInt = random.nextInt(4);
+		final int width;
+		final int height;
 
+		if(frame == null || portalType.destination.portalGenerationBehavior !=
+				DestinationData.PortalGenerationBehavior.CLONE) {
+			final List<FrameType> types = portalType.destination.generatedFrameType.getTypes();
+			type = types.get(random.nextInt(types.size()));
+
+			final FrameSize size = portalType.destination.generatedFrameSize.get(type);
+
+			if(size.minWidth == size.maxWidth) {
+				width = size.maxWidth;
+			} else {
+				width = random.nextInt(size.maxWidth + 1 - size.minWidth) + size.minWidth;
+			}
+
+			if(size.minHeight == size.maxHeight) {
+				height = size.maxHeight;
+			} else {
+				height = random.nextInt(size.maxHeight + 1 - size.minHeight) + size.minHeight;
+			}
+		} else {
+			type = frame.getType();
+			width = frame.getWidth();
+			height = frame.getHeight();
+		}
+
+		boolean oneWay = portalType.destination.oneWay;
+
+		if(portalType.destination.portalGenerationBehavior ==
+				DestinationData.PortalGenerationBehavior.USE_RECEIVING_DIMENSION_PORTAL_TYPE) {
+			portalType = portalType.group.getType(portalType.destination.dimensionID);
+		}
+
+		final int platformLength = type == FrameType.LATERAL ? height : 3;
+		final int spaceHeight = type == FrameType.LATERAL ? 2 : height;
+
+		final int fallbackWidth = width == 3 ? 3 : 4;
+		final int fallbackLength = 1;
+		final int fallbackSpaceHeight = type == FrameType.LATERAL ? 2 : 4;
+
+		final int x = (int) entity.posX;
+		final int z = (int) entity.posZ;
+
+		int portalX = 0;
+		int portalY = 0;
+		int portalZ = 0;
+
+		double distanceSq = -1.0;
+
+		int fallbackX = 0;
+		int fallbackY = 0;
+		int fallbackZ = 0;
+
+		double fallbackDistanceSq = -1.0;
+
+		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+		for(int checkX = x - 16; checkX <= x + 16; checkX++) {
+			final double xDistance = checkX + 0.5 - entity.posX;
+
+			for(int checkZ = z - 16; checkZ <= z + 16; checkZ++) {
+				final double zDistance = checkZ + 0.5 - entity.posZ;
+
+				for(int checkY = world.getActualHeight() - 1; checkY >= 0; checkY--) {
+					//Check for space above the platform first
+					if(!world.isAirBlock(pos.setPos(checkX, checkY, checkZ))) {
+						continue;
+					}
+
+					//Find the highest air block with a non-air block below it
+					while(checkY > 0 && world.isAirBlock(pos.setPos(checkX, checkY - 1, checkZ))) {
+						checkY--;
+					}
+
+					final double yDistance = checkY + 0.5 - entity.posY;
+					final double newDistance = xDistance * xDistance +
+							yDistance * yDistance +
+							zDistance * zDistance;
+
+					if(distanceSq != 1.0 && newDistance > distanceSq) {
+						continue;
+					}
+
+					boolean valid = isValidPortalPosition(
+							pos, checkX, checkY, checkZ, width, platformLength,
+							spaceHeight, type
+					);
+
+					if(!valid && distanceSq == -1.0) {
+						valid = isValidPortalPosition(
+								pos, checkX, checkY, checkZ, fallbackWidth, fallbackLength,
+								fallbackSpaceHeight, type
+						);
+
+						if(valid &&
+								(fallbackDistanceSq == -1.0 || newDistance < fallbackDistanceSq)) {
+							fallbackDistanceSq = newDistance;
+							fallbackX = checkX;
+							fallbackY = checkY;
+							fallbackZ = checkZ;
+						}
+
+						continue;
+					}
+
+					distanceSq = newDistance;
+					portalX = checkX;
+					portalY = checkY;
+					portalZ = checkZ;
+				}
+			}
+		}
+
+		if(distanceSq == -1.0 && fallbackDistanceSq != -1.0) {
+			portalX = fallbackX;
+			portalY = fallbackY;
+			portalZ = fallbackZ;
+		}
+
+		//portalX, portalY, portalZ point to the bottom left of the frame, so we offset the
+		//position in type.getHeightDirection()
+		final BlockPos topLeft = new BlockPos(portalX, portalY, portalZ).
+				offset(type.getHeightDirection(), height - 1);
+
+		final Frame newFrame = new Frame(world, type, topLeft, width, height);
+
+		for(BlockPos framePos : newFrame.getFrameBlockPositions()) {
+			final int index = random.nextInt(portalType.frame.blocks.size());
+			world.setBlockState(framePos, portalType.frame.blocks.get(index).getActualState(), 2);
+		}
+
+		final IBlockState air = Blocks.AIR.getDefaultState();
+
+		for(BlockPos innerPos : newFrame.getInnerBlockPositions()) {
+			world.setBlockState(innerPos, air, 2);
+		}
+
+		//We offset the position once in type.getWidthDirection() and type.getHeightDirection()
+		//because NetherPortalActivator only works with inner blocks
+		final BlockPos activationPos =
+				topLeft.offset(type.getWidthDirection()).offset(type.getHeightDirection());
+
+		new NetherPortalActivator().
+				forcePortalType(portalType).
+				setUserCreated(false).
+				setFunctionType(oneWay ? FunctionType.ONE_WAY : null).
+				activate(world, activationPos, null);
+
+		return true;
+	}
+
+	public boolean isValidPortalPosition(BlockPos.MutableBlockPos pos, int x, int y, int z,
+			int platformWidth, int platformLength, int spaceHeight, FrameType type) {
+		//checkY - 1 should now be the platform
+		//Ensure the platform (size platformWidth * platformHeight) is solid
+		for(int widthOffset = 0; widthOffset < platformWidth; widthOffset++) {
+			for(int lengthOffset = 0; lengthOffset < platformLength; lengthOffset++) {
+				final int offsetX;
+				final int offsetZ;
+
+				if(type == FrameType.VERTICAL_Z) {
+					offsetX = x + lengthOffset;
+					offsetZ = z + widthOffset;
+				} else {
+					offsetX = x + widthOffset;
+					offsetZ = z + lengthOffset;
+				}
+
+				if(world.isAirBlock(pos.setPos(offsetX, y - 1, offsetZ))) {
+					return false;
+				}
+
+				for(int yOffset = 0; yOffset < spaceHeight; yOffset++) {
+					if(!world.isAirBlock(pos.setPos(offsetX, y + yOffset, offsetZ))) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+	/*
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
 		for(int checkX = x - 16; checkX <= x + 16; checkX++) {
@@ -506,7 +685,7 @@ public class RPOTeleporter extends Teleporter {
 		);
 
 		return true;
-	}
+	}*/
 
 	@Override
 	public void placeEntity(World world, Entity entity, float yaw) {
@@ -519,13 +698,18 @@ public class RPOTeleporter extends Teleporter {
 		return false;
 	}
 
+	//TODO use MutableBlockPos
 	private BlockPos findExistingPortal(RPOSavedData savedData, Entity entity, String groupID) {
+		final String defaultGroupID = PortalTypes.getDefaultGroup().toString();
+
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
 
 		BlockPos pos = null;
-		BlockPos posWithoutReceivingFrame = null;
 		double distanceSq = -1.0;
+
+		BlockPos preferedPos = null;
+		double preferedDistanceSq = -1.0;
 
 		for(int xOffset = -128; xOffset <= 128; xOffset++) {
 			BlockPos checkPos;
@@ -543,23 +727,31 @@ public class RPOTeleporter extends Teleporter {
 					if(PortalBlockRegistry.isPortal(world, portalPos)) {
 						final NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
-						if(portal != null && groupID.equals(portal.getType().group.toString())) {
-							for(checkPos = portalPos.down();
-								PortalBlockRegistry.isPortal(world, checkPos);
-								checkPos = checkPos.down()) {
-								portalPos = checkPos;
-							}
+						if(portal != null && portal.getFunctionType() == FunctionType.ONE_WAY) {
+							continue;
+						}
 
-							final double newDistance = portalPos.distanceSq(entityPos);
+						if((portal != null && !groupID.equals(portal.getType().group.toString())) ||
+								(portal == null && !groupID.equals(defaultGroupID))) {
+							continue;
+						}
 
-							if(distanceSq == -1.0 || newDistance < distanceSq) {
-								distanceSq = newDistance;
-								pos = portalPos;
+						for(checkPos = portalPos.down();
+							PortalBlockRegistry.isPortal(world, checkPos);
+							checkPos = checkPos.down()) {
+							portalPos = checkPos;
+						}
 
-								if(portal.getReceivingFrame() == null) {
-									posWithoutReceivingFrame = pos;
-								}
-							}
+						final double newDistance = portalPos.distanceSq(entityPos);
+
+						if(distanceSq == -1.0 || newDistance < distanceSq) {
+							distanceSq = newDistance;
+							pos = portalPos;
+						}
+
+						if(portal.getReceivingFrame() == null &&
+								(preferedDistanceSq == -1.0 || newDistance < preferedDistanceSq)) {
+							preferedPos = pos;
 						}
 					}
 				}
@@ -567,7 +759,7 @@ public class RPOTeleporter extends Teleporter {
 		}
 
 		//Prefer portals without a saved receiving frame
-		return posWithoutReceivingFrame == null ? pos : posWithoutReceivingFrame;
+		return preferedPos == null ? pos : preferedPos;
 	}
 
 	public static void register() {

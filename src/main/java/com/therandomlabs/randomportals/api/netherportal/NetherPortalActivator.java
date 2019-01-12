@@ -41,6 +41,7 @@ public class NetherPortalActivator {
 	private boolean userCreated = true;
 	private boolean activatedByFire;
 	private boolean activationDelayed;
+	private FunctionType functionType;
 
 	public PortalType getForcedPortalType() {
 		return forcePortalType;
@@ -100,6 +101,15 @@ public class NetherPortalActivator {
 
 	public NetherPortalActivator setActivationDelayed(boolean flag) {
 		activationDelayed = flag;
+		return this;
+	}
+
+	public FunctionType getFunctionType() {
+		return functionType;
+	}
+
+	public NetherPortalActivator setFunctionType(FunctionType type) {
+		functionType = type;
 		return this;
 	}
 
@@ -248,7 +258,7 @@ public class NetherPortalActivator {
 		}
 
 		if(forcePortalType != null) {
-			return new NetherPortal(frame, null, forcePortalType);
+			return new NetherPortal(frame, null, forcePortalType, functionType);
 		}
 
 		final List<PortalType> types;
@@ -270,7 +280,7 @@ public class NetherPortalActivator {
 			if((!activatedByFire || type.activation.canBeActivatedByFire) && type.test(frame) &&
 					(forcePortalType != null || activator == null ||
 							type.testActivator(activator))) {
-				return new NetherPortal(frame, null, type);
+				return new NetherPortal(frame, null, type, functionType);
 			}
 		}
 
