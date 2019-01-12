@@ -296,6 +296,9 @@ public class RPOTeleporter extends Teleporter {
 		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
 		PortalType portalType = data.getPortalType();
 
+		final boolean clone = portalType.destination.portalGenerationBehavior ==
+				DestinationData.PortalGenerationBehavior.CLONE;
+
 		final Frame frame = data.getFrame();
 
 		final FrameType type;
@@ -303,8 +306,7 @@ public class RPOTeleporter extends Teleporter {
 		final int width;
 		final int height;
 
-		if(frame == null || portalType.destination.portalGenerationBehavior !=
-				DestinationData.PortalGenerationBehavior.CLONE) {
+		if(frame == null || !clone) {
 			final List<FrameType> types = portalType.destination.generatedFrameType.getTypes();
 			type = types.get(random.nextInt(types.size()));
 
@@ -473,9 +475,36 @@ public class RPOTeleporter extends Teleporter {
 
 		final Frame newFrame = new Frame(world, type, topLeft, width, height);
 
+		if(clone) {
+			final List<IBlockState> sendingFrameBlocks = frame.getFrameBlocks();
+			final List<BlockPos> framePositions = newFrame.getFrameBlockPositions();
+
+			for(int i = 0; i < framePositions.size(); i++) {
+				world.setBlockState(framePositions.get(i), sendingFrameBlocks.get(i), 2);
+			}
+
+			final List<IBlockState> sendingInnerBlocks = frame.getInnerBlocks();
+			final List<BlockPos> innerPositions = newFrame.getInnerBlockPositions();
+
+			for(int i = 0; i < innerPositions.size(); i++) {
+				world.setBlockState(innerPositions.get(i), sendingInnerBlocks.get(i), 2);
+			}
+
+			final NetherPortal portal = new NetherPortal(
+					newFrame, frame, portalType, oneWay ? FunctionType.ONE_WAY : null
+			);
+
+			RPOSavedData.get(world).addNetherPortal(portal, false);
+
+			return true;
+		}
+
 		for(BlockPos framePos : newFrame.getFrameBlockPositions()) {
 			final int index = random.nextInt(portalType.frame.blocks.size());
-			world.setBlockState(framePos, portalType.frame.blocks.get(index).getActualState(), 2);
+
+			world.setBlockState(
+					framePos, portalType.frame.blocks.get(index).getActualState(), 2
+			);
 		}
 
 		for(BlockPos innerPos : newFrame.getInnerBlockPositions()) {
@@ -491,7 +520,8 @@ public class RPOTeleporter extends Teleporter {
 				forcePortalType(portalType).
 				setUserCreated(false).
 				setFunctionType(oneWay ? FunctionType.ONE_WAY : null).
-				activate(world, activationPos, null);
+				activate(world, activationPos, null).
+				setReceivingFrame(frame);
 
 		return true;
 	}

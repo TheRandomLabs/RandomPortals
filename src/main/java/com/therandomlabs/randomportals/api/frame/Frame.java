@@ -1,7 +1,7 @@
 package com.therandomlabs.randomportals.api.frame;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -247,7 +247,8 @@ public class Frame {
 			getLeftBlockPositions();
 
 			//Each corner is in two lists, so we use a set to remove duplicates
-			final Set<BlockPos> frameBlocks = new HashSet<>(
+			//The order should be preserved so frames can be modified consistently
+			final Set<BlockPos> frameBlocks = new LinkedHashSet<>(
 					topBlocks.size() + rightBlocks.size() + bottomBlocks.size() +
 							leftBlocks.size() - 4
 			);
