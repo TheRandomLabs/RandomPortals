@@ -22,7 +22,6 @@ public final class PortalType {
 		return group + ":" + dimensionID;
 	}
 
-	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		frame.ensureCorrect();
 		activation.ensureCorrect();

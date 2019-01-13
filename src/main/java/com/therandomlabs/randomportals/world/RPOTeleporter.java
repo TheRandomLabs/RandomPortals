@@ -531,6 +531,17 @@ public class RPOTeleporter extends Teleporter {
 		return true;
 	}
 
+	@Override
+	public void placeEntity(World world, Entity entity, float yaw) {
+		placeInPortal(entity, yaw);
+		NetherPortalTeleportHandler.clearTeleportData(entity);
+	}
+
+	@Override
+	public boolean isVanilla() {
+		return false;
+	}
+
 	@SuppressWarnings("Duplicates")
 	public boolean isValidPortalPosition(BlockPos.MutableBlockPos pos, int x, int y, int z,
 			int platformWidth, int platformLength, int spaceHeight, FrameType type) {
@@ -563,17 +574,6 @@ public class RPOTeleporter extends Teleporter {
 		}
 
 		return true;
-	}
-
-	@Override
-	public void placeEntity(World world, Entity entity, float yaw) {
-		placeInPortal(entity, yaw);
-		NetherPortalTeleportHandler.clearTeleportData(entity);
-	}
-
-	@Override
-	public boolean isVanilla() {
-		return false;
 	}
 
 	public BlockPos findExistingPortal(RPOSavedData savedData, Entity entity, String groupID,
@@ -630,7 +630,7 @@ public class RPOTeleporter extends Teleporter {
 							pos = portalPos;
 						}
 
-						if(portal.getReceivingFrame() == null &&
+						if((portal == null || portal.getReceivingFrame()) == null &&
 								(preferedDistanceSq == -1.0 || newDistance < preferedDistanceSq)) {
 							preferedPos = pos;
 						}

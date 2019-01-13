@@ -59,11 +59,11 @@ public class NetherPortalActivator {
 	public NetherPortalActivator setPortalTypes(PortalType... portalTypes) {
 		if(portalTypes.length == 0) {
 			portalTypes = null;
-		}
-
-		for(PortalType type : portalTypes) {
-			if(type == null) {
-				throw new NullPointerException("portalTypes");
+		} else {
+			for(PortalType type : portalTypes) {
+				if(type == null) {
+					throw new NullPointerException("portalTypes");
+				}
 			}
 		}
 
