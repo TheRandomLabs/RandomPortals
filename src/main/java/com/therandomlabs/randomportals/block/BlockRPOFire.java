@@ -1,6 +1,7 @@
 package com.therandomlabs.randomportals.block;
 
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
+import com.therandomlabs.randomportals.handler.NetherPortalActivationHandler;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
@@ -23,7 +24,9 @@ public class BlockRPOFire extends BlockFire {
 
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if(PORTAL_ACTIVATOR.activate(world, pos, null) != null) {
+		if(PORTAL_ACTIVATOR.
+				setPlayer(NetherPortalActivationHandler.getPotentialFireActivator(pos)).
+				activate(world, pos, null) != null) {
 			return;
 		}
 

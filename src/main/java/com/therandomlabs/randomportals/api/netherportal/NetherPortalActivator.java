@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypeGroup;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
@@ -21,10 +22,14 @@ import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,6 +47,7 @@ public class NetherPortalActivator {
 	private boolean activatedByFire;
 	private boolean activationDelayed;
 	private FunctionType functionType;
+	private EntityPlayer player;
 
 	public PortalType getForcedPortalType() {
 		return forcePortalType;
@@ -110,6 +116,15 @@ public class NetherPortalActivator {
 
 	public NetherPortalActivator setFunctionType(FunctionType type) {
 		functionType = type;
+		return this;
+	}
+
+	public EntityPlayer getPlayer() {
+		return player;
+	}
+
+	public NetherPortalActivator setPlayer(EntityPlayer player) {
+		this.player = player;
 		return this;
 	}
 
@@ -207,11 +222,11 @@ public class NetherPortalActivator {
 		}
 
 		final NetherPortal result = event.getPortal();
-		onActivate(world, result, portalBlocks);
+		onActivate(world, result, pos, portalBlocks);
 		return result;
 	}
 
-	protected void onActivate(World world, NetherPortal portal,
+	protected void onActivate(World world, NetherPortal portal, BlockPos pos,
 			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
 		RPOSavedData.get(world).addNetherPortal(portal, userCreated);
 
@@ -248,6 +263,27 @@ public class NetherPortalActivator {
 			for(BlockPos portalPos : portalPositions) {
 				world.setBlockState(portalPos, state, 2);
 			}
+		}
+
+		final PortalType portalType = portal.getType();
+		final SoundEvent[] sounds = portalType.activation.getActivationSoundEvents();
+
+		if(sounds.length != 0) {
+			world.playSound(
+					null,
+					pos,
+					sounds[world.rand.nextInt(sounds.length)],
+					SoundCategory.BLOCKS,
+					1.0F,
+					world.rand.nextFloat() * 0.4F + 0.8F
+			);
+		}
+
+		if(player != null &&
+				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
+			RPOCriteriaTriggers.ACTIVATED_NETHER_PORTAL.trigger(
+					(EntityPlayerMP) player, frame.getType(), frame.getSize()
+			);
 		}
 	}
 

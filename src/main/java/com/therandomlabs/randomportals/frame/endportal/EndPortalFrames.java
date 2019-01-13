@@ -62,7 +62,7 @@ public final class EndPortalFrames {
 	public static final ImmutableMap<EnumFacing, FrameDetector> VERTICAL;
 
 	public static final FrameDetector VERTICAL_INWARDS_FACING =
-			new VerticalInwardsEndPortalFrameDetector();
+			new VerticalInwardsEndPortalDetector();
 
 	static {
 		final EnumMap<EnumFacing, FrameDetector> vertical = new EnumMap<>(EnumFacing.class);

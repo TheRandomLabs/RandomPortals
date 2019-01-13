@@ -14,8 +14,8 @@ import net.minecraft.util.math.BlockPos;
 import static net.minecraft.block.BlockEndPortalFrame.EYE;
 import static net.minecraft.block.BlockHorizontal.FACING;
 
-public final class VerticalInwardsEndPortalFrameDetector extends SidedFrameDetector {
-	VerticalInwardsEndPortalFrameDetector() {
+public final class VerticalInwardsEndPortalDetector extends SidedFrameDetector {
+	VerticalInwardsEndPortalDetector() {
 		super(FrameType.VERTICAL);
 	}
 

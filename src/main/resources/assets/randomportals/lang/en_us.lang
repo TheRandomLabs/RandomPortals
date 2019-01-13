@@ -77,5 +77,5 @@ commands.rporeload.success=RandomPortals configuration reloaded!
 commands.rporeloadclient.usage=/rporeloadclient
 commands.rporeloadclient.success=RandomPortals client-sided configuration reloaded!
 
-advancements.nether.activate_lateral_portal.title=Activate Lateral Portal
+advancements.nether.activate_lateral_portal.title=Fat Portal
 advancements.nether.activate_lateral_portal.description=Activate a lateral Nether portal at least 100 blocks large (including the frame blocks)

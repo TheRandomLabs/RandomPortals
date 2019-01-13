@@ -1,23 +1,20 @@
 package com.therandomlabs.randomportals.handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
+import java.util.Map;
 import com.therandomlabs.randomportals.api.config.ActivationData;
-import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
-import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -40,6 +37,7 @@ public final class NetherPortalActivationHandler {
 	private static final NetherPortalActivator PORTAL_ACTIVATOR =
 			new NetherPortalActivator().setActivationDelayed(true);
 
+	private static final Map<BlockPos, EntityPlayer> potentialFirePositions = new HashMap<>();
 	private static final List<DelayedActivation> delayedActivations = new ArrayList<>();
 
 	@SubscribeEvent
@@ -49,6 +47,11 @@ public final class NetherPortalActivationHandler {
 		final BlockPos pos = event.getPos();
 		final EntityPlayer player = event.getEntityPlayer();
 		final EnumFacing face = event.getFace();
+		final BlockPos portalPos = pos.offset(face);
+
+		if(stack.getItem() == Items.FLINT_AND_STEEL) {
+			potentialFirePositions.put(portalPos, player);
+		}
 
 		if(!PortalTypes.getValidActivators().test(stack) ||
 				!PortalTypes.getValidBlocks().test(world, pos, world.getBlockState(pos)) ||
@@ -56,7 +59,6 @@ public final class NetherPortalActivationHandler {
 			return;
 		}
 
-		final BlockPos portalPos = pos.offset(face);
 		final NetherPortal portal = PORTAL_ACTIVATOR.activate(world, portalPos, stack);
 
 		if(portal == null) {
@@ -70,9 +72,7 @@ public final class NetherPortalActivationHandler {
 			return;
 		}
 
-		final PortalType portalType = portal.getType();
-
-		final ActivationData activation = portalType.activation;
+		final ActivationData activation = portal.getType().activation;
 		final ActivationData.ConsumeBehavior behavior = activation.activatorConsumeBehavior;
 
 		if(!player.capabilities.isCreativeMode) {
@@ -81,27 +81,6 @@ public final class NetherPortalActivationHandler {
 			} else if(behavior == ActivationData.ConsumeBehavior.DAMAGE) {
 				stack.damageItem(1, player);
 			}
-		}
-
-		final SoundEvent[] sounds = activation.getActivationSoundEvents();
-
-		if(sounds.length != 0) {
-			world.playSound(
-					null,
-					pos,
-					sounds[world.rand.nextInt(sounds.length)],
-					SoundCategory.BLOCKS,
-					1.0F,
-					world.rand.nextFloat() * 0.4F + 0.8F
-			);
-		}
-
-		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
-			final Frame frame = portal.getFrame();
-
-			RPOCriteriaTriggers.ACTIVATED_NETHER_PORTAL.trigger(
-					(EntityPlayerMP) player, frame.getType(), frame.getSize()
-			);
 		}
 
 		if(activation.spawnFireBeforeActivating) {
@@ -137,8 +116,13 @@ public final class NetherPortalActivationHandler {
 	@SubscribeEvent
 	public static void onServerTick(TickEvent.ServerTickEvent event) {
 		if(event.phase == TickEvent.Phase.END) {
+			potentialFirePositions.clear();
 			delayedActivations.clear();
 		}
+	}
+
+	public static EntityPlayer getPotentialFireActivator(BlockPos pos) {
+		return potentialFirePositions.get(pos);
 	}
 
 	public static void queueDelayedActivation(World world, List<BlockPos> portalPositions,
