@@ -24,7 +24,7 @@ public final class RandomPortals {
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
 	public static final String DEPENDENCIES =
-			"required-after:rpintegration@[1.12.2-1.1.0.0,);before:movingworld";
+			"required-after:randompatches@[1.12.2-1.12.0.0,);before:movingworld";
 	public static final String UPDATE_JSON =
 			"https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";

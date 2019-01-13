@@ -2,8 +2,8 @@ package com.therandomlabs.randomportals.world;
 
 import java.util.Collections;
 import java.util.List;
-import com.therandomlabs.randompatches.integration.RPIStaticConfig;
-import com.therandomlabs.randompatches.integration.world.RPITeleporter;
+import com.therandomlabs.randompatches.common.RPTeleporter;
+import com.therandomlabs.randompatches.config.RPStaticConfig;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.DestinationData;
@@ -644,11 +644,11 @@ public class RPOTeleporter extends Teleporter {
 	}
 
 	public static void register() {
-		if(RPIStaticConfig.replaceTeleporter) {
-			RPITeleporter.setTeleporter(RPOTeleporter.class);
+		if(RPStaticConfig.replaceTeleporter) {
+			RPTeleporter.setTeleporter(RPOTeleporter.class);
 		} else {
 			RandomPortals.LOGGER.error(
-					"RandomPatches Integration's Teleporter replacement has been disabled. " +
+					"RandomPatches' Teleporter replacement has been disabled. " +
 							"This will cause issues with Nether portal teleportation."
 			);
 		}

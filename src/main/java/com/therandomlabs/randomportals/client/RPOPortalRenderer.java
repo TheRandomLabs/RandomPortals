@@ -1,7 +1,7 @@
 package com.therandomlabs.randomportals.client;
 
-import com.therandomlabs.randompatches.integration.RPIStaticConfig;
-import com.therandomlabs.randompatches.integration.patch.GuiIngamePatch;
+import com.therandomlabs.randompatches.config.RPStaticConfig;
+import com.therandomlabs.randompatches.patch.client.GuiIngamePatch;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.block.BlockLateralNetherPortal;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
@@ -110,8 +110,8 @@ public final class RPOPortalRenderer {
 	}
 
 	public static void register() {
-		if(RPIStaticConfig.replacePortalRenderer) {
-			GuiIngamePatch.setRenderer(RPOPortalRenderer::render);
+		if(RPStaticConfig.replacePortalRenderer) {
+			GuiIngamePatch.setPortalRenderer(RPOPortalRenderer::render);
 		} else {
 			RandomPortals.LOGGER.error(
 					"RandomPatches Integration's portal renderer replacement has been disabled. " +
