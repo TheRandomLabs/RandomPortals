@@ -79,3 +79,5 @@ commands.rporeloadclient.success=RandomPortals client-sided configuration reload
 
 advancements.nether.activate_lateral_portal.title=Fat Portal
 advancements.nether.activate_lateral_portal.description=Activate a lateral Nether portal at least 100 blocks large (including the frame blocks)
+advancements.nether.dye_nether_portal.title=Evil Portal
+advancements.nether.dye_nether_portal.description=Dye a Nether portal red

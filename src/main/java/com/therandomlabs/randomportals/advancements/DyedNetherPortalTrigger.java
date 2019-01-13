@@ -14,22 +14,21 @@ import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionInstance;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 
-public class ActivatedNetherPortalTrigger
-		implements ICriterionTrigger<ActivatedNetherPortalTrigger.Instance> {
+public class DyedNetherPortalTrigger
+		implements ICriterionTrigger<DyedNetherPortalTrigger.Instance> {
 	public static final class Instance extends AbstractCriterionInstance {
-		private final FrameType type;
-		private final int size;
+		private final EnumDyeColor color;
 
-		public Instance(FrameType type, int size) {
+		public Instance(EnumDyeColor color) {
 			super(ID);
-			this.type = type;
-			this.size = size;
+			this.color = color;
 		}
 
-		public boolean test(FrameType type, int size) {
-			return this.type.test(type) && size >= this.size;
+		public boolean test(EnumDyeColor color) {
+			return this.color == color;
 		}
 	}
 
@@ -53,9 +52,9 @@ public class ActivatedNetherPortalTrigger
 			listeners.remove(listener);
 		}
 
-		public void trigger(FrameType type, int size) {
+		public void trigger(EnumDyeColor color) {
 			listeners.stream().
-					filter(listener -> listener.getCriterionInstance().test(type, size)).
+					filter(listener -> listener.getCriterionInstance().test(color)).
 					forEach(listener -> listener.grantCriterion(advancements));
 		}
 	}
@@ -97,20 +96,19 @@ public class ActivatedNetherPortalTrigger
 	@Override
 	public Instance deserializeInstance(JsonObject object, JsonDeserializationContext context) {
 		return new Instance(
-				FrameType.valueOf(object.get("type").getAsString().toUpperCase(Locale.ROOT)),
-				object.get("size").getAsInt()
+				EnumDyeColor.valueOf(object.get("color").getAsString().toUpperCase(Locale.ROOT))
 		);
 	}
 
-	public void trigger(EntityPlayerMP player, FrameType type, int size) {
+	public void trigger(EntityPlayerMP player, EnumDyeColor color) {
 		final Listeners listeners = this.listeners.get(player.getAdvancements());
 
 		if(listeners != null) {
-			listeners.trigger(type, size);
+			listeners.trigger(color);
 		}
 	}
 
 	public static void register() {
-		CriteriaTriggers.register(new ActivatedNetherPortalTrigger());
+		CriteriaTriggers.register(new DyedNetherPortalTrigger());
 	}
 }

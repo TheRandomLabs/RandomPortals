@@ -9,6 +9,7 @@ import java.util.Random;
 import com.google.common.collect.ImmutableList;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
+import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.ColorData;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.PortalType;
@@ -37,6 +38,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
@@ -347,15 +349,14 @@ public class BlockNetherPortal extends BlockPortal {
 
 		//Don't call findFrame because this method is called every tick an entity is in a portal
 		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(pos);
+		final PortalType portalType =
+				portal == null ? PortalTypes.getDefault(world) : portal.getType();
 
 		if(newColor != null) {
-			final PortalType type =
-					portal == null ? PortalTypes.getDefault(world) : portal.getType();
-
-			if(type.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
+			if(portalType.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
 				newColor = null;
-			} else if(type.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
-					!ArrayUtils.contains(type.color.colors, newColor)) {
+			} else if(portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
+					!ArrayUtils.contains(portalType.color.colors, newColor)) {
 				if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor) {
 					world.removeEntity(dyeEntity);
 					return;
@@ -404,6 +405,15 @@ public class BlockNetherPortal extends BlockPortal {
 		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Dye.Post(
 				world, portal, dyedPortalPositions, color, newColor
 		));
+
+		final String thrower = dyeEntity.getThrower();
+
+		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID) &&
+				thrower != null) {
+			final EntityPlayerMP player =
+					world.getMinecraftServer().getPlayerList().getPlayerByUsername(thrower);
+			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger(player, newColor);
+		}
 	}
 
 	@Override
