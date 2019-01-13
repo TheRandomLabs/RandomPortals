@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.frame.FrameType;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionInstance;
@@ -56,6 +56,7 @@ public class ActivatedNetherPortalTrigger
 		public void trigger(FrameType type, int size) {
 			listeners.stream().
 					filter(listener -> listener.getCriterionInstance().test(type, size)).
+					collect(Collectors.toList()). //Avoid ConcurrentModificationException
 					forEach(listener -> listener.grantCriterion(advancements));
 		}
 	}
@@ -108,9 +109,5 @@ public class ActivatedNetherPortalTrigger
 		if(listeners != null) {
 			listeners.trigger(type, size);
 		}
-	}
-
-	public static void register() {
-		CriteriaTriggers.register(new ActivatedNetherPortalTrigger());
 	}
 }

@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.therandomlabs.randomportals.RandomPortals;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionInstance;
@@ -54,6 +54,7 @@ public class DyedNetherPortalTrigger
 		public void trigger(EnumDyeColor color) {
 			listeners.stream().
 					filter(listener -> listener.getCriterionInstance().test(color)).
+					collect(Collectors.toList()). //Avoid ConcurrentModificationException
 					forEach(listener -> listener.grantCriterion(advancements));
 		}
 	}
@@ -105,9 +106,5 @@ public class DyedNetherPortalTrigger
 		if(listeners != null) {
 			listeners.trigger(color);
 		}
-	}
-
-	public static void register() {
-		CriteriaTriggers.register(new DyedNetherPortalTrigger());
 	}
 }
