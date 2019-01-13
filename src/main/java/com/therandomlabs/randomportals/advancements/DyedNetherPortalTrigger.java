@@ -8,7 +8,6 @@ import java.util.Set;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.therandomlabs.randomportals.RandomPortals;
-import com.therandomlabs.randomportals.api.frame.FrameType;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
@@ -60,7 +59,7 @@ public class DyedNetherPortalTrigger
 	}
 
 	private static final ResourceLocation ID =
-			new ResourceLocation(RandomPortals.MOD_ID, "activated_nether_portal");
+			new ResourceLocation(RandomPortals.MOD_ID, "dyed_nether_portal");
 
 	private final Map<PlayerAdvancements, Listeners> listeners = new HashMap<>();
 
