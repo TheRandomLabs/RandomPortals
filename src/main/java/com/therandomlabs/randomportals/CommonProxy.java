@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import com.elytradev.movingworld.MovingWorldMod;
 import com.elytradev.movingworld.common.config.priority.AssemblePriorityConfig;
 import com.therandomlabs.randompatches.util.RPUtils;
+import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
@@ -55,6 +56,8 @@ public class CommonProxy {
 		} catch(IOException ex) {
 			RPUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
+
+		RPOCriteriaTriggers.register();
 	}
 
 	private void handleMovingWorld() throws NoSuchFieldException, IllegalAccessException {

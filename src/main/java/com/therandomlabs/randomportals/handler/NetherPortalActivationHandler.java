@@ -2,12 +2,16 @@ package com.therandomlabs.randomportals.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.ActivationData;
+import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
+import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortal;
 import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -66,7 +70,9 @@ public final class NetherPortalActivationHandler {
 			return;
 		}
 
-		final ActivationData activation = portal.getType().activation;
+		final PortalType portalType = portal.getType();
+
+		final ActivationData activation = portalType.activation;
 		final ActivationData.ConsumeBehavior behavior = activation.activatorConsumeBehavior;
 
 		if(!player.capabilities.isCreativeMode) {
@@ -87,6 +93,14 @@ public final class NetherPortalActivationHandler {
 					SoundCategory.BLOCKS,
 					1.0F,
 					world.rand.nextFloat() * 0.4F + 0.8F
+			);
+		}
+
+		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
+			final Frame frame = portal.getFrame();
+
+			RPOCriteriaTriggers.ACTIVATED_NETHER_PORTAL.trigger(
+					(EntityPlayerMP) player, frame.getType(), frame.getSize()
 			);
 		}
 

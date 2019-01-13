@@ -268,8 +268,14 @@ public class NetherPortalActivator {
 			types = new ArrayList<>();
 
 			for(PortalTypeGroup group : PortalTypes.getGroups().values()) {
-				if(group.testActivationDimensionID(dimensionID)) {
-					types.addAll(group.types.values());
+				final PortalType type = group.types.get(dimensionID);
+
+				if(type == null) {
+					if(group.testActivationDimensionID(dimensionID)) {
+						types.add(group.types.get(group.defaultDimensionID));
+					}
+				} else {
+					types.add(type);
 				}
 			}
 		} else {

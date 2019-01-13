@@ -25,6 +25,7 @@ public class Frame {
 
 	private final int width;
 	private final int height;
+	private final int size;
 
 	private final EnumFacing widthDirection;
 	private final EnumFacing heightDirection;
@@ -66,6 +67,7 @@ public class Frame {
 
 		this.width = width;
 		this.height = height;
+		size = width * height;
 
 		widthDirection = type.getWidthDirection();
 		heightDirection = type.getHeightDirection();
@@ -127,6 +129,10 @@ public class Frame {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public int getSize() {
+		return size;
 	}
 
 	public EnumFacing getWidthDirection() {
