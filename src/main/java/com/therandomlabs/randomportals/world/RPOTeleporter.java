@@ -272,25 +272,6 @@ public class RPOTeleporter extends Teleporter {
 		return true;
 	}
 
-	/*
-	Looking for the closest suitable location to place a portal, within 16 blocks horizontally
-	(but any distance vertically) of the player's destination coordinates. A valid location is
-	3*4 buildable blocks with air 4 high above all 12 blocks. When enough space is available,
-	the orientation of the portal is random. The closest valid position in 3D distance is always
-	picked.
-
-	A valid location exactly 3 wide in the shorter dimension may sometimes not be found, as the
-	check for a point fails if the first tried orientation wants that dimension to be 4 wide.
-	This is likely a bug.
-
-	If the first check for valid locations fails entirely, the check is redone looking for a
-	1*4 expanse of buildable blocks with air 4 high above each.
-
-	If that fails too, a portal is forced at the target coordinates, but with Y constrained to be
-	between 70 and 10 less than the world height (i.e. 118 for the Nether or 246 for the
-	Overworld). When a portal is forced in this way, a 2*3 platform of obsidian with air 3 high
-	above is created at the target location, overwriting whatever might be there.
-	*/
 	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean makePortal(Entity entity) {
