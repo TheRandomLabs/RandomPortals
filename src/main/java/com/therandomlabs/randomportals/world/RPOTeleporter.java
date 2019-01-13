@@ -630,7 +630,7 @@ public class RPOTeleporter extends Teleporter {
 							pos = portalPos;
 						}
 
-						if((portal == null || portal.getReceivingFrame()) == null &&
+						if((portal == null || portal.getReceivingFrame() == null) &&
 								(preferedDistanceSq == -1.0 || newDistance < preferedDistanceSq)) {
 							preferedPos = pos;
 						}
