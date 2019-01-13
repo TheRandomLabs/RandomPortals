@@ -27,6 +27,10 @@ public final class FrameData {
 
 	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
+		if(type == FrameType.SAME) {
+			type = FrameType.LATERAL_OR_VERTICAL;
+		}
+
 		size.ensureCorrect();
 
 		final List<RegistryNameAndMeta> checkedBlocks = new ArrayList<>();

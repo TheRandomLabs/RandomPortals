@@ -33,7 +33,8 @@ public enum FrameType {
 	),
 	LATERAL_OR_VERTICAL(null, null, null, null, null, false),
 	LATERAL_OR_VERTICAL_X(null, null, null, null, null, false),
-	LATERAL_OR_VERTICAL_Z(null, null, null, null, null, false);
+	LATERAL_OR_VERTICAL_Z(null, null, null, null, null, false),
+	SAME(null, null, null, null, null, false);
 
 	final EnumFacing[] rightDownLeftUp;
 

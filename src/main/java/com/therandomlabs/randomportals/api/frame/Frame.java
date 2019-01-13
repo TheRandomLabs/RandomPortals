@@ -55,6 +55,10 @@ public class Frame {
 
 	private Frame(World world, FrameType type, BlockPos topLeft, BlockPos topRight,
 			BlockPos bottomLeft, BlockPos bottomRight, int width, int height) {
+		if(width < 3 || height < 3) {
+			throw new IllegalArgumentException("Frame cannot be smaller than 3 blocks");
+		}
+
 		this.world = world;
 		dimensionType = world.provider.getDimensionType();
 
