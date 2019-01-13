@@ -2,6 +2,7 @@ package com.therandomlabs.randomportals.world;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import com.therandomlabs.randompatches.common.RPTeleporter;
 import com.therandomlabs.randompatches.config.RPStaticConfig;
 import com.therandomlabs.randomportals.RPOConfig;
@@ -36,6 +37,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 
+//TODO don't set receiving portal if irrelevant dimension
 public class RPOTeleporter extends Teleporter {
 	public RPOTeleporter(WorldServer world) {
 		super(world);
@@ -193,9 +195,10 @@ public class RPOTeleporter extends Teleporter {
 					potentialFrame -> potentialFrame.isInnerBlock(required)
 			);
 		} else {
-			frame = BlockNetherPortal.findFrame(
+			final Map.Entry<Boolean, NetherPortal> entry = BlockNetherPortal.findFrame(
 					NetherPortalFrames.ACTIVATED_FRAMES, world, portalPos
-			).getValue().getFrame();
+			);
+			frame = entry == null ? null : entry.getValue().getFrame();
 		}
 
 		final double xOffset;
