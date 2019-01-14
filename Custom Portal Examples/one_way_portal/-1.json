@@ -1,0 +1,82 @@
+{
+	"frame": {
+		"type": "LATERAL_OR_VERTICAL",
+		"size": {
+			"lateral": {
+				"minWidth": 3,
+				"maxWidth": 2147483647,
+				"minHeight": 3,
+				"maxHeight": 2147483647
+			},
+			"verticalX": {
+				"minWidth": 3,
+				"maxWidth": 2147483647,
+				"minHeight": 3,
+				"maxHeight": 2147483647
+			},
+			"verticalZ": {
+				"minWidth": 3,
+				"maxWidth": 2147483647,
+				"minHeight": 3,
+				"maxHeight": 2147483647
+			}
+		},
+		"blocks": [
+			{
+				"registryName": "minecraft:sponge",
+				"meta": 32767,
+				"minimumAmount": 0
+			}
+		],
+		"requiredCorner": "ANY_NON_AIR",
+		"cornerBlocksContributeToMinimumAmount": true,
+		"doGeneratedFramesDrop": true
+	},
+	"activation": {
+		"canBeActivatedByFire": true,
+		"activators": [],
+		"activatorConsumeBehavior": "CONSUME",
+		"spawnFireBeforeActivating": true,
+		"activationSounds": []
+	},
+	"color": {
+		"colors": [
+			"RED"
+		],
+		"dyeBehavior": "ENABLE"
+	},
+	"destination": {
+		"dimensionID": 0,
+		"teleportToPortal": true,
+		"oneWay": true,
+		"generatePortalIfNotFound": true,
+		"portalGenerationBehavior": "CLONE",
+		"generatedFrameType": "VERTICAL",
+		"generatedFrameSize": {
+			"lateral": {
+				"minWidth": 4,
+				"maxWidth": 4,
+				"minHeight": 5,
+				"maxHeight": 5
+			},
+			"verticalX": {
+				"minWidth": 4,
+				"maxWidth": 4,
+				"minHeight": 5,
+				"maxHeight": 5
+			},
+			"verticalZ": {
+				"minWidth": 4,
+				"maxWidth": 4,
+				"minHeight": 5,
+				"maxHeight": 5
+			}
+		}
+	},
+	"teleportationDelay": {
+		"lateral": 0,
+		"verticalX": 0,
+		"verticalZ": 0
+	},
+	"decorative": false
+}
