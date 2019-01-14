@@ -37,4 +37,9 @@ public final class PortalType {
 	public boolean test(Frame frame) {
 		return this.frame.test(frame);
 	}
+
+	public int getDestinationDimensionID(int sendingDimensionID) {
+		return sendingDimensionID == destination.dimensionID ?
+				group.defaultDimensionID : destination.dimensionID;
+	}
 }

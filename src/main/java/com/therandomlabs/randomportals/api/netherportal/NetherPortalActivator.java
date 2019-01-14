@@ -308,7 +308,7 @@ public class NetherPortalActivator {
 
 				if(type == null) {
 					if(group.testActivationDimensionID(dimensionID)) {
-						types.add(group.types.get(group.defaultDimensionID));
+						types.add(group.getDefaultType());
 					}
 				} else {
 					types.add(type);

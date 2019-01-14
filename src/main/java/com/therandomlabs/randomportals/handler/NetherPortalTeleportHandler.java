@@ -169,10 +169,6 @@ public final class NetherPortalTeleportHandler {
 		}
 
 		teleportData.put(reference, data);
-
-		entity.changeDimension(
-				dimensionID == type.destination.dimensionID ?
-						type.group.defaultDimensionID : type.destination.dimensionID
-		);
+		entity.changeDimension(type.getDestinationDimensionID(dimensionID));
 	}
 }

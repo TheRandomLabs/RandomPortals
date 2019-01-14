@@ -41,6 +41,10 @@ public final class PortalTypeGroup {
 
 	public PortalType getType(int dimensionID) {
 		final PortalType type = types.get(dimensionID);
-		return type == null ? types.get(defaultDimensionID) : type;
+		return type == null ? getDefaultType() : type;
+	}
+
+	public PortalType getDefaultType() {
+		return types.get(defaultDimensionID);
 	}
 }

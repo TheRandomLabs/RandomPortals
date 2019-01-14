@@ -6,9 +6,11 @@ import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
+import net.minecraft.world.World;
 
 public final class NetherPortal {
 	private final Frame frame;
+	private final World world;
 	private Frame receivingFrame;
 	private String typeID;
 	private FunctionType functionType;
@@ -20,6 +22,7 @@ public final class NetherPortal {
 	public NetherPortal(Frame frame, Frame receivingFrame, PortalType type,
 			FunctionType functionType) {
 		this.frame = frame;
+		world = frame.getWorld();
 		this.receivingFrame = receivingFrame;
 		typeID = type.toString();
 
@@ -36,9 +39,14 @@ public final class NetherPortal {
 				",typeID=" + typeID + ",functionType=" + functionType + "]";
 	}
 
-	@Nullable
+	@Nonnull
 	public Frame getFrame() {
 		return frame;
+	}
+
+	@Nonnull
+	public World getWorld() {
+		return world;
 	}
 
 	@Nullable
@@ -48,10 +56,7 @@ public final class NetherPortal {
 
 	public void setReceivingFrame(Frame frame) {
 		receivingFrame = frame;
-
-		if(this.frame != null) {
-			RPOSavedData.get(this.frame.getWorld()).markDirty();
-		}
+		RPOSavedData.get(world).markDirty();
 	}
 
 	@Nonnull
@@ -68,9 +73,6 @@ public final class NetherPortal {
 
 	public void setFunctionType(FunctionType type) {
 		functionType = type;
-
-		if(frame != null) {
-			RPOSavedData.get(frame.getWorld()).markDirty();
-		}
+		RPOSavedData.get(world).markDirty();
 	}
 }

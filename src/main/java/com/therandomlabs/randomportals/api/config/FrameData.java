@@ -25,6 +25,7 @@ public final class FrameData {
 
 	public boolean doGeneratedFramesDrop = true;
 
+	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
 		if(type == FrameType.SAME) {
 			type = FrameType.LATERAL_OR_VERTICAL;

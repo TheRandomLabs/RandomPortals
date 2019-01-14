@@ -68,8 +68,7 @@ public final class PortalTypes {
 		final String[] split = StringUtils.split(id, ':');
 
 		if(split.length == 1) {
-			final PortalTypeGroup group = getGroup(id);
-			return group.types.get(group.defaultDimensionID);
+			return getGroup(id).getDefaultType();
 		}
 
 		return getGroup(split[0]).getType(Integer.parseInt(split[1]));

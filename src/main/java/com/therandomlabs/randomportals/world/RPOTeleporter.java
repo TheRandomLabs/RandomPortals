@@ -37,10 +37,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 
-//TODO don't set receiving portal if irrelevant dimension
 public class RPOTeleporter extends Teleporter {
+	private final int dimensionID;
+
 	public RPOTeleporter(WorldServer world) {
 		super(world);
+		dimensionID = world.provider.getDimension();
 	}
 
 	@Override
@@ -218,10 +220,13 @@ public class RPOTeleporter extends Teleporter {
 				}
 
 				if(receivingPortal != null) {
-					final Frame sendingFrame = sendingPortal.getFrame();
+					final int receivingDestination =
+							receivingPortal.getType().getDestinationDimensionID(dimensionID);
+					final int sendingDimensionID =
+							data.getSendingPortalWorld().provider.getDimension();
 
-					if(sendingFrame != null) {
-						receivingPortal.setReceivingFrame(sendingFrame);
+					if(receivingDestination == sendingDimensionID) {
+						receivingPortal.setReceivingFrame(sendingPortal.getFrame());
 					}
 				}
 			}
@@ -481,6 +486,10 @@ public class RPOTeleporter extends Teleporter {
 					offset(type == FrameType.VERTICAL_Z ? EnumFacing.EAST : EnumFacing.SOUTH);
 		}
 
+		final int receivingDestination = portalType.getDestinationDimensionID(dimensionID);
+		final int sendingDimensionID = data.getSendingPortalWorld().provider.getDimension();
+		final Frame receivingFrame = receivingDestination == sendingDimensionID ? frame : null;
+
 		final Frame newFrame = new Frame(world, type, topLeft, width, height);
 
 		if(clone) {
@@ -499,7 +508,7 @@ public class RPOTeleporter extends Teleporter {
 			}
 
 			final NetherPortal portal = new NetherPortal(
-					newFrame, frame, portalType, oneWay ? FunctionType.ONE_WAY : null
+					newFrame, receivingFrame, portalType, oneWay ? FunctionType.ONE_WAY : null
 			);
 
 			RPOSavedData.get(world).addNetherPortal(portal, false);
@@ -529,7 +538,7 @@ public class RPOTeleporter extends Teleporter {
 				setUserCreated(false).
 				setFunctionType(oneWay ? FunctionType.ONE_WAY : null).
 				activate(world, activationPos, null).
-				setReceivingFrame(frame);
+				setReceivingFrame(receivingFrame);
 
 		return true;
 	}

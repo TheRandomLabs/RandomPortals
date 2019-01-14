@@ -257,7 +257,7 @@ public class NetherPortalEvent extends Event {
 		private final NetherPortal portal;
 
 		public Remove(NetherPortal portal) {
-			super(portal.getFrame().getWorld(), portal.getFrame());
+			super(portal.getWorld(), portal.getFrame());
 			this.portal = portal;
 		}
 
