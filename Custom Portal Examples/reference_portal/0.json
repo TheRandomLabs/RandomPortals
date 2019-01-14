@@ -24,6 +24,10 @@
 			}
 		},
 		"blocks": [
+			//Note that RandomPortals automatically formats and ensures the correctness
+			//of these configuration files. For example,
+			//{"registryName":"leaves"}
+			//would expand to the following when loaded.
 			{
 				"registryName": "minecraft:leaves",
 				//32767 is the wildcard value.
