@@ -9,7 +9,8 @@ These are some custom portal type examples.
 `one_way_portal` defines a standard obsidian portal for the overworld, but when entered, the
 generated portal cannot be entered to return to the overworld. Instead, a separate sponge
 portal must be activated, and when entered, the generated sponge portal in the overworld
-cannot be entered to return to the Nether.
+cannot be entered to return to the Nether. You can see this portal type group in action
+[here](https://gfycat.com/FittingSecondaryHoiho).
 
 Note that `vanilla_nether_portal` only defines a portal type for the dimension with ID `0`.
 If a player goes through a vanilla Nether portal from the Nether, even though the destination
