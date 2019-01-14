@@ -293,8 +293,8 @@ public class RPOTeleporter extends Teleporter {
 
 		final FrameType type;
 
-		final int width;
-		final int height;
+		int width;
+		int height;
 
 		if(clone) {
 			type = frame.getType();
@@ -339,7 +339,6 @@ public class RPOTeleporter extends Teleporter {
 			portalType = portalType.group.getType(portalType.destination.dimensionID);
 		}
 
-		@SuppressWarnings("UnnecessaryLocalVariable")
 		final int platformWidth = width;
 		//Length is the shorter one because I couldn't be bothered to swap width and length
 		final int platformLength = type == FrameType.LATERAL ? height : 3;
@@ -470,6 +469,8 @@ public class RPOTeleporter extends Teleporter {
 				portalX = fallbackX;
 				portalY = fallbackY;
 				portalZ = fallbackZ;
+				width = 4;
+				height = 5;
 			}
 		}
 
