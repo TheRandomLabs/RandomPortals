@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.5.0.0": "Revamped the portal configuration system and teleportation logic. There are now many more options to configure, however, custom portal types created prior to this version are not compatible.\nRandomPortals no longer requires RandomPatches Integration.\nAdded advancements for activating a lateral Nether portal over 100 blocks large and dyeing a Nether portal red.\nMany bug fixes and improvements.",
 		"1.12.2-1.4.1.1": "Improved the configuration.",
 		"1.12.2-1.4.1.0": "Bug fixes and improvements.",
 		"1.12.2-1.4.0.0": "Added more portal events.\nRenamed \"nether_portal_types\" to \"portal_types\". Any preexisting portal types will be migrated to the new directory.\nMiscellaneous improvements.",
@@ -21,7 +22,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.4.1.1",
-		"1.12.2-recommended": "1.12.2-1.4.1.1"
+		"1.12.2-latest": "1.12.2-1.5.0.0",
+		"1.12.2-recommended": "1.12.2-1.5.0.0"
 	}
 }
