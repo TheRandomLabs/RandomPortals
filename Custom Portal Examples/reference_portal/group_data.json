@@ -4,6 +4,7 @@
 	"blacklistAllUndefinedActivationDimensions": false,
 	//An array of the IDs of the dimensions that portal types in this group cannot be activated
 	//in. If "blacklistAllUndefinedActivationDimensions" is set to true, this has no effect.
+	//Because this is empty, portal types in this group can be activated in any dimension.
 	"activationDimensionIDBlacklist": [],
 	//The default dimension ID. When RandomPortals cannot figure out which dimension to teleport
 	//to, this dimension ID is used. Note that a portal type *must* be defined for this dimension.
