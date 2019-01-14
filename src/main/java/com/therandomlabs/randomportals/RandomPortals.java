@@ -29,6 +29,7 @@ public final class RandomPortals {
 			"https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
 
+	public static final boolean CUBIC_CHUNKS_INSTALLED = Loader.isModLoaded("cubicchunks");
 	public static final boolean MOVINGWORLD_INSTALLED = Loader.isModLoaded("movingworld");
 
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);

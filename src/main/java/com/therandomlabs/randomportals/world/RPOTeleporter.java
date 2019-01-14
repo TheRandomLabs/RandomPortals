@@ -349,6 +349,7 @@ public class RPOTeleporter extends Teleporter {
 		final int fallbackSpaceHeight = type == FrameType.LATERAL ? 2 : 4;
 
 		final int entityX = (int) entity.posX;
+		final int entityY = (int) entity.posY;
 		final int entityZ = (int) entity.posZ;
 
 		int portalX = 0;
@@ -363,9 +364,21 @@ public class RPOTeleporter extends Teleporter {
 
 		double fallbackDistanceSq = -1.0;
 
+		final int minY;
+		final int maxY;
+
+		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
+			//https://github.com/OpenCubicChunks/CubicChunks/blob/MC_1.12/src/main/java/io/github/
+			//opencubicchunks/cubicchunks/core/asm/mixin/fixes/common/MixinTeleporter.java
+			minY = entityY - 128;
+			maxY = entityY + 128;
+		} else {
+			minY = 0;
+			maxY = world.getActualHeight();
+		}
+
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-		final int worldHeight = type == FrameType.LATERAL ?
-				world.getActualHeight() - 1 : world.getActualHeight() - height;
+		final int worldHeight = type == FrameType.LATERAL ? maxY - 1 : maxY - height;
 
 		for(int checkX = entityX - 16; checkX <= entityX + 16; checkX++) {
 			final double xDistance = checkX + 0.5 - entity.posX;
@@ -373,14 +386,15 @@ public class RPOTeleporter extends Teleporter {
 			for(int checkZ = entityZ - 16; checkZ <= entityZ + 16; checkZ++) {
 				final double zDistance = checkZ + 0.5 - entity.posZ;
 
-				for(int checkY = worldHeight; checkY >= 0; checkY--) {
+				for(int checkY = worldHeight; checkY >= minY; checkY--) {
 					//Check for space above the platform first
 					if(!world.isAirBlock(pos.setPos(checkX, checkY, checkZ))) {
 						continue;
 					}
 
 					//Find the highest air block with a non-air block below it
-					while(checkY > 0 && world.isAirBlock(pos.setPos(checkX, checkY - 1, checkZ))) {
+					while(checkY > minY &&
+							world.isAirBlock(pos.setPos(checkX, checkY - 1, checkZ))) {
 						checkY--;
 					}
 
@@ -433,7 +447,7 @@ public class RPOTeleporter extends Teleporter {
 		if(distanceSq == -1.0) {
 			if(fallbackDistanceSq == -1.0) {
 				portalX = entityX;
-				portalY = MathHelper.clamp((int) entity.posY, 70, world.getActualHeight() - 10);
+				portalY = MathHelper.clamp((int) entity.posY, 70, maxY - 10);
 				portalZ = entityZ;
 
 				for(int widthOffset = 0; widthOffset < platformWidth; widthOffset++) {
@@ -589,12 +603,26 @@ public class RPOTeleporter extends Teleporter {
 		return true;
 	}
 
+	@SuppressWarnings("Duplicates")
 	public BlockPos findExistingPortal(RPOSavedData savedData, Entity entity, String groupID,
 			boolean oneWay) {
 		final String defaultGroupID = PortalTypes.getDefaultGroup().toString();
 
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
+
+		final int minY;
+		final int maxY;
+
+		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
+			//https://github.com/OpenCubicChunks/CubicChunks/blob/MC_1.12/src/main/java/io/github/
+			//opencubicchunks/cubicchunks/core/asm/mixin/fixes/common/MixinTeleporter.java
+			minY = entityY - 128;
+			maxY = entityY + 128;
+		} else {
+			minY = 0;
+			maxY = world.getActualHeight();
+		}
 
 		BlockPos pos = null;
 		double distanceSq = -1.0;
@@ -608,11 +636,11 @@ public class RPOTeleporter extends Teleporter {
 			for(int zOffset = -128; zOffset <= 128; zOffset++) {
 				BlockPos portalPos = entityPos.add(
 						xOffset,
-						world.getActualHeight() - 1 - entityY,
+						maxY - 1 - entityY,
 						zOffset
 				);
 
-				for(; portalPos.getY() >= 0; portalPos = checkPos) {
+				for(; portalPos.getY() >= minY; portalPos = checkPos) {
 					checkPos = portalPos.down();
 
 					if(PortalBlockRegistry.isPortal(world, portalPos)) {
