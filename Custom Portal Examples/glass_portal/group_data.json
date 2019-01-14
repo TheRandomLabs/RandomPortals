@@ -1,0 +1,5 @@
+{
+	"blacklistAllUndefinedActivationDimensions": false,
+	"activationDimensionIDBlacklist": [],
+	"defaultDimensionID": 0
+}

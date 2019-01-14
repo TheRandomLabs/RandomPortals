@@ -1,0 +1,88 @@
+{
+	"frame": {
+		"type": "LATERAL_OR_VERTICAL",
+		"size": {
+			"lateral": {
+				"minWidth": 3,
+				"maxWidth": 2147483647,
+				"minHeight": 3,
+				"maxHeight": 2147483647
+			},
+			"verticalX": {
+				"minWidth": 3,
+				"maxWidth": 2147483647,
+				"minHeight": 3,
+				"maxHeight": 2147483647
+			},
+			"verticalZ": {
+				"minWidth": 3,
+				"maxWidth": 2147483647,
+				"minHeight": 3,
+				"maxHeight": 2147483647
+			}
+		},
+		"blocks": [
+			{
+				"registryName": "minecraft:leaves",
+				"meta": 32767,
+				"minimumAmount": 0
+			}
+		],
+		"requiredCorner": "SAME",
+		"cornerBlocksContributeToMinimumAmount": true,
+		"doGeneratedFramesDrop": true
+	},
+	"activation": {
+		"canBeActivatedByFire": true,
+		"activators": [],
+		"activatorConsumeBehavior": "CONSUME",
+		"spawnFireBeforeActivating": true,
+		"activationSounds": [
+			"minecraft:entity.wither.death"
+		]
+	},
+	"color": {
+		"colors": [
+			"GRAY",
+			"YELLOW",
+			"PURPLE",
+			"BLACK",
+			"RED"
+		],
+		"dyeBehavior": "ONLY_DEFINED_COLORS"
+	},
+	"destination": {
+		"dimensionID": 1,
+		"teleportToPortal": true,
+		"oneWay": false,
+		"generatePortalIfNotFound": true,
+		"portalGenerationBehavior": "CLONE",
+		"generatedFrameType": "VERTICAL",
+		"generatedFrameSize": {
+			"lateral": {
+				"minWidth": 4,
+				"maxWidth": 4,
+				"minHeight": 5,
+				"maxHeight": 5
+			},
+			"verticalX": {
+				"minWidth": 4,
+				"maxWidth": 4,
+				"minHeight": 5,
+				"maxHeight": 5
+			},
+			"verticalZ": {
+				"minWidth": 4,
+				"maxWidth": 4,
+				"minHeight": 5,
+				"maxHeight": 5
+			}
+		}
+	},
+	"teleportationDelay": {
+		"lateral": 0,
+		"verticalX": 0,
+		"verticalZ": 0
+	},
+	"decorative": false
+}

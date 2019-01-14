@@ -1,0 +1,11 @@
+{
+	//If this is true, portal types in this group can only be activated in the dimensions
+	//they are defined for (in this case, just the Overworld since we only have "0.json").
+	"blacklistAllUndefinedActivationDimensions": false,
+	//An array of the IDs of the dimensions that portal types in this group cannot be activated
+	//in. If "blacklistAllUndefinedActivationDimensions" is set to true, this has no effect.
+	"activationDimensionIDBlacklist": [],
+	//The default dimension ID. When RandomPortals cannot figure out which dimension to teleport
+	//to, this dimension ID is used. Note that a portal type *must* be defined for this dimension.
+	"defaultDimensionID": 0
+}
