@@ -39,12 +39,16 @@ public final class DestinationData {
 	}
 
 	public FrameSizeData getGeneratedFrameSize(@Nullable Frame frame) {
-		if(frame == null) {
-			return generatedFrameSize;
-		}
+		final int width;
+		final int height;
 
-		final int width = frame.getWidth();
-		final int height = frame.getHeight();
+		if(frame == null) {
+			width = 4;
+			height = 5;
+		} else {
+			width = frame.getWidth();
+			height = frame.getHeight();
+		}
 
 		final FrameSizeData newGeneratedFrameSize = new FrameSizeData();
 
