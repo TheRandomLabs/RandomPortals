@@ -234,7 +234,6 @@ public final class PortalTypes {
 				final PortalType type = RPOConfig.readJson(typePath, PortalType.class);
 
 				if(type == null) {
-					Files.delete(typePath);
 					continue;
 				}
 
