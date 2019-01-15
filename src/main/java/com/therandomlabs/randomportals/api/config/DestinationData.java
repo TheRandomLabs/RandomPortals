@@ -32,7 +32,11 @@ public final class DestinationData {
 		generatedFrameSize.verticalZ = new FrameSize(0, 0, 0, 0);
 	}
 
-	public void ensureCorrect() {}
+	public void ensureCorrect() {
+		ensureCorrect(generatedFrameSize.lateral);
+		ensureCorrect(generatedFrameSize.verticalX);
+		ensureCorrect(generatedFrameSize.verticalZ);
+	}
 
 	public FrameSizeData getGeneratedFrameSize(@Nullable Frame frame) {
 		if(frame == null) {
@@ -49,6 +53,32 @@ public final class DestinationData {
 		newGeneratedFrameSize.verticalZ = getSize(generatedFrameSize.verticalZ, width, height);
 
 		return newGeneratedFrameSize;
+	}
+
+	private void ensureCorrect(FrameSize size) {
+		if(size.minWidth < 3 && size.minWidth != 0) {
+			size.minWidth = 3;
+		}
+
+		if(size.maxWidth < 3) {
+			size.maxWidth = 3;
+		}
+
+		if(size.minHeight < 3 && size.minHeight != 0) {
+			size.minHeight = 3;
+		}
+
+		if(size.maxHeight < 3) {
+			size.maxHeight = 3;
+		}
+
+		if(size.minWidth != 0 && size.maxWidth != 0 && size.maxWidth < size.minWidth) {
+			size.maxWidth = size.minWidth;
+		}
+
+		if(size.minHeight != 0 && size.maxHeight != 0 && size.maxHeight < size.minHeight) {
+			size.maxHeight = size.minHeight;
+		}
 	}
 
 	private FrameSize getSize(FrameSize size, int width, int height) {

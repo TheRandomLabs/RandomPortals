@@ -340,7 +340,6 @@ public class RPOTeleporter extends Teleporter {
 		}
 
 		final int platformWidth = width;
-		//Length is the shorter one because I couldn't be bothered to swap width and length
 		final int platformLength = type == FrameType.LATERAL ? height : 3;
 		final int spaceHeight = type == FrameType.LATERAL ? 2 : height;
 
