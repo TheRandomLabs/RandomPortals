@@ -65,6 +65,10 @@ public final class RPOConfig {
 	}
 
 	public static final class Misc {
+		@Config.LangKey("randomportals.config.misc.advancements")
+		@Config.Comment("Whether to trigger advancements related to portals.")
+		public boolean advancements = true;
+
 		@Config.RequiresWorldRestart
 		@Config.LangKey("randomportals.config.misc.rporeloadCommand")
 		@Config.Comment("Enables the /rporeload command.")

@@ -279,7 +279,8 @@ public class NetherPortalActivator {
 			);
 		}
 
-		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
+		if(RPOConfig.misc.advancements &&
+				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
 			final EntityPlayerMP playerMP = (EntityPlayerMP) player;
 
 			RPOCriteriaTriggers.PORTALS.trigger(playerMP);

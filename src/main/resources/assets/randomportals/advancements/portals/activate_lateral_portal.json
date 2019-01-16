@@ -12,7 +12,7 @@
 		"frame": "challenge"
 	},
 	"rewards": {
-		"experience": 50
+		"experience": 5
 	},
 	"parent": "randomportals:portals/root",
 	"criteria": {

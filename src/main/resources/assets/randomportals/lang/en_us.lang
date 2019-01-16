@@ -11,6 +11,7 @@ randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads=Right c
 
 randomportals.config.misc=Miscellaneous
 randomportals.config.misc.tooltip=Options that don't fit into any other categories.
+randomportals.config.misc.advancements=Advancements
 randomportals.config.misc.rporeloadCommand=/rporeload
 
 randomportals.config.netherPortals=Nether Portals

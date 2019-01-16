@@ -413,7 +413,8 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final String thrower = dyeEntity.getThrower();
 
-		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID) &&
+		if(RPOConfig.misc.advancements &&
+				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID) &&
 				thrower != null) {
 			final EntityPlayerMP player =
 					world.getMinecraftServer().getPlayerList().getPlayerByUsername(thrower);
@@ -490,7 +491,8 @@ public class BlockNetherPortal extends BlockPortal {
 				world, portal, dyedPortalPositions, color, newColor, true
 		));
 
-		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
+		if(RPOConfig.misc.advancements &&
+				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
 			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger((EntityPlayerMP) player, newColor, true);
 		}
 
