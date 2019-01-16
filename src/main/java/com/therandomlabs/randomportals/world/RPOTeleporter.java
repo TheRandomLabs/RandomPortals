@@ -334,7 +334,6 @@ public class RPOTeleporter extends Teleporter {
 		return true;
 	}
 
-	@SuppressWarnings("Duplicates")
 	@Override
 	public boolean makePortal(Entity entity) {
 		final TeleportData data = NetherPortalTeleportHandler.getTeleportData(entity);
@@ -417,18 +416,9 @@ public class RPOTeleporter extends Teleporter {
 
 		double fallbackDistanceSq = -1.0;
 
-		final int minY;
-		final int maxY;
-
-		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
-			//https://github.com/OpenCubicChunks/CubicChunks/blob/MC_1.12/src/main/java/io/github/
-			//opencubicchunks/cubicchunks/core/asm/mixin/fixes/common/MixinTeleporter.java
-			minY = entityY - 128;
-			maxY = entityY + 128;
-		} else {
-			minY = 0;
-			maxY = world.getActualHeight();
-		}
+		final Tuple<Integer, Integer> yBounds = getYBounds(entityY);
+		final int minY = yBounds.getFirst();
+		final int maxY = yBounds.getSecond();
 
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		final int worldHeight = type == FrameType.LATERAL ? maxY - 1 : maxY - height;
@@ -555,23 +545,8 @@ public class RPOTeleporter extends Teleporter {
 		final Frame newFrame = new Frame(world, type, topLeft, width, height);
 
 		if(clone) {
-			final List<IBlockState> sendingFrameBlocks = frame.getFrameBlocks();
-			final List<BlockPos> framePositions = newFrame.getFrameBlockPositions();
-			final int framePositionsSize =
-					Math.min(framePositions.size(), sendingFrameBlocks.size());
-
-			for(int i = 0; i < framePositionsSize; i++) {
-				world.setBlockState(framePositions.get(i), sendingFrameBlocks.get(i), 2);
-			}
-
-			final List<IBlockState> sendingInnerBlocks = frame.getInnerBlocks();
-			final List<BlockPos> innerPositions = newFrame.getInnerBlockPositions();
-			final int innerPositionsSize =
-					Math.min(innerPositions.size(), sendingInnerBlocks.size());
-
-			for(int i = 0; i < innerPositionsSize; i++) {
-				world.setBlockState(innerPositions.get(i), sendingInnerBlocks.get(i), 2);
-			}
+			clone(newFrame.getFrameBlockPositions(), frame.getFrameBlocks());
+			clone(newFrame.getInnerBlockPositions(), frame.getInnerBlocks());
 
 			final NetherPortal portal = new NetherPortal(
 					newFrame, receivingFrame, portalType, oneWay ? FunctionType.ONE_WAY : null
@@ -647,7 +622,6 @@ public class RPOTeleporter extends Teleporter {
 		return true;
 	}
 
-	@SuppressWarnings("Duplicates")
 	public BlockPos findExistingPortal(RPOSavedData savedData, Entity entity, String groupID,
 			boolean oneWay) {
 		final String defaultGroupID = PortalTypes.getDefaultGroup().toString();
@@ -655,18 +629,9 @@ public class RPOTeleporter extends Teleporter {
 		final BlockPos entityPos = new BlockPos(entity);
 		final int entityY = entityPos.getY();
 
-		final int minY;
-		final int maxY;
-
-		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
-			//https://github.com/OpenCubicChunks/CubicChunks/blob/MC_1.12/src/main/java/io/github/
-			//opencubicchunks/cubicchunks/core/asm/mixin/fixes/common/MixinTeleporter.java
-			minY = entityY - 128;
-			maxY = entityY + 128;
-		} else {
-			minY = 0;
-			maxY = world.getActualHeight();
-		}
+		final Tuple<Integer, Integer> yBounds = getYBounds(entityY);
+		final int minY = yBounds.getFirst();
+		final int maxY = yBounds.getSecond();
 
 		BlockPos pos = null;
 		double distanceSq = -1.0;
@@ -745,6 +710,24 @@ public class RPOTeleporter extends Teleporter {
 					"RandomPatches' Teleporter replacement has been disabled. " +
 							"This will cause issues with Nether portal teleportation."
 			);
+		}
+	}
+
+	private Tuple<Integer, Integer> getYBounds(int referenceY) {
+		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
+			//https://github.com/OpenCubicChunks/CubicChunks/blob/MC_1.12/src/main/java/io/github/
+			//opencubicchunks/cubicchunks/core/asm/mixin/fixes/common/MixinTeleporter.java
+			return new Tuple<>(referenceY - 128, referenceY + 128);
+		}
+
+		return new Tuple<>(0, world.getActualHeight());
+	}
+
+	private void clone(List<BlockPos> newPositions, List<IBlockState> oldStates) {
+		final int size = Math.min(newPositions.size(), oldStates.size());
+
+		for(int i = 0; i < size; i++) {
+			world.setBlockState(newPositions.get(i), oldStates.get(i), 2);
 		}
 	}
 

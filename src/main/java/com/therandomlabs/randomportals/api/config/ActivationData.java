@@ -29,7 +29,7 @@ public final class ActivationData {
 
 	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
-		final List<RegistryNameAndMeta> items = new ArrayList<>();
+		final List<RegistryNameAndMeta> checkedItems = new ArrayList<>();
 
 		for(int i = 0; i < activators.size(); i++) {
 			final PortalActivator activator = activators.get(i);
@@ -37,12 +37,12 @@ public final class ActivationData {
 					activator.registryName, activator.meta
 			);
 
-			if(!activator.isValid() || items.contains(registryNameAndMeta)) {
+			if(!activator.isValid() || checkedItems.contains(registryNameAndMeta)) {
 				activators.remove(i--);
 				continue;
 			}
 
-			items.add(registryNameAndMeta);
+			checkedItems.add(registryNameAndMeta);
 		}
 
 		getActivationSoundEvents();
