@@ -2,6 +2,7 @@ package com.therandomlabs.randomportals.api.config;
 
 import com.therandomlabs.randomportals.api.frame.Frame;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.DimensionType;
 
 public final class PortalType {
 	public FrameData frame = new FrameData();
@@ -39,7 +40,13 @@ public final class PortalType {
 	}
 
 	public int getDestinationDimensionID(int sendingDimensionID) {
-		return sendingDimensionID == destination.dimensionID ?
+		final int id = sendingDimensionID == destination.dimensionID ?
 				group.defaultDimensionID : destination.dimensionID;
+
+		if(DimensionType.getById(id) == null) {
+			return sendingDimensionID == -1 ? 0 : -1;
+		}
+
+		return id;
 	}
 }

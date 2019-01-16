@@ -92,6 +92,13 @@ public final class RPOConfig {
 		@Config.Comment("Whether portals should be dyeable.")
 		public boolean dyeablePortals = true;
 
+		@Config.LangKey("randomportals.config.netherPortals.dyeableSinglePortalBlocks")
+		@Config.Comment({
+				"Whether single portal blocks can be dyed by right-clicking on them.",
+				"This property and the above are independent of each other."
+		})
+		public boolean dyeableSinglePortalBlocks = true;
+
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.enabled")
 		@Config.Comment(

@@ -4,24 +4,23 @@
 			"item": "minecraft:flint_and_steel"
 		},
 		"title": {
-			"translate": "advancements.nether.activate_lateral_portal.title"
+			"translate": "advancements.portals.activate_lateral_portal.title"
 		},
 		"description": {
-			"translate": "advancements.nether.activate_lateral_portal.description"
+			"translate": "advancements.portals.activate_lateral_portal.description"
 		},
-		"frame": "challenge",
-		"hidden": true
+		"frame": "challenge"
 	},
 	"rewards": {
 		"experience": 50
 	},
-	"parent": "minecraft:nether/root",
+	"parent": "randomportals:portals/root",
 	"criteria": {
 		"activated_lateral_nether_portal": {
 			"trigger": "randomportals:activated_nether_portal",
 			"conditions": {
 				"type": "lateral",
-				"size": 100
+				"size": 625
 			}
 		}
 	}

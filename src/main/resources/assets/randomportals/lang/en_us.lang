@@ -19,6 +19,7 @@ randomportals.config.netherPortals.coloredPortals=Colored portals
 randomportals.config.netherPortals.consumeDyesEvenIfInvalidColor=Consume dyes even if they are an invalid color
 randomportals.config.netherPortals.consumeDyesEvenIfSameColor=Consume dyes even if they are the same color
 randomportals.config.netherPortals.dyeablePortals=Dyeable portals
+randomportals.config.netherPortals.dyeableSinglePortalBlocks=Dyeable single portal blocks
 randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
 randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
@@ -73,11 +74,14 @@ tile.netherPortalLateralBlack.name=Black Lateral Nether Portal
 
 commands.rporeload.usage=/rporeload
 commands.rporeload.success=RandomPortals configuration reloaded!
+commands.rporeload.loadedPortalTypes=Loaded portal type groups: %s
 
 commands.rporeloadclient.usage=/rporeloadclient
 commands.rporeloadclient.success=RandomPortals client-sided configuration reloaded!
 
-advancements.nether.activate_lateral_portal.title=Fat Portal
-advancements.nether.activate_lateral_portal.description=Activate a lateral Nether portal at least 100 blocks large (including the frame blocks)
-advancements.nether.dye_nether_portal.title=Evil Portal
-advancements.nether.dye_nether_portal.description=Dye a Nether portal red
+advancements.portals.root.title=Portals
+advancements.portals.root.description=Shiny...
+advancements.portals.activate_lateral_portal.title=Fat Portal
+advancements.portals.activate_lateral_portal.description=Activate a lateral Nether portal at least 625 blocks large (including the frame blocks)
+advancements.portals.dye_nether_portal.title=Evil Portal
+advancements.portals.dye_nether_portal.description=Dye a Nether portal red by throwing in a Rose Red

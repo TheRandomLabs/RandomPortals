@@ -279,11 +279,16 @@ public class NetherPortalActivator {
 			);
 		}
 
-		if(player != null &&
-				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
-			RPOCriteriaTriggers.ACTIVATED_NETHER_PORTAL.trigger(
-					(EntityPlayerMP) player, frame.getType(), frame.getSize()
-			);
+		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
+			final EntityPlayerMP playerMP = (EntityPlayerMP) player;
+
+			RPOCriteriaTriggers.PORTALS.trigger(playerMP);
+
+			if(player != null) {
+				RPOCriteriaTriggers.ACTIVATED_NETHER_PORTAL.trigger(
+						playerMP, frame.getType(), frame.getSize()
+				);
+			}
 		}
 	}
 

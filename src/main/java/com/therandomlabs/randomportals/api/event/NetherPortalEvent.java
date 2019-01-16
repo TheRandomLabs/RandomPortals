@@ -194,7 +194,7 @@ public class NetherPortalEvent extends Event {
 		}
 	}
 
-	public static class Dye extends NetherPortalEvent {
+	public abstract static class Dye extends NetherPortalEvent {
 		@Cancelable
 		public static class Pre extends Dye {
 			private final EntityItem dyeEntity;
@@ -205,16 +205,30 @@ public class NetherPortalEvent extends Event {
 				this.dyeEntity = dyeEntity;
 			}
 
-			@Nonnull
+			@Nullable
 			public EntityItem getDyeEntity() {
 				return dyeEntity;
+			}
+
+			@Override
+			public boolean isRightClickSinglePortalBlock() {
+				return dyeEntity == null;
 			}
 		}
 
 		public static class Post extends Dye {
+			private final boolean rightClickSinglePortalBlock;
+
 			public Post(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
-					EnumDyeColor oldColor, EnumDyeColor newColor) {
+					EnumDyeColor oldColor, EnumDyeColor newColor,
+					boolean rightClickSinglePortalBlock) {
 				super(world, portal, dyedPortalPositions, oldColor, newColor);
+				this.rightClickSinglePortalBlock = rightClickSinglePortalBlock;
+			}
+
+			@Override
+			public boolean isRightClickSinglePortalBlock() {
+				return rightClickSinglePortalBlock;
 			}
 		}
 
@@ -251,6 +265,8 @@ public class NetherPortalEvent extends Event {
 		public EnumDyeColor getNewColor() {
 			return newColor;
 		}
+
+		public abstract boolean isRightClickSinglePortalBlock();
 	}
 
 	public static class Remove extends NetherPortalEvent {

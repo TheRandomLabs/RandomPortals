@@ -246,6 +246,7 @@ public final class PortalTypes {
 			}
 
 			if(group.isValid()) {
+				group.ensureCorrect();
 				types.put(id, group);
 			} else {
 				RandomPortals.LOGGER.error("Invalid portal type group: " + id);

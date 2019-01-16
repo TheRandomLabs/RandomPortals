@@ -1,0 +1,21 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:portal"
+        },
+        "title": {
+            "translate": "advancements.portals.root.title"
+        },
+        "description": {
+            "translate": "advancements.portals.root.description"
+        },
+        "background": "randomportals:textures/gui/advancements/backgrounds/portals.png",
+        "show_toast": false,
+        "announce_to_chat": false
+    },
+    "criteria": {
+        "entered_nether": {
+            "trigger": "randomportals:portals"
+        }
+    }
+}

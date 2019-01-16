@@ -1,6 +1,8 @@
 package com.therandomlabs.randomportals.api.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -9,22 +11,41 @@ public final class PortalTypeGroup {
 	public int[] activationDimensionIDBlacklist = new int[0];
 
 	public int defaultDimensionID;
+	//Chance that a zombie pigman spawns each tick is d in n, where d is the difficulty
+	//from 0 to 3 and n is the defined spawn rate
+	public Map<Integer, Integer> zombiePigmanSpawnRates = new HashMap<>();
 
 	public transient Map<Integer, PortalType> types = new HashMap<>();
 
 	transient String id = "unknown_portal";
 
-	public PortalTypeGroup() {}
+	public PortalTypeGroup() {
+		this(null);
+	}
 
 	public PortalTypeGroup(String id) {
 		if(id != null) {
 			this.id = id;
 		}
+
+		zombiePigmanSpawnRates.put(0, 2000);
 	}
 
 	@Override
 	public String toString() {
 		return id;
+	}
+
+	public void ensureCorrect() {
+		final List<Integer> toRemove = new ArrayList<>();
+
+		for(Map.Entry<Integer, Integer> entry : zombiePigmanSpawnRates.entrySet()) {
+			if(entry.getValue() < 1) {
+				toRemove.add(entry.getKey());
+			}
+		}
+
+		toRemove.forEach(zombiePigmanSpawnRates::remove);
 	}
 
 	public boolean isValid() {

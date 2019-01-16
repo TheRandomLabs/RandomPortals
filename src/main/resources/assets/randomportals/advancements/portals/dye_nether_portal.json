@@ -1,0 +1,23 @@
+{
+	"display": {
+		"icon": {
+			"item": "randomportals:red_vertical_nether_portal"
+		},
+		"title": {
+			"translate": "advancements.portals.dye_nether_portal.title"
+		},
+		"description": {
+			"translate": "advancements.portals.dye_nether_portal.description"
+		}
+	},
+	"parent": "randomportals:portals/root",
+	"criteria": {
+		"activated_lateral_nether_portal": {
+			"trigger": "randomportals:dyed_nether_portal",
+			"conditions": {
+				"color": "red",
+				"rightClickSinglePortalBlock": false
+			}
+		}
+	}
+}

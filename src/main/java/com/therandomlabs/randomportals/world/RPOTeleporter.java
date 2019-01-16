@@ -509,15 +509,19 @@ public class RPOTeleporter extends Teleporter {
 		if(clone) {
 			final List<IBlockState> sendingFrameBlocks = frame.getFrameBlocks();
 			final List<BlockPos> framePositions = newFrame.getFrameBlockPositions();
+			final int framePositionsSize =
+					Math.min(framePositions.size(), sendingFrameBlocks.size());
 
-			for(int i = 0; i < framePositions.size(); i++) {
+			for(int i = 0; i < framePositionsSize; i++) {
 				world.setBlockState(framePositions.get(i), sendingFrameBlocks.get(i), 2);
 			}
 
 			final List<IBlockState> sendingInnerBlocks = frame.getInnerBlocks();
 			final List<BlockPos> innerPositions = newFrame.getInnerBlockPositions();
+			final int innerPositionsSize =
+					Math.min(innerPositions.size(), sendingInnerBlocks.size());
 
-			for(int i = 0; i < innerPositions.size(); i++) {
+			for(int i = 0; i < innerPositionsSize; i++) {
 				world.setBlockState(innerPositions.get(i), sendingInnerBlocks.get(i), 2);
 			}
 

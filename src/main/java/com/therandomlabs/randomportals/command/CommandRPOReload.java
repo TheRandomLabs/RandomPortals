@@ -1,12 +1,14 @@
 package com.therandomlabs.randomportals.command;
 
 import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.api.config.PortalTypes;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.commons.lang3.StringUtils;
 
 public class CommandRPOReload extends CommandBase {
 	private final boolean isClient;
@@ -30,10 +32,18 @@ public class CommandRPOReload extends CommandBase {
 			throws CommandException {
 		RPOConfig.reloadFromDisk();
 
+		final String loadedPortalTypes = StringUtils.join(PortalTypes.getGroups().keySet(), ", ");
+
 		if(server != null && server.isDedicatedServer()) {
 			notifyCommandListener(sender, this, "commands.rporeload.success");
+			notifyCommandListener(
+					sender, this, "commands.rporeload.loadedPortalTypes", loadedPortalTypes
+			);
 		} else {
 			sender.sendMessage(new TextComponentTranslation("commands.rporeloadclient.success"));
+			sender.sendMessage(new TextComponentTranslation(
+					"commands.rporeload.loadedPortalTypes", loadedPortalTypes
+			));
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.therandomlabs.randomportals.api.config;
 
 import com.therandomlabs.randomportals.api.frame.FrameType;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 
 public final class TeleportationDelay {
@@ -24,5 +25,10 @@ public final class TeleportationDelay {
 
 	public int get(EnumFacing.Axis axis) {
 		return FrameType.get(axis, lateral, verticalX, verticalZ);
+	}
+
+	public int getMaxInPortalTime(EnumFacing.Axis axis, Entity entity) {
+		final int time = get(axis);
+		return time == 0 ? entity.getMaxInPortalTime() : time;
 	}
 }

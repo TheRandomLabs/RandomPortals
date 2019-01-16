@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
@@ -35,16 +36,20 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -403,7 +408,7 @@ public class BlockNetherPortal extends BlockPortal {
 		world.removeEntity(entity);
 
 		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Dye.Post(
-				world, portal, dyedPortalPositions, color, newColor
+				world, portal, dyedPortalPositions, color, newColor, false
 		));
 
 		final String thrower = dyeEntity.getThrower();
@@ -412,7 +417,128 @@ public class BlockNetherPortal extends BlockPortal {
 				thrower != null) {
 			final EntityPlayerMP player =
 					world.getMinecraftServer().getPlayerList().getPlayerByUsername(thrower);
-			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger(player, newColor);
+			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger(player, newColor, false);
+		}
+	}
+
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
+			EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
+			float hitZ) {
+		if(world.isRemote || !RPOConfig.netherPortals.dyeableSinglePortalBlocks) {
+			return false;
+		}
+
+		final ItemStack stack = player.getHeldItem(hand);
+
+		if(stack.getItem() != Items.DYE) {
+			return false;
+		}
+
+		final EnumDyeColor newColor = EnumDyeColor.byDyeDamage(stack.getMetadata());
+
+		if(color == newColor) {
+			if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor &&
+					!player.capabilities.isCreativeMode) {
+				stack.shrink(1);
+			}
+
+			return false;
+		}
+
+		final Map.Entry<Boolean, NetherPortal> entry = findFrame(world, pos);
+		final NetherPortal portal = entry == null ? null : entry.getValue();
+		final PortalType portalType =
+				portal == null ? PortalTypes.getDefault(world) : portal.getType();
+
+		if(portalType.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
+			return false;
+		}
+
+		if(portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
+				!ArrayUtils.contains(portalType.color.colors, newColor)) {
+			if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor &&
+					!player.capabilities.isCreativeMode) {
+				stack.shrink(1);
+			}
+
+			return false;
+		}
+
+		final List<BlockPos> dyedPortalPositions = Lists.newArrayList(pos);
+
+		final NetherPortalEvent.Dye.Pre event = new NetherPortalEvent.Dye.Pre(
+				world, portal, dyedPortalPositions, color, newColor, null
+		);
+
+		if(MinecraftForge.EVENT_BUS.post(event)) {
+			return false;
+		}
+
+		final IBlockState newState = getByColor(newColor).getDefaultState().
+				withProperty(AXIS, state.getValue(AXIS)).
+				withProperty(USER_PLACED, state.getValue(USER_PLACED));
+
+		world.setBlockState(pos, newState, 2);
+
+		if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor &&
+				!player.capabilities.isCreativeMode) {
+			stack.shrink(1);
+		}
+
+		MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Dye.Post(
+				world, portal, dyedPortalPositions, color, newColor, true
+		));
+
+		if(portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
+			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger((EntityPlayerMP) player, newColor, true);
+		}
+
+		return true;
+	}
+
+	@Override
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+		if(!world.getGameRules().getBoolean("doMobSpawning")) {
+			return;
+		}
+
+		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(pos);
+		final PortalType portalType =
+				portal == null ? PortalTypes.getDefault(world) : portal.getType();
+		final Integer spawnRate =
+				portalType.group.zombiePigmanSpawnRates.get(world.provider.getDimension());
+
+		if(spawnRate == null || random.nextInt(spawnRate) > world.getDifficulty().getId()) {
+			return;
+		}
+
+		final int minY = RandomPortals.CUBIC_CHUNKS_INSTALLED ? pos.getY() - 256 : 0;
+		boolean found = false;
+
+		while(pos.getY() > minY) {
+			pos = pos.down();
+
+			if(world.getBlockState(pos).isSideSolid(world, pos, EnumFacing.UP)) {
+				found = true;
+				break;
+			}
+		}
+
+		if(!found || world.getBlockState(pos.up()).isNormalCube()) {
+			return;
+		}
+
+		final Entity entity = ItemMonsterPlacer.spawnCreature(
+				world,
+				EntityList.getKey(EntityPigZombie.class),
+				pos.getX() + 0.5,
+				pos.getY() + 1.1,
+				pos.getZ() + 0.5
+		);
+
+		if(entity != null) {
+			entity.timeUntilPortal = entity.getPortalCooldown();
 		}
 	}
 
@@ -586,8 +712,8 @@ public class BlockNetherPortal extends BlockPortal {
 		return findFrame(NetherPortalFrames.FRAMES, world, portalPos);
 	}
 
-	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector,
-			World world, BlockPos portalPos) {
+	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector, World world,
+			BlockPos portalPos) {
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 

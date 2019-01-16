@@ -1,12 +1,14 @@
 package com.therandomlabs.randomportals.handler;
 
 import java.util.Random;
+import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortalFrame;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -64,6 +66,7 @@ public final class EndPortalActivationHandler {
 		if(EndPortalFrames.activate(world, pos) == null) {
 			event.setCancellationResult(EnumActionResult.FAIL);
 		} else {
+			RPOCriteriaTriggers.PORTALS.trigger((EntityPlayerMP) player);
 			event.setCancellationResult(EnumActionResult.SUCCESS);
 		}
 	}
