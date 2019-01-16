@@ -1,8 +1,6 @@
 package com.therandomlabs.randomportals.api.config;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -37,15 +35,10 @@ public final class PortalTypeGroup {
 	}
 
 	public void ensureCorrect() {
-		final List<Integer> toRemove = new ArrayList<>();
-
-		for(Map.Entry<Integer, Integer> entry : zombiePigmanSpawnRates.entrySet()) {
-			if(entry.getValue() < 1) {
-				toRemove.add(entry.getKey());
-			}
-		}
-
-		toRemove.forEach(zombiePigmanSpawnRates::remove);
+		zombiePigmanSpawnRates.entrySet().stream().
+				filter(entry -> entry.getValue() < 1).
+				map(Map.Entry::getKey).
+				forEach(zombiePigmanSpawnRates::remove);
 	}
 
 	public boolean isValid() {

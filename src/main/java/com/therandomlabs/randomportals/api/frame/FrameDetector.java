@@ -154,6 +154,7 @@ public abstract class FrameDetector {
 
 				checkPos = checkPos.offset(opposite);
 				checkState = getState(world, checkPos);
+
 				final BlockPos checkPos2 = checkPos.offset(previousFacing);
 				final IBlockState checkState2 = getState(world, checkPos2);
 
