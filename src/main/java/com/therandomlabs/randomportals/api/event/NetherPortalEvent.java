@@ -205,14 +205,14 @@ public class NetherPortalEvent extends Event {
 				this.dyeEntity = dyeEntity;
 			}
 
-			@Nullable
-			public EntityItem getDyeEntity() {
-				return dyeEntity;
-			}
-
 			@Override
 			public boolean isRightClickSinglePortalBlock() {
 				return dyeEntity == null;
+			}
+
+			@Nullable
+			public EntityItem getDyeEntity() {
+				return dyeEntity;
 			}
 		}
 
