@@ -162,8 +162,6 @@ public final class NetherPortalTeleportHandler {
 		entity.portalCounter = maxInPortalTime;
 		entity.timeUntilPortal = entity.getPortalCooldown();
 
-		data.getPortal(); //If portal is null, TeleportData tries to detect a portal
-
 		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport.Pre(entity, data))) {
 			return;
 		}
