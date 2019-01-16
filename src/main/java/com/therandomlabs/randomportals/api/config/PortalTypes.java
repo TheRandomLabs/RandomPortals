@@ -247,6 +247,7 @@ public final class PortalTypes {
 
 			if(group.isValid()) {
 				group.ensureCorrect();
+				RPOConfig.writeJson(groupPath, group);
 				types.put(id, group);
 			} else {
 				RandomPortals.LOGGER.error("Invalid portal type group: " + id);
