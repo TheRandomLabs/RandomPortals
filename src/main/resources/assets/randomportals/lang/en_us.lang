@@ -24,6 +24,7 @@ randomportals.config.netherPortals.dyeableSinglePortalBlocks=Dyeable single port
 randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
 randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
+randomportals.config.netherPortals.portalsContributeToBeaconColors=Portals contribute to beacon colors
 randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation=Replace user placed portals on activation
 
 itemGroup.portals=Portals

@@ -126,6 +126,10 @@ public final class RPOConfig {
 		})
 		public boolean persistentReceivingPortals = true;
 
+		@Config.LangKey("randomportals.config.netherPortals.portalsContributeToBeaconColors")
+		@Config.Comment("Whether portals contribute to beacon colors.")
+		public boolean portalsContributeToBeaconColors = true;
+
 		@Config.LangKey("randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation")
 		@Config.Comment({
 				"Whether user placed portals inside the frame of the same type as the " +

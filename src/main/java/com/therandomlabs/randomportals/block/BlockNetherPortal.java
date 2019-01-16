@@ -28,8 +28,10 @@ import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBeacon;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -568,6 +570,26 @@ public class BlockNetherPortal extends BlockPortal {
 		return new BlockStateContainer(this, AXIS, USER_PLACED);
 	}
 
+	@SuppressWarnings("deprecation")
+	@Override
+	public MapColor getMapColor(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return MapColor.getBlockColor(color);
+	}
+
+	@Override
+	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+		if(RPOConfig.netherPortals.portalsContributeToBeaconColors && !world.isRemote) {
+			BlockBeacon.updateColorAsync(world, pos);
+		}
+	}
+
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		if(RPOConfig.netherPortals.portalsContributeToBeaconColors && !world.isRemote) {
+			BlockBeacon.updateColorAsync(world, pos);
+		}
+	}
+
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
 			EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
@@ -672,7 +694,8 @@ public class BlockNetherPortal extends BlockPortal {
 	@Override
 	public float[] getBeaconColorMultiplier(IBlockState state, World world, BlockPos pos,
 			BlockPos beaconPos) {
-		return color.getColorComponentValues();
+		return RPOConfig.netherPortals.portalsContributeToBeaconColors ?
+				color.getColorComponentValues() : null;
 	}
 
 	public EnumFacing.Axis getEffectiveAxis(IBlockState state) {
