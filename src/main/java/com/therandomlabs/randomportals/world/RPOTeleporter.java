@@ -2,7 +2,6 @@ package com.therandomlabs.randomportals.world;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import com.therandomlabs.randompatches.common.RPTeleporter;
 import com.therandomlabs.randompatches.config.RPStaticConfig;
 import com.therandomlabs.randomportals.RPOConfig;
@@ -23,11 +22,13 @@ import com.therandomlabs.randomportals.block.BlockNetherPortal;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -197,15 +198,16 @@ public class RPOTeleporter extends Teleporter {
 					potentialFrame -> potentialFrame.isInnerBlock(required)
 			);
 		} else {
-			final Map.Entry<Boolean, NetherPortal> entry = BlockNetherPortal.findFrame(
+			final Tuple<Boolean, NetherPortal> entry = BlockNetherPortal.findFrame(
 					NetherPortalFrames.ACTIVATED_FRAMES, world, portalPos
 			);
-			frame = entry == null ? null : entry.getValue().getFrame();
+			frame = entry == null ? null : entry.getSecond().getFrame();
 		}
 
-		final double xOffset;
-		final double zOffset;
+		double xOffset;
+		double zOffset;
 		final EnumFacing forwards;
+		BlockPos teleportPos = portalPos;
 
 		if(frame == null) {
 			xOffset = 0.0;
@@ -232,30 +234,82 @@ public class RPOTeleporter extends Teleporter {
 			}
 
 			final FrameType type = frame.getType();
+			final int width = frame.getWidth();
+			final BlockPos bottomLeft = frame.getBottomLeft();
 
 			if(type.isVertical()) {
 				if(type == FrameType.VERTICAL_X) {
-					xOffset = frame.getWidth() / 2.0;
+					xOffset = width / 2.0;
 					zOffset = 0.75;
 					forwards = EnumFacing.SOUTH;
 				} else {
 					xOffset = 0.75;
-					zOffset = -frame.getWidth() / 2.0 + 1.0;
+					zOffset = -width / 2.0 + 1.0;
 					forwards = EnumFacing.EAST;
 				}
 
-				portalPos = frame.getBottomLeft();
+				teleportPos = bottomLeft.up();
 			} else {
-				xOffset = frame.getWidth() / 2.0;
-				zOffset = -0.5;
+				xOffset = width / 2.0;
+				zOffset = 0.5;
 				forwards = EnumFacing.SOUTH;
-				portalPos = frame.getBottomLeft().offset(EnumFacing.SOUTH);
+				teleportPos = bottomLeft.up();
+
+				final int xOffsetInt = (int) xOffset;
+				final BlockPos actualPos = teleportPos.east(xOffsetInt);
+				boolean invalid = isSolidOrLiquid(world, actualPos) ||
+						isSolidOrLiquid(world, actualPos.up());
+
+				//Then the player is meant to be teleported between two blocks, so we check
+				//the east block as well
+				if(!invalid && xOffset != xOffsetInt) {
+					final BlockPos east = actualPos.east();
+					invalid = isSolidOrLiquid(world, east) || isSolidOrLiquid(world, east.up());
+				}
+
+				if(invalid) {
+					xOffset = 0.5;
+
+					boolean found = false;
+
+					for(BlockPos pos : frame.getFrameBlockPositions()) {
+						final BlockPos up = pos.up();
+
+						if(!isSolidOrLiquid(world, up) && !isSolidOrLiquid(world, up.up())) {
+							teleportPos = up;
+							found = true;
+							break;
+						}
+					}
+
+					if(!found) {
+						final int x = actualPos.getX();
+						int y = actualPos.getY();
+						final int z = actualPos.getZ();
+
+						final int maxY = RandomPortals.CUBIC_CHUNKS_INSTALLED ?
+								y + 128 : world.getActualHeight();
+
+						y++;
+
+						teleportPos = actualPos;
+
+						for(; y <= maxY; y++) {
+							teleportPos = new BlockPos(x, y, z);
+
+							if(!isSolidOrLiquid(world, teleportPos) &&
+									!isSolidOrLiquid(world, teleportPos.up())) {
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 
-		final double x = portalPos.getX() + xOffset;
-		final double y = portalPos.getY() + 1.0;
-		final double z = portalPos.getZ() + zOffset;
+		final double x = teleportPos.getX() + xOffset;
+		final double y = teleportPos.getY();
+		final double z = teleportPos.getZ() + zOffset;
 
 		final float newYaw = yaw -
 				entity.getHorizontalFacing().getHorizontalIndex() * 90.0F +
@@ -451,16 +505,10 @@ public class RPOTeleporter extends Teleporter {
 
 				for(int widthOffset = 0; widthOffset < platformWidth; widthOffset++) {
 					for(int lengthOffset = 0; lengthOffset < platformLength; lengthOffset++) {
-						final int offsetX;
-						final int offsetZ;
-
-						if(type == FrameType.VERTICAL_Z) {
-							offsetX = portalX + lengthOffset;
-							offsetZ = portalZ + widthOffset;
-						} else {
-							offsetX = portalX + widthOffset;
-							offsetZ = portalZ + lengthOffset;
-						}
+						final Tuple<Integer, Integer> offsets =
+								getOffsets(type, widthOffset, lengthOffset);
+						final int offsetX = portalX + offsets.getFirst();
+						final int offsetZ = portalZ + offsets.getSecond();
 
 						//Don't use a MutableBlockPos because we're adding this to the saved data
 						final BlockPos platformPos = new BlockPos(offsetX, portalY - 1, offsetZ);
@@ -490,13 +538,13 @@ public class RPOTeleporter extends Teleporter {
 		BlockPos topLeft = new BlockPos(portalX, portalY, portalZ);
 
 		if(type == FrameType.LATERAL) {
-			topLeft = topLeft.offset(EnumFacing.DOWN);
+			topLeft = topLeft.down();
 		} else {
 			//portalX, portalY, portalZ point to the bottom left of the frame, so we offset the
 			//position in type.getHeightDirection().getOpposite(), then offset it an extra time
 			//so that the bottom is in the platform
 			//Then we offset it once so the frame is centered in the platform
-			topLeft = topLeft.offset(EnumFacing.UP, height - 2).
+			topLeft = topLeft.up(height - 2).
 					offset(type == FrameType.VERTICAL_Z ? EnumFacing.EAST : EnumFacing.SOUTH);
 		}
 
@@ -572,23 +620,16 @@ public class RPOTeleporter extends Teleporter {
 		return false;
 	}
 
-	@SuppressWarnings("Duplicates")
 	public boolean isValidPortalPosition(BlockPos.MutableBlockPos pos, int x, int y, int z,
 			int platformWidth, int platformLength, int spaceHeight, FrameType type) {
 		//y - 1 should be the platform
 		//Ensure the platform (size platformWidth * platformHeight) is solid
 		for(int widthOffset = 0; widthOffset < platformWidth; widthOffset++) {
 			for(int lengthOffset = 0; lengthOffset < platformLength; lengthOffset++) {
-				final int offsetX;
-				final int offsetZ;
-
-				if(type == FrameType.VERTICAL_Z) {
-					offsetX = x + lengthOffset;
-					offsetZ = z + widthOffset;
-				} else {
-					offsetX = x + widthOffset;
-					offsetZ = z + lengthOffset;
-				}
+				final Tuple<Integer, Integer> offsets =
+						getOffsets(type, widthOffset, lengthOffset);
+				final int offsetX = x + offsets.getFirst();
+				final int offsetZ = z + offsets.getSecond();
 
 				if(world.isAirBlock(pos.setPos(offsetX, y - 1, offsetZ)) ||
 						!world.getBlockState(pos).getMaterial().isSolid()) {
@@ -687,6 +728,15 @@ public class RPOTeleporter extends Teleporter {
 		return preferedPos == null ? pos : preferedPos;
 	}
 
+	public static boolean isSolidOrLiquid(World world, BlockPos pos) {
+		final IBlockState state = world.getBlockState(pos);
+		final Material material = state.getMaterial();
+
+		return (material.blocksMovement() || material.isLiquid()) &&
+				!state.getBlock().isLeaves(state, world, pos) &&
+				!state.getBlock().isFoliage(world, pos);
+	}
+
 	public static void register() {
 		if(RPStaticConfig.replaceTeleporter) {
 			RPTeleporter.setTeleporter(RPOTeleporter.class);
@@ -696,5 +746,11 @@ public class RPOTeleporter extends Teleporter {
 							"This will cause issues with Nether portal teleportation."
 			);
 		}
+	}
+
+	private static Tuple<Integer, Integer> getOffsets(FrameType type, int widthOffset,
+			int lengthOffset) {
+		return type == FrameType.VERTICAL_Z ?
+				new Tuple<>(lengthOffset, widthOffset) : new Tuple<>(widthOffset, lengthOffset);
 	}
 }

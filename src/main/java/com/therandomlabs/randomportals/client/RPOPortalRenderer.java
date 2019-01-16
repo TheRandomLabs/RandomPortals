@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 public final class RPOPortalRenderer {
@@ -86,8 +85,7 @@ public final class RPOPortalRenderer {
 					stateToRender = block.getDefaultState();
 				} else {
 					//If the portal is vertical, get the portal at eye-level
-					final Block block2 =
-							mc.world.getBlockState(pos.offset(EnumFacing.UP)).getBlock();
+					final Block block2 = mc.world.getBlockState(pos.up()).getBlock();
 
 					if(block2 instanceof BlockNetherPortal) {
 						stateToRender = block2.getDefaultState();

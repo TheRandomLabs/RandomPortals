@@ -1,6 +1,5 @@
 package com.therandomlabs.randomportals.api.frame;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.function.Predicate;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -233,7 +233,7 @@ public abstract class FrameDetector {
 		//Find the other end of the side, i.e. the next corner
 
 		//Possible corner, current side length if corner is valid
-		final List<Map.Entry<BlockPos, Integer>> possibleCorners = new ArrayList<>();
+		final List<Tuple<BlockPos, Integer>> possibleCorners = new ArrayList<>();
 		BlockPos checkPos = pos;
 		IBlockState checkState;
 
@@ -261,7 +261,7 @@ public abstract class FrameDetector {
 			if(length >= minLength &&
 					test(world, type, pos, checkState, nextSide, CORNER) &&
 					test(world, type, checkPos2, checkState2, nextSide, 2)) {
-				possibleCorners.add(new AbstractMap.SimpleEntry<>(checkPos, length));
+				possibleCorners.add(new Tuple<>(checkPos, length));
 			} else if(!testInner(world, type, checkPos2, checkState2)) {
 				//Then checkState2 is an inner block
 				break;
@@ -278,15 +278,15 @@ public abstract class FrameDetector {
 
 		//There should only be one possible corner by this time since the length is already known
 		if(nextIndex == startIndex) {
-			corners.get(actualIndex).sideLength = possibleCorners.get(0).getValue();
+			corners.get(actualIndex).sideLength = possibleCorners.get(0).getSecond();
 			final Frame frame = new Frame(world, type, corners);
 			return test(frame) && frameCondition.test(frame) ? frame : null;
 		}
 
-		for(Map.Entry<BlockPos, Integer> corner : possibleCorners) {
-			final BlockPos cornerPos = corner.getKey();
+		for(Tuple<BlockPos, Integer> corner : possibleCorners) {
+			final BlockPos cornerPos = corner.getFirst();
 
-			corners.get(actualIndex).sideLength = corner.getValue();
+			corners.get(actualIndex).sideLength = corner.getSecond();
 			corners.put(nextIndex, new Corner(cornerPos, 0));
 
 			final Frame frame = detect(

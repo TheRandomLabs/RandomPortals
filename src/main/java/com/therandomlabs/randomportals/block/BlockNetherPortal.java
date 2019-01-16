@@ -1,6 +1,5 @@
 package com.therandomlabs.randomportals.block;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -53,6 +52,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -249,22 +249,22 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final Map.Entry<Boolean, NetherPortal> entry;
+		final Tuple<Boolean, NetherPortal> tuple;
 
 		if(portal == null) {
-			entry = findFrame(world, pos);
+			tuple = findFrame(world, pos);
 		} else {
-			entry = new AbstractMap.SimpleEntry<>(true, portal);
+			tuple = new Tuple<>(true, portal);
 		}
 
-		if(entry != null) {
-			portal = entry.getValue();
+		if(tuple != null) {
+			portal = tuple.getSecond();
 			final Frame frame = portal.getFrame();
 
-			//If the frame was retrieved from saved data (entry.getKey()),
+			//If the frame was retrieved from saved data (tuple.getFirst()),
 			// the frame is not guaranteed to still exist, so we call PortalType.test
 			//The following loop then ensures that the inner blocks are all portal blocks
-			boolean shouldBreak = entry.getKey() && !portal.getType().test(frame);
+			boolean shouldBreak = tuple.getFirst() && !portal.getType().test(frame);
 
 			if(!shouldBreak) {
 				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
@@ -615,8 +615,8 @@ public class BlockNetherPortal extends BlockPortal {
 			return false;
 		}
 
-		final Map.Entry<Boolean, NetherPortal> entry = findFrame(world, pos);
-		final NetherPortal portal = entry == null ? null : entry.getValue();
+		final Tuple<Boolean, NetherPortal> tuple = findFrame(world, pos);
+		final NetherPortal portal = tuple == null ? null : tuple.getSecond();
 		final PortalType portalType =
 				portal == null ? PortalTypes.getDefault(world) : portal.getType();
 
@@ -727,10 +727,10 @@ public class BlockNetherPortal extends BlockPortal {
 		final EnumFacing.Axis axis = block.getEffectiveAxis(state);
 
 		if(frame == null) {
-			final Map.Entry<Boolean, NetherPortal> entry = findFrame(world, portalPos);
+			final Tuple<Boolean, NetherPortal> tuple = findFrame(world, portalPos);
 
-			if(entry != null) {
-				return entry.getValue().getFrame().getInnerBlockPositions();
+			if(tuple != null) {
+				return tuple.getSecond().getFrame().getInnerBlockPositions();
 			}
 		} else {
 			return frame.getInnerBlockPositions();
@@ -739,17 +739,17 @@ public class BlockNetherPortal extends BlockPortal {
 		return getConnectedPortals(world, portalPos, block, axis, state.getValue(USER_PLACED));
 	}
 
-	public static Map.Entry<Boolean, NetherPortal> findFrame(World world, BlockPos portalPos) {
+	public static Tuple<Boolean, NetherPortal> findFrame(World world, BlockPos portalPos) {
 		return findFrame(NetherPortalFrames.FRAMES, world, portalPos);
 	}
 
-	public static Map.Entry<Boolean, NetherPortal> findFrame(FrameDetector detector, World world,
+	public static Tuple<Boolean, NetherPortal> findFrame(FrameDetector detector, World world,
 			BlockPos portalPos) {
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
 		if(portal != null) {
-			return new AbstractMap.SimpleEntry<>(true, portal);
+			return new Tuple<>(true, portal);
 		}
 
 		final IBlockState state = world.getBlockState(portalPos);
@@ -801,7 +801,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		portal = new NetherPortal(frame, null, PortalTypes.get(frame));
 		savedData.addNetherPortal(portal, true);
-		return new AbstractMap.SimpleEntry<>(false, portal);
+		return new Tuple<>(false, portal);
 	}
 
 	private static ImmutableList<BlockPos> getConnectedPortals(World world, BlockPos portalPos,
