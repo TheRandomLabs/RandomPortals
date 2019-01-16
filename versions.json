@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.6.1.0": "Improved the teleportation logic.",
 		"1.12.2-1.6.0.0": "Invalid portal type JSONs are no longer deleted.\nFixed a teleportation crash.\n/rporeload and /rporeloadclient now list the loaded portal type groups.\nSingle portal blocks can now be dyed by right clicking on them.\nZombie pigman spawn rates are now configurable for each portal type.\nImproved the advancements. Advancements can now be disabled in the configuration.\nPortals now contribute to beacon colors and have map colors.",
 		"1.12.2-1.5.0.2": "Fixed a teleportation crash.",
 		"1.12.2-1.5.0.1": "Improved Cubic Chunks compatibility.",
@@ -25,7 +26,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.6.0.0",
-		"1.12.2-recommended": "1.12.2-1.6.0.0"
+		"1.12.2-latest": "1.12.2-1.6.1.0",
+		"1.12.2-recommended": "1.12.2-1.6.1.0"
 	}
 }
