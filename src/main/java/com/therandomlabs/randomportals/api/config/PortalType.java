@@ -2,7 +2,7 @@ package com.therandomlabs.randomportals.api.config;
 
 import com.therandomlabs.randomportals.api.frame.Frame;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.DimensionType;
+import net.minecraftforge.common.DimensionManager;
 
 public final class PortalType {
 	public FrameData frame = new FrameData();
@@ -43,11 +43,10 @@ public final class PortalType {
 		final int id = sendingDimensionID == destination.dimensionID ?
 				group.defaultDimensionID : destination.dimensionID;
 
-		try {
-			DimensionType.getById(id);
-			return id;
-		} catch(IllegalArgumentException ignored) {}
+		if(DimensionManager.getWorld(sendingDimensionID) == null) {
+			return sendingDimensionID == -1 ? 0 : -1;
+		}
 
-		return sendingDimensionID == -1 ? 0 : -1;
+		return id;
 	}
 }
