@@ -287,8 +287,13 @@ public class RPOTeleporter extends Teleporter {
 						int y = actualPos.getY();
 						final int z = actualPos.getZ();
 
-						final int maxY = RandomPortals.CUBIC_CHUNKS_INSTALLED ?
-								y + 128 : world.getActualHeight();
+						final int maxY;
+
+						if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
+							maxY = y + RPOConfig.netherPortals.portalSearchRadius;
+						} else {
+							maxY = world.getActualHeight();
+						}
 
 						y++;
 
@@ -423,10 +428,12 @@ public class RPOTeleporter extends Teleporter {
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		final int worldHeight = type == FrameType.LATERAL ? maxY - 1 : maxY - height;
 
-		for(int checkX = entityX - 16; checkX <= entityX + 16; checkX++) {
+		final int radius = RPOConfig.netherPortals.portalGenerationLocationSearchRadius;
+
+		for(int checkX = entityX - radius; checkX <= entityX + radius; checkX++) {
 			final double xDistance = checkX + 0.5 - entity.posX;
 
-			for(int checkZ = entityZ - 16; checkZ <= entityZ + 16; checkZ++) {
+			for(int checkZ = entityZ - radius; checkZ <= entityZ + radius; checkZ++) {
 				final double zDistance = checkZ + 0.5 - entity.posZ;
 
 				for(int checkY = worldHeight; checkY >= minY; checkY--) {
@@ -639,10 +646,12 @@ public class RPOTeleporter extends Teleporter {
 		BlockPos preferedPos = null;
 		double preferedDistanceSq = -1.0;
 
-		for(int xOffset = -128; xOffset <= 128; xOffset++) {
+		final int radius = RPOConfig.netherPortals.portalSearchRadius;
+
+		for(int xOffset = -radius; xOffset <= radius; xOffset++) {
 			BlockPos checkPos;
 
-			for(int zOffset = -128; zOffset <= 128; zOffset++) {
+			for(int zOffset = -radius; zOffset <= radius; zOffset++) {
 				BlockPos portalPos = entityPos.add(
 						xOffset,
 						maxY - 1 - entityY,
@@ -715,9 +724,10 @@ public class RPOTeleporter extends Teleporter {
 
 	private Tuple<Integer, Integer> getYBounds(int referenceY) {
 		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
-			//https://github.com/OpenCubicChunks/CubicChunks/blob/MC_1.12/src/main/java/io/github/
-			//opencubicchunks/cubicchunks/core/asm/mixin/fixes/common/MixinTeleporter.java
-			return new Tuple<>(referenceY - 128, referenceY + 128);
+			return new Tuple<>(
+					referenceY - RPOConfig.netherPortals.portalSearchRadius,
+					referenceY + RPOConfig.netherPortals.portalSearchRadius
+			);
 		}
 
 		return new Tuple<>(0, world.getActualHeight());

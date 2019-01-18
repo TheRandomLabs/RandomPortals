@@ -130,6 +130,20 @@ public final class RPOConfig {
 		@Config.Comment("Whether portals contribute to beacon colors.")
 		public boolean portalsContributeToBeaconColors = true;
 
+		@Config.RangeInt(min = 1)
+		@Config.Comment(
+				"The radius in which a suitable location to generate a portal should be " +
+						"searched for upon teleportation through a portal."
+		)
+		public int portalGenerationLocationSearchRadius = 16;
+
+		@Config.RangeInt(min = 1)
+		@Config.Comment(
+				"The radius in which existing portals in the destination dimension should be " +
+						"searched for upon teleportation through a portal."
+		)
+		public int portalSearchRadius = 128;
+
 		@Config.LangKey("randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation")
 		@Config.Comment({
 				"Whether user placed portals inside the frame of the same type as the " +
@@ -162,7 +176,7 @@ public final class RPOConfig {
 	public static final Misc misc = new Misc();
 
 	@Config.LangKey("randomportals.config.netherPortals")
-	@Config.Comment("Options related to Nether portals.")
+	@Config.Comment("Options related to Nether portals and custom portal types.")
 	public static final NetherPortals netherPortals = new NetherPortals();
 
 	private static final Method GET_CONFIGURATION = RPUtils.findMethod(

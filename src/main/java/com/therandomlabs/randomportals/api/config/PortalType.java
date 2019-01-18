@@ -43,10 +43,11 @@ public final class PortalType {
 		final int id = sendingDimensionID == destination.dimensionID ?
 				group.defaultDimensionID : destination.dimensionID;
 
-		if(DimensionType.getById(id) == null) {
-			return sendingDimensionID == -1 ? 0 : -1;
-		}
+		try {
+			DimensionType.getById(id);
+			return id;
+		} catch(IllegalArgumentException ignored) {}
 
-		return id;
+		return sendingDimensionID == -1 ? 0 : -1;
 	}
 }

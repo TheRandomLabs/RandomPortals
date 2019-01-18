@@ -15,7 +15,7 @@ randomportals.config.misc.advancements=Advancements
 randomportals.config.misc.rporeloadCommand=/rporeload
 
 randomportals.config.netherPortals=Nether Portals
-randomportals.config.netherPortals.tooltip=Options related to Nether portals.
+randomportals.config.netherPortals.tooltip=Options related to Nether portals and custom portal types.
 randomportals.config.netherPortals.coloredPortals=Colored portals
 randomportals.config.netherPortals.consumeDyesEvenIfInvalidColor=Consume dyes even if they are an invalid color
 randomportals.config.netherPortals.consumeDyesEvenIfSameColor=Consume dyes even if they are the same color
@@ -25,6 +25,8 @@ randomportals.config.netherPortals.enabled=Enabled
 randomportals.config.netherPortals.forceCreateVanillaType=Force create vanilla type
 randomportals.config.netherPortals.persistentReceivingPortals=Persistent receiving portals
 randomportals.config.netherPortals.portalsContributeToBeaconColors=Portals contribute to beacon colors
+randomportals.config.netherPortals.portalGenerationLocationSearchRadius=Portal generation location search radius
+randomportals.config.netherPortals.portalSearchRadius=Portal search radius
 randomportals.config.netherPortals.replaceUserPlacedPortalsOnActivation=Replace user placed portals on activation
 
 itemGroup.portals=Portals
