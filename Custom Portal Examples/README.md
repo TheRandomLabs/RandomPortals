@@ -1,6 +1,8 @@
 # Custom Portal Examples
 
-These are some custom portal type examples.
+Each portal type group is defined in its own directory under `config/randomportals/portal_types`.
+Each portal type group directory needs a `group_data.json` and at least one portal type JSON.
+Portal type JSONs are named `<Activation dimension ID>.json`.
 
 `reference_portal` should be used as a reference.
 
