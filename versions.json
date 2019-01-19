@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.6.3.1": "Fixed a crash related to advancements.",
 		"1.12.2-1.6.3.0": "Fixed instant portal teleportation in survival mode.\nInvalid corner frame blocks are no longer cloned.\nFixed a teleportation crash.",
 		"1.12.2-1.6.2.1": "Improved portal type validation.",
 		"1.12.2-1.6.2.0": "Fixed invalid dimension IDs causing the game to crash.\nThe portal search radius and portal generation location search radius are now configurable.",
@@ -29,7 +30,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.6.3.0",
-		"1.12.2-recommended": "1.12.2-1.6.3.0"
+		"1.12.2-latest": "1.12.2-1.6.3.1",
+		"1.12.2-recommended": "1.12.2-1.6.3.1"
 	}
 }
