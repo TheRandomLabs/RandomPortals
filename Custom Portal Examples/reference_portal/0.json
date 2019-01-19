@@ -108,7 +108,8 @@
 		//Valid values:
 		//"RANDOMIZE": randomize the frame type, size and blocks
 		//"CLONE": copy the frame type, size and blocks from the sending portal
-		//(note that this also copies any portal blocks, which means dye patterns are persistent)
+		//(note that this also copies any portal blocks, which means dye patterns are persistent,
+		//and that invalid corner blocks such as rogue chests and beds are not cloned)
 		//"USE_RECEIVING_DIMENSION_PORTAL_TYPE": randomize the frame type, size and blocks using
 		//the portal type defined for the receiving dimension
 		"portalGenerationBehavior": "RANDOMIZE",
