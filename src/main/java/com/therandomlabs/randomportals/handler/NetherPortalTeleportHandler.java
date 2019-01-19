@@ -146,8 +146,8 @@ public final class NetherPortalTeleportHandler {
 		final int maxInPortalTime;
 
 		if(block instanceof BlockNetherPortal) {
-			maxInPortalTime = type.teleportationDelay.get(
-					((BlockNetherPortal) block).getEffectiveAxis(state)
+			maxInPortalTime = type.teleportationDelay.getMaxInPortalTime(
+					((BlockNetherPortal) block).getEffectiveAxis(state), entity
 			);
 		} else {
 			maxInPortalTime = entity.getMaxInPortalTime();

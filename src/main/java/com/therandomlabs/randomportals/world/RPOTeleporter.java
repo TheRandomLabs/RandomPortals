@@ -7,6 +7,7 @@ import com.therandomlabs.randompatches.config.RPStaticConfig;
 import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.DestinationData;
+import com.therandomlabs.randomportals.api.config.FrameBlock;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
@@ -545,15 +546,20 @@ public class RPOTeleporter extends Teleporter {
 					offset(type == FrameType.VERTICAL_Z ? EnumFacing.EAST : EnumFacing.SOUTH);
 		}
 
+		final World sendingWorld = data.getSendingPortalWorld();
 		final int receivingDestination = portalType.getDestinationDimensionID(dimensionID);
-		final int sendingDimensionID = data.getSendingPortalWorld().provider.getDimension();
+		final int sendingDimensionID = sendingWorld.provider.getDimension();
 		final Frame receivingFrame = receivingDestination == sendingDimensionID ? frame : null;
 
 		final Frame newFrame = new Frame(world, type, topLeft, width, height);
 
 		if(clone) {
-			clone(newFrame.getFrameBlockPositions(), frame.getFrameBlocks());
-			clone(newFrame.getInnerBlockPositions(), frame.getInnerBlocks());
+			//Pass in portalType and newFrame so clone checks for valid corner blocks
+			clone(
+					portalType, newFrame, newFrame.getFrameBlockPositions(), frame.getFrameBlocks()
+			);
+
+			clone(null, null, newFrame.getInnerBlockPositions(), frame.getInnerBlocks());
 
 			final NetherPortal portal = new NetherPortal(
 					newFrame, receivingFrame, portalType, oneWay ? FunctionType.ONE_WAY : null
@@ -733,11 +739,39 @@ public class RPOTeleporter extends Teleporter {
 		return new Tuple<>(0, world.getActualHeight());
 	}
 
-	private void clone(List<BlockPos> newPositions, List<IBlockState> oldStates) {
+	private void clone(PortalType portalType, Frame newFrame, List<BlockPos> newPositions,
+			List<IBlockState> oldStates) {
 		final int size = Math.min(newPositions.size(), oldStates.size());
 
 		for(int i = 0; i < size; i++) {
-			world.setBlockState(newPositions.get(i), oldStates.get(i), 2);
+			final BlockPos newPos = newPositions.get(i);
+			final IBlockState oldState = oldStates.get(i);
+
+			//Ensure the corner is a valid block and not something that shouldn't be cloned
+			//like a chest or bed
+			if(portalType != null && newFrame.isCorner(newPos) &&
+					oldState.getBlock() != Blocks.AIR) {
+				boolean valid = false;
+
+				for(FrameBlock frameBlock : portalType.frame.blocks) {
+					if(frameBlock.test(oldState)) {
+						valid = true;
+						break;
+					}
+				}
+
+				if(!valid) {
+					final int index = random.nextInt(portalType.frame.blocks.size());
+
+					world.setBlockState(
+							newPos, portalType.frame.blocks.get(index).getActualState(), 2
+					);
+
+					continue;
+				}
+			}
+
+			world.setBlockState(newPos, oldState, 2);
 		}
 	}
 

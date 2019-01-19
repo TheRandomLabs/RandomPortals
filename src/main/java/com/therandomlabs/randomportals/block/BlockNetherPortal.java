@@ -753,8 +753,13 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		final IBlockState state = world.getBlockState(portalPos);
+		final Block block = state.getBlock();
 
-		final EnumFacing.Axis axis = ((BlockNetherPortal) state.getBlock()).getEffectiveAxis(state);
+		if(!(state instanceof BlockNetherPortal)) {
+			return null;
+		}
+
+		final EnumFacing.Axis axis = ((BlockNetherPortal) block).getEffectiveAxis(state);
 		final EnumFacing frameDirection = axis == EnumFacing.Axis.Y ?
 				EnumFacing.NORTH : EnumFacing.DOWN;
 
