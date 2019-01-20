@@ -59,8 +59,9 @@ public class RPOTeleporter extends Teleporter {
 					return;
 				}
 
-				//Only players can spawn portals for some reason
-				if(entity instanceof EntityPlayerMP && type.destination.generatePortalIfNotFound) {
+				if((RPOConfig.netherPortals.allEntitiesCanCausePortalGeneration ||
+						entity instanceof EntityPlayerMP) &&
+						type.destination.generatePortalIfNotFound) {
 					makePortal(entity);
 					placeInExistingPortal(entity, yaw);
 					return;

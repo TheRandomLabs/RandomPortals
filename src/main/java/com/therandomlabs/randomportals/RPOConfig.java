@@ -76,6 +76,13 @@ public final class RPOConfig {
 	}
 
 	public static final class NetherPortals {
+		@Config.LangKey("randomportals.config.netherPortals.allEntitiesCanCausePortalGeneration")
+		@Config.Comment(
+				"Whether all entities can cause portal generation when teleported through a " +
+						"portal."
+		)
+		public boolean allEntitiesCanCausePortalGeneration;
+
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.coloredPortals")
 		@Config.Comment("Whether to enable colored portals.")
@@ -131,6 +138,7 @@ public final class RPOConfig {
 		public boolean portalsContributeToBeaconColors = true;
 
 		@Config.RangeInt(min = 1)
+		@Config.LangKey("randomportals.config.netherPortals.portalGenerationLocationSearchRadius")
 		@Config.Comment(
 				"The radius in which a suitable location to generate a portal should be " +
 						"searched for upon teleportation through a portal."
@@ -138,6 +146,7 @@ public final class RPOConfig {
 		public int portalGenerationLocationSearchRadius = 16;
 
 		@Config.RangeInt(min = 1)
+		@Config.LangKey("randomportals.config.netherPortals.portalSearchRadius")
 		@Config.Comment(
 				"The radius in which existing portals in the destination dimension should be " +
 						"searched for upon teleportation through a portal."

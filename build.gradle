@@ -16,21 +16,19 @@ buildscript {
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "com.github.johnrengelman.shadow"
 
-version = "1.12.2-1.6.3.1"
+version = "1.12.2-1.6.3.2"
 group = "com.therandomlabs.randomportals"
 archivesBaseName = "randomportals"
 
 sourceCompatibility = targetCompatibility = "1.8"
 
 repositories {
-	ivy {
-		artifactPattern "https://endless.blue/files/ivy/[module]-[revision].[ext]"
-	}
+	mavenCentral()
 }
 
 dependencies {
-	shadow "blue.endless:Jankson:0.0.4"
-	compile "blue.endless:Jankson:0.0.4"
+	shadow "blue.endless:jankson:1.1.0"
+	compile "blue.endless:jankson:1.1.0"
 }
 
 shadowJar {

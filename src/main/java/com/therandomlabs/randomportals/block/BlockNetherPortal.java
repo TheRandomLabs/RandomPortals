@@ -368,7 +368,8 @@ public class BlockNetherPortal extends BlockPortal {
 		EnumDyeColor newColor = null;
 		EntityItem dyeEntity = null;
 
-		if(RPOConfig.netherPortals.dyeablePortals && entity instanceof EntityItem) {
+		if(RPOConfig.netherPortals.coloredPortals && RPOConfig.netherPortals.dyeablePortals &&
+				entity instanceof EntityItem) {
 			dyeEntity = (EntityItem) entity;
 			final ItemStack stack = dyeEntity.getItem();
 
@@ -594,7 +595,8 @@ public class BlockNetherPortal extends BlockPortal {
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
 			EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
 			float hitZ) {
-		if(world.isRemote || !RPOConfig.netherPortals.dyeableSinglePortalBlocks) {
+		if(world.isRemote || !RPOConfig.netherPortals.coloredPortals ||
+				!RPOConfig.netherPortals.dyeableSinglePortalBlocks) {
 			return false;
 		}
 
