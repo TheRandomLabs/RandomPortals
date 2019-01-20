@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.6.3.2": "Added a configuration option to allow all entities to cause portal generation upon teleportation through a portal.\nDisabling colored portals now fully disables all dyeing behavior.\nImproved the teleportation logic.",
 		"1.12.2-1.6.3.1": "Fixed a crash related to advancements.",
 		"1.12.2-1.6.3.0": "Fixed instant portal teleportation in survival mode.\nInvalid corner frame blocks are no longer cloned.\nFixed a teleportation crash.",
 		"1.12.2-1.6.2.1": "Improved portal type validation.",
