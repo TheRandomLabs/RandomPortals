@@ -709,26 +709,6 @@ public class RPOTeleporter extends Teleporter {
 		return preferedPos == null ? pos : preferedPos;
 	}
 
-	public static boolean isSolidOrLiquid(World world, BlockPos pos) {
-		final IBlockState state = world.getBlockState(pos);
-		final Material material = state.getMaterial();
-
-		return (material.blocksMovement() || material.isLiquid()) &&
-				!state.getBlock().isLeaves(state, world, pos) &&
-				!state.getBlock().isFoliage(world, pos);
-	}
-
-	public static void register() {
-		if(RPStaticConfig.replaceTeleporter) {
-			RPTeleporter.setTeleporter(RPOTeleporter.class);
-		} else {
-			RandomPortals.LOGGER.error(
-					"RandomPatches' Teleporter replacement has been disabled. " +
-							"This will cause issues with Nether portal teleportation."
-			);
-		}
-	}
-
 	private Tuple<Integer, Integer> getYBounds(int referenceY) {
 		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
 			return new Tuple<>(
@@ -773,6 +753,26 @@ public class RPOTeleporter extends Teleporter {
 			}
 
 			world.setBlockState(newPos, oldState, 2);
+		}
+	}
+
+	public static boolean isSolidOrLiquid(World world, BlockPos pos) {
+		final IBlockState state = world.getBlockState(pos);
+		final Material material = state.getMaterial();
+
+		return (material.blocksMovement() || material.isLiquid()) &&
+				!state.getBlock().isLeaves(state, world, pos) &&
+				!state.getBlock().isFoliage(world, pos);
+	}
+
+	public static void register() {
+		if(RPStaticConfig.replaceTeleporter) {
+			RPTeleporter.setTeleporter(RPOTeleporter.class);
+		} else {
+			RandomPortals.LOGGER.error(
+					"RandomPatches' Teleporter replacement has been disabled. " +
+							"This will cause issues with Nether portal teleportation."
+			);
 		}
 	}
 
