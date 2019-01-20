@@ -545,6 +545,11 @@ public class RPOTeleporter extends Teleporter {
 			//Then we offset it once so the frame is centered in the platform
 			topLeft = topLeft.up(height - 2).
 					offset(type == FrameType.VERTICAL_Z ? EnumFacing.EAST : EnumFacing.SOUTH);
+
+			//The portal position should be the northmost block but topLeft should be the southmost
+			if(type == FrameType.VERTICAL_Z) {
+				topLeft = topLeft.south(width - 1);
+			}
 		}
 
 		final World sendingWorld = data.getSendingPortalWorld();
