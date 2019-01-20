@@ -81,7 +81,7 @@ public final class RPOConfig {
 				"Whether all entities can cause portal generation when teleported through a " +
 						"portal."
 		)
-		public boolean allEntitiesCanCausePortalGeneration;
+		public boolean allEntitiesCanCausePortalGeneration = RandomPatches.IS_DEOBFUSCATED;
 
 		@Config.RequiresMcRestart
 		@Config.LangKey("randomportals.config.netherPortals.coloredPortals")
