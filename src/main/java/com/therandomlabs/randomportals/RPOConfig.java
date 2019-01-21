@@ -65,6 +65,11 @@ public final class RPOConfig {
 	}
 
 	public static final class Misc {
+		@Config.RequiresMcRestart
+		@Config.LangKey("randomportals.config.misc.addEndGatewayItem")
+		@Config.Comment("Whether to add an item for the End gateway.")
+		public boolean addEndGatewayItem = true;
+
 		@Config.LangKey("randomportals.config.misc.advancements")
 		@Config.Comment("Whether to trigger advancements related to portals.")
 		public boolean advancements = true;

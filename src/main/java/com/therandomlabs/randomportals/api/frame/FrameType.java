@@ -64,6 +64,8 @@ public enum FrameType {
 
 	public List<FrameType> getTypes() {
 		switch(this) {
+		case VERTICAL:
+			return Arrays.asList(VERTICAL_X, VERTICAL_Z);
 		case LATERAL_OR_VERTICAL:
 			return Arrays.asList(LATERAL, VERTICAL_X, VERTICAL_Z);
 		case LATERAL_OR_VERTICAL_X:

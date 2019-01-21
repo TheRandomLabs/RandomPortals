@@ -11,6 +11,7 @@ randomportals.config.endPortals.rightClickVillagersToConvertToFrameHeads=Right c
 
 randomportals.config.misc=Miscellaneous
 randomportals.config.misc.tooltip=Options that don't fit into any other categories.
+randomportals.config.misc.addEndGatewayItem=Add End gateway item
 randomportals.config.misc.advancements=Advancements
 randomportals.config.misc.rporeloadCommand=/rporeload
 
@@ -40,6 +41,8 @@ tile.endPortalVertical.name=Vertical End Portal
 
 tile.endPortalFrameUpsideDown.name=Upside Down End Portal Frame
 tile.endPortalUpsideDown.name=Upside Down End Portal
+
+tile.endGateway.name=End Gateway
 
 tile.netherPortalVertical.name=Vertical Nether Portal
 tile.netherPortalVerticalWhite.name=White Vertical Nether Portal

@@ -51,12 +51,14 @@ public final class CreativeTabPortals extends CreativeTabs {
 			firstInit = true;
 
 			Blocks.END_PORTAL_FRAME.setCreativeTab(INSTANCE);
+			Blocks.END_GATEWAY.setCreativeTab(INSTANCE);
 
 			for(Block block : RPOBlocks.getBlocksWithItems()) {
 				block.setCreativeTab(INSTANCE);
 			}
 		} else if(firstInit) {
 			Blocks.END_PORTAL_FRAME.setCreativeTab(originalLateralEndPortalFrameTab);
+			Blocks.END_GATEWAY.setCreativeTab(DECORATIONS);
 
 			for(Block block : RPOBlocks.getBlocksWithItems()) {
 				block.setCreativeTab(DECORATIONS);

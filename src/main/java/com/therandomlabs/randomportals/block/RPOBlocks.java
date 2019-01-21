@@ -122,6 +122,10 @@ public final class RPOBlocks {
 			}
 		}
 
+		if(RPOConfig.misc.addEndGatewayItem) {
+			blocksWithItems.add(new BlockRPOEndGateway());
+		}
+
 		for(Block block : blocksWithItems) {
 			registry.register(block);
 		}

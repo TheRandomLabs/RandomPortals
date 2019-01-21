@@ -1,6 +1,5 @@
 package com.therandomlabs.randomportals.world;
 
-import java.util.Collections;
 import java.util.List;
 import com.therandomlabs.randompatches.common.RPTeleporter;
 import com.therandomlabs.randompatches.config.RPStaticConfig;
@@ -367,7 +366,7 @@ public class RPOTeleporter extends Teleporter {
 				if(frame == null) {
 					types = FrameType.LATERAL_OR_VERTICAL.getTypes();
 				} else if(frame.getType() == FrameType.LATERAL) {
-					types = Collections.singletonList(FrameType.LATERAL);
+					types = FrameType.LATERAL.getTypes();
 				} else {
 					types = FrameType.VERTICAL.getTypes();
 				}
