@@ -20,7 +20,10 @@ public final class NetherPortalFrameBreakHandler {
 		final World world = event.getWorld();
 		final BlockPos pos = event.getPos();
 
-		if(!event.getBlockSnapshot().getReplacedBlock().getBlock().isReplaceable(world, pos) &&
+		//Exchangers compatibility
+		//If the replaced block is not replaceable (i.e. not air, snow or similar blocks),
+		//then it can be assumed that this event was posted by Exchangers or a similar mod
+		if(!event.getBlockSnapshot().getReplacedBlock().getMaterial().isReplaceable() &&
 				RPOSavedData.get(world).getGeneratedNetherPortalType(pos) != null) {
 			event.setCanceled(true);
 		}
