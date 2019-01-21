@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.6.4.1": "Fixed the log spam that occurs when snow and similar blocks are replaced.",
 		"1.12.2-1.6.4.0": "Added an item for the End gateway.\nFixed a teleportation crash.",
 		"1.12.2-1.6.3.2": "Added a configuration option to allow all entities to cause portal generation upon teleportation through a portal.\nDisabling colored portals now fully disables all dyeing behavior.\nImproved the teleportation logic.",
 		"1.12.2-1.6.3.1": "Fixed a crash related to advancements.",
@@ -32,7 +33,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.6.4.0",
-		"1.12.2-recommended": "1.12.2-1.6.4.0"
+		"1.12.2-latest": "1.12.2-1.6.4.1",
+		"1.12.2-recommended": "1.12.2-1.6.4.1"
 	}
 }
