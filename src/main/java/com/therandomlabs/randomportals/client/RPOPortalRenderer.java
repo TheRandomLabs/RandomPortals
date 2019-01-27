@@ -1,7 +1,6 @@
 package com.therandomlabs.randomportals.client;
 
-import com.therandomlabs.randompatches.config.RPStaticConfig;
-import com.therandomlabs.randompatches.patch.client.GuiIngamePatch;
+import com.therandomlabs.randomportals.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.block.BlockLateralNetherPortal;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
@@ -17,7 +16,13 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
+@Mod.EventBusSubscriber(value = Side.CLIENT, modid = RandomPortals.MOD_ID)
 public final class RPOPortalRenderer {
 	private static final Minecraft mc = Minecraft.getMinecraft();
 
@@ -28,6 +33,21 @@ public final class RPOPortalRenderer {
 	private static float minV;
 	private static float maxU;
 	private static float maxV;
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public static void onRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
+		if(RPOConfig.netherPortals.enabled &&
+				event.getType() == RenderGameOverlayEvent.ElementType.PORTAL) {
+			final float timeInPortal = mc.player.prevTimeInPortal +
+					(mc.player.timeInPortal - mc.player.prevTimeInPortal) * event.getPartialTicks();
+
+			if(timeInPortal > 0.0F) {
+				render(timeInPortal, event.getResolution());
+			}
+
+			event.setCanceled(true);
+		}
+	}
 
 	public static void render(float timeInPortal, ScaledResolution resolution) {
 		if(timeInPortal < 1.0F) {
@@ -104,17 +124,6 @@ public final class RPOPortalRenderer {
 			minV = sprite.getMinV();
 			maxU = sprite.getMaxU();
 			maxV = sprite.getMaxV();
-		}
-	}
-
-	public static void register() {
-		if(RPStaticConfig.replacePortalRenderer) {
-			GuiIngamePatch.setPortalRenderer(RPOPortalRenderer::render);
-		} else {
-			RandomPortals.LOGGER.error(
-					"RandomPatches Integration's portal renderer replacement has been disabled. " +
-							"This will cause issues with colored Nether portal rendering."
-			);
 		}
 	}
 

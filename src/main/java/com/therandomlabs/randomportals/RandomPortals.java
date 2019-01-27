@@ -14,13 +14,15 @@ import org.apache.logging.log4j.Logger;
 
 @Mod.EventBusSubscriber(modid = RandomPortals.MOD_ID)
 @Mod(
-		modid = RandomPortals.MOD_ID, version = RandomPortals.VERSION,
+		modid = RandomPortals.MOD_ID, name = RandomPortals.NAME,
+		version = RandomPortals.VERSION,
 		acceptedMinecraftVersions = RandomPortals.ACCEPTED_MINECRAFT_VERSIONS,
 		dependencies = RandomPortals.DEPENDENCIES, updateJSON = RandomPortals.UPDATE_JSON,
 		certificateFingerprint = RandomPortals.CERTIFICATE_FINGERPRINT
 )
 public final class RandomPortals {
 	public static final String MOD_ID = "randomportals";
+	public static final String NAME = "RandomPortals";
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
 	public static final String DEPENDENCIES =

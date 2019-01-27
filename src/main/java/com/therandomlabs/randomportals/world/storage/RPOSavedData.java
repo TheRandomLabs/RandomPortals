@@ -369,8 +369,7 @@ public class RPOSavedData extends WorldSavedData {
 		currentWorld = world;
 
 		final MapStorage storage = world.getPerWorldStorage();
-		RPOSavedData instance =
-				(RPOSavedData) storage.getOrLoadData(RPOSavedData.class, ID);
+		RPOSavedData instance = (RPOSavedData) storage.getOrLoadData(RPOSavedData.class, ID);
 
 		if(instance == null) {
 			instance = new RPOSavedData();

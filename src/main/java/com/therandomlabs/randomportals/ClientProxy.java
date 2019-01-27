@@ -1,7 +1,6 @@
 package com.therandomlabs.randomportals;
 
 import com.therandomlabs.randompatches.client.TileEntityEndPortalRenderer;
-import com.therandomlabs.randomportals.client.RPOPortalRenderer;
 import com.therandomlabs.randomportals.client.creativetab.CreativeTabPortals;
 import com.therandomlabs.randomportals.command.CommandRPOReload;
 import com.therandomlabs.randomportals.tileentity.TileEntityUpsideDownEndPortal;
@@ -27,10 +26,6 @@ public final class ClientProxy extends CommonProxy {
 			ClientRegistry.bindTileEntitySpecialRenderer(
 					TileEntityUpsideDownEndPortal.class, new TileEntityEndPortalRenderer(true)
 			);
-		}
-
-		if(RPOConfig.netherPortals.enabled) {
-			RPOPortalRenderer.register();
 		}
 	}
 
