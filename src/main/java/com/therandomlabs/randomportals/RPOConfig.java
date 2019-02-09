@@ -224,8 +224,6 @@ public final class RPOConfig {
 				SYNC.invoke(null, config, RPOConfig.class, RandomPortals.MOD_ID, "", false, null);
 			}
 
-			firstReload = false;
-
 			onReload();
 
 			//Remove old elements
