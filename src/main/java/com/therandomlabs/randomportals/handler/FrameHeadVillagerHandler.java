@@ -1,6 +1,6 @@
 package com.therandomlabs.randomportals.handler;
 
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
@@ -21,7 +21,7 @@ public final class FrameHeadVillagerHandler {
 			return;
 		}
 
-		final double chance = RPOConfig.endPortals.frameHeadVillagerSpawnChance;
+		final double chance = RPOConfig.EndPortals.frameHeadVillagerSpawnChance;
 
 		if(chance == 0.0) {
 			return;
@@ -52,7 +52,7 @@ public final class FrameHeadVillagerHandler {
 
 	@SubscribeEvent
 	public static void onEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
-		if(!RPOConfig.endPortals.rightClickVillagersToConvertToFrameHeads) {
+		if(!RPOConfig.EndPortals.rightClickVillagersToConvertToFrameHeads) {
 			return;
 		}
 

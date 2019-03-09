@@ -1,6 +1,7 @@
 package com.therandomlabs.randomportals.command;
 
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomlib.config.ConfigManager;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -30,7 +31,8 @@ public class CommandRPOReload extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args)
 			throws CommandException {
-		RPOConfig.reloadFromDisk();
+		ConfigManager.reloadFromDisk(RPOConfig.class);
+		RPOConfig.reload();
 
 		final String loadedPortalTypes = StringUtils.join(PortalTypes.getGroups().keySet(), ", ");
 

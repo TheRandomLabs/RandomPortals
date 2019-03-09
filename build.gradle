@@ -16,23 +16,30 @@ buildscript {
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "com.github.johnrengelman.shadow"
 
-version = "1.12.2-1.6.5.1"
+version = "1.12.2-1.7.0.0"
 group = "com.therandomlabs.randomportals"
 archivesBaseName = "randomportals"
 
 sourceCompatibility = targetCompatibility = "1.8"
 
 repositories {
+	maven {
+		url "https://jitpack.io"
+	}
+
 	mavenCentral()
 }
 
 dependencies {
+	shadow "com.github.TheRandomLabs:RandomLib:1.12-SNAPSHOT"
+	compile "com.github.TheRandomLabs:RandomLib:1.12-SNAPSHOT"
 	shadow "blue.endless:jankson:1.1.0"
 	compile "blue.endless:jankson:1.1.0"
 }
 
 shadowJar {
 	classifier = ""
+	relocate "com.therandomlabs.randomlib", "com.therandomlabs.randomconfigs.repackage.com.therandomlabs.randomlib"
 	relocate "blue.endless.jankson", "com.therandomlabs.randomportals.repackage.blue.endless.jankson"
 	configurations = [project.configurations.shadow]
 }
@@ -50,7 +57,7 @@ artifacts {
 }
 
 minecraft {
-	version = "1.12.2-latest"
+	version = "1.12.2-14.23.5.2815"
 	runDir = "run"
 	mappings = "stable_39"
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.tileentity.TileEntityUpsideDownEndPortal;
 import com.therandomlabs.randomportals.tileentity.TileEntityVerticalEndPortal;
@@ -89,7 +89,7 @@ public final class RPOBlocks {
 		final List<Block> blocksWithItems = new ArrayList<>();
 		final IForgeRegistry<Block> registry = event.getRegistry();
 
-		if(RPOConfig.endPortals.enabled) {
+		if(RPOConfig.EndPortals.enabled) {
 			Collections.addAll(
 					blocksWithItems,
 					new BlockVerticalEndPortalFrame(),
@@ -100,10 +100,10 @@ public final class RPOBlocks {
 			);
 		}
 
-		if(RPOConfig.netherPortals.enabled) {
+		if(RPOConfig.NetherPortals.enabled) {
 			registry.register(new BlockRPOFire());
 
-			if(RPOConfig.netherPortals.coloredPortals) {
+			if(RPOConfig.NetherPortals.coloredPortals) {
 				for(EnumDyeColor color : EnumDyeColor.values()) {
 					Collections.addAll(
 							blocksWithItems,
@@ -122,7 +122,7 @@ public final class RPOBlocks {
 			}
 		}
 
-		if(RPOConfig.misc.addEndGatewayItem) {
+		if(RPOConfig.Misc.addEndGatewayItem) {
 			blocksWithItems.add(new BlockRPOEndGateway());
 		}
 

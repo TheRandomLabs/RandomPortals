@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import com.elytradev.movingworld.MovingWorldMod;
 import com.elytradev.movingworld.common.config.priority.AssemblePriorityConfig;
-import com.therandomlabs.randompatches.util.RPUtils;
+import com.therandomlabs.randomlib.TRLUtils;
+import com.therandomlabs.randomlib.config.ConfigManager;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import com.therandomlabs.randomportals.handler.EndPortalActivationHandler;
 import com.therandomlabs.randomportals.handler.FrameHeadVillagerHandler;
@@ -20,11 +22,9 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 
 public class CommonProxy {
-	public void construct() {
-		RPOConfig.reload();
-	}
-
 	public void preInit() {
+		ConfigManager.register(RPOConfig.class);
+		RPOConfig.reload();
 		RPOTeleporter.register();
 	}
 
@@ -37,12 +37,12 @@ public class CommonProxy {
 			}
 		}
 
-		if(RPOConfig.endPortals.enabled) {
+		if(RPOConfig.EndPortals.enabled) {
 			MinecraftForge.EVENT_BUS.register(EndPortalActivationHandler.class);
 			MinecraftForge.EVENT_BUS.register(FrameHeadVillagerHandler.class);
 		}
 
-		if(RPOConfig.netherPortals.enabled) {
+		if(RPOConfig.NetherPortals.enabled) {
 			MinecraftForge.EVENT_BUS.register(NetherPortalTeleportHandler.class);
 			MinecraftForge.EVENT_BUS.register(NetherPortalFrameBreakHandler.class);
 			MinecraftForge.EVENT_BUS.register(NetherPortalActivationHandler.class);
@@ -54,7 +54,7 @@ public class CommonProxy {
 		try {
 			PortalTypes.reload();
 		} catch(IOException ex) {
-			RPUtils.crashReport("Error while reloading Nether portal types", ex);
+			TRLUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
 
 		RPOCriteriaTriggers.register();

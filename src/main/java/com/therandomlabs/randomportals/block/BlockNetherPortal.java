@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Random;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.ColorData;
@@ -368,7 +368,7 @@ public class BlockNetherPortal extends BlockPortal {
 		EnumDyeColor newColor = null;
 		EntityItem dyeEntity = null;
 
-		if(RPOConfig.netherPortals.coloredPortals && RPOConfig.netherPortals.dyeablePortals &&
+		if(RPOConfig.NetherPortals.coloredPortals && RPOConfig.NetherPortals.dyeablePortals &&
 				entity instanceof EntityItem) {
 			dyeEntity = (EntityItem) entity;
 			final ItemStack stack = dyeEntity.getItem();
@@ -379,7 +379,7 @@ public class BlockNetherPortal extends BlockPortal {
 		}
 
 		if(color == newColor) {
-			if(RPOConfig.netherPortals.consumeDyesEvenIfSameColor) {
+			if(RPOConfig.NetherPortals.consumeDyesEvenIfSameColor) {
 				world.removeEntity(dyeEntity);
 				return;
 			}
@@ -410,7 +410,7 @@ public class BlockNetherPortal extends BlockPortal {
 				newColor = null;
 			} else if(portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
 					!ArrayUtils.contains(portalType.color.colors, newColor)) {
-				if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor) {
+				if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor) {
 					world.removeEntity(dyeEntity);
 					return;
 				}
@@ -461,7 +461,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final String thrower = dyeEntity.getThrower();
 
-		if(RPOConfig.misc.advancements &&
+		if(RPOConfig.Misc.advancements &&
 				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID) &&
 				thrower != null) {
 			final EntityPlayerMP player =
@@ -579,14 +579,14 @@ public class BlockNetherPortal extends BlockPortal {
 
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if(RPOConfig.netherPortals.portalsContributeToBeaconColors && !world.isRemote) {
+		if(RPOConfig.NetherPortals.portalsContributeToBeaconColors && !world.isRemote) {
 			BlockBeacon.updateColorAsync(world, pos);
 		}
 	}
 
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		if(RPOConfig.netherPortals.portalsContributeToBeaconColors && !world.isRemote) {
+		if(RPOConfig.NetherPortals.portalsContributeToBeaconColors && !world.isRemote) {
 			BlockBeacon.updateColorAsync(world, pos);
 		}
 	}
@@ -595,8 +595,8 @@ public class BlockNetherPortal extends BlockPortal {
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
 			EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
 			float hitZ) {
-		if(world.isRemote || !RPOConfig.netherPortals.coloredPortals ||
-				!RPOConfig.netherPortals.dyeableSinglePortalBlocks) {
+		if(world.isRemote || !RPOConfig.NetherPortals.coloredPortals ||
+				!RPOConfig.NetherPortals.dyeableSinglePortalBlocks) {
 			return false;
 		}
 
@@ -609,7 +609,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final EnumDyeColor newColor = EnumDyeColor.byDyeDamage(stack.getMetadata());
 
 		if(color == newColor) {
-			if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor &&
+			if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
 					!player.capabilities.isCreativeMode) {
 				stack.shrink(1);
 			}
@@ -628,7 +628,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		if(portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
 				!ArrayUtils.contains(portalType.color.colors, newColor)) {
-			if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor &&
+			if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
 					!player.capabilities.isCreativeMode) {
 				stack.shrink(1);
 			}
@@ -652,7 +652,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		world.setBlockState(pos, newState, 2);
 
-		if(RPOConfig.netherPortals.consumeDyesEvenIfInvalidColor &&
+		if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
 				!player.capabilities.isCreativeMode) {
 			stack.shrink(1);
 		}
@@ -661,7 +661,7 @@ public class BlockNetherPortal extends BlockPortal {
 				world, portal, dyedPortalPositions, color, newColor, true
 		));
 
-		if(RPOConfig.misc.advancements &&
+		if(RPOConfig.Misc.advancements &&
 				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
 			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger((EntityPlayerMP) player, newColor, true);
 		}
@@ -696,7 +696,7 @@ public class BlockNetherPortal extends BlockPortal {
 	@Override
 	public float[] getBeaconColorMultiplier(IBlockState state, World world, BlockPos pos,
 			BlockPos beaconPos) {
-		return RPOConfig.netherPortals.portalsContributeToBeaconColors ?
+		return RPOConfig.NetherPortals.portalsContributeToBeaconColors ?
 				color.getColorComponentValues() : null;
 	}
 

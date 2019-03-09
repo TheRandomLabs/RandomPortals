@@ -1,8 +1,8 @@
 package com.therandomlabs.randomportals.client.creativetab;
 
 import java.lang.reflect.Field;
-import com.therandomlabs.randompatches.util.RPUtils;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomlib.TRLUtils;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import net.minecraft.block.Block;
@@ -21,7 +21,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public final class CreativeTabPortals extends CreativeTabs {
 	public static final CreativeTabs INSTANCE = new CreativeTabPortals();
 
-	public static final Field TAB_PAGE = RPUtils.findField(GuiContainerCreative.class, "tabPage");
+	public static final Field TAB_PAGE = TRLUtils.findField(GuiContainerCreative.class, "tabPage");
 
 	private static CreativeTabs originalLateralEndPortalFrameTab;
 	private static boolean firstInit;
@@ -46,7 +46,7 @@ public final class CreativeTabPortals extends CreativeTabs {
 	public static void init() {
 		register();
 
-		if(RPOConfig.client.portalsCreativeTab) {
+		if(RPOConfig.Client.portalsCreativeTab) {
 			originalLateralEndPortalFrameTab = Blocks.END_PORTAL_FRAME.getCreativeTab();
 			firstInit = true;
 
@@ -67,7 +67,7 @@ public final class CreativeTabPortals extends CreativeTabs {
 	}
 
 	private static void register() {
-		if(RPOConfig.client.portalsCreativeTab) {
+		if(RPOConfig.Client.portalsCreativeTab) {
 			if(!ArrayUtils.contains(CreativeTabs.CREATIVE_TAB_ARRAY, INSTANCE)) {
 				CreativeTabs.CREATIVE_TAB_ARRAY =
 						ArrayUtils.add(CreativeTabs.CREATIVE_TAB_ARRAY, INSTANCE);
@@ -91,7 +91,7 @@ public final class CreativeTabPortals extends CreativeTabs {
 			try {
 				TAB_PAGE.set(null, 0);
 			} catch(Exception ex) {
-				RPUtils.crashReport("Error while disabling creative tab", ex);
+				TRLUtils.crashReport("Error while disabling creative tab", ex);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 package com.therandomlabs.randomportals.handler;
 
 import java.util.Random;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.block.RPOBlocks;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
@@ -67,7 +67,7 @@ public final class EndPortalActivationHandler {
 		if(EndPortalFrames.activate(world, pos) == null) {
 			event.setCancellationResult(EnumActionResult.FAIL);
 		} else {
-			if(RPOConfig.misc.advancements) {
+			if(RPOConfig.Misc.advancements) {
 				RPOCriteriaTriggers.PORTALS.trigger((EntityPlayerMP) player);
 			}
 

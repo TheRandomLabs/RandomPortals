@@ -1,10 +1,10 @@
 package com.therandomlabs.randomportals;
 
 import com.therandomlabs.randomportals.command.CommandRPOReload;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -17,7 +17,8 @@ import org.apache.logging.log4j.Logger;
 		modid = RandomPortals.MOD_ID, name = RandomPortals.NAME,
 		version = RandomPortals.VERSION,
 		acceptedMinecraftVersions = RandomPortals.ACCEPTED_MINECRAFT_VERSIONS,
-		dependencies = RandomPortals.DEPENDENCIES, updateJSON = RandomPortals.UPDATE_JSON,
+		dependencies = RandomPortals.DEPENDENCIES, guiFactory = RandomPortals.GUI_FACTORY,
+		updateJSON = RandomPortals.UPDATE_JSON,
 		certificateFingerprint = RandomPortals.CERTIFICATE_FINGERPRINT
 )
 public final class RandomPortals {
@@ -26,7 +27,9 @@ public final class RandomPortals {
 	public static final String VERSION = "@VERSION@";
 	public static final String ACCEPTED_MINECRAFT_VERSIONS = "[1.12.2,1.13)";
 	public static final String DEPENDENCIES =
-			"required-after:randompatches@[1.12.2-1.12.0.0,);before:movingworld";
+			"required-after:randompatches@[1.12.2-1.15.0.0,);before:movingworld";
+	public static final String GUI_FACTORY =
+			"com.therandomlabs.randomportals.config.RPOGuiConfigFactory";
 	public static final String UPDATE_JSON =
 			"https://raw.githubusercontent.com/TheRandomLabs/RandomPortals/misc/versions.json";
 	public static final String CERTIFICATE_FINGERPRINT = "@FINGERPRINT@";
@@ -43,11 +46,6 @@ public final class RandomPortals {
 	public static CommonProxy proxy;
 
 	@Mod.EventHandler
-	public static void construct(FMLConstructionEvent event) {
-		proxy.construct();
-	}
-
-	@Mod.EventHandler
 	public static void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit();
 	}
@@ -59,7 +57,7 @@ public final class RandomPortals {
 
 	@Mod.EventHandler
 	public static void serverStarting(FMLServerStartingEvent event) {
-		if(RPOConfig.misc.rporeloadCommand) {
+		if(RPOConfig.Misc.rporeloadCommand) {
 			event.registerServerCommand(new CommandRPOReload(Side.SERVER));
 		}
 	}

@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.collect.ImmutableMap;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameType;
@@ -254,7 +254,7 @@ public final class PortalTypes {
 			}
 		}
 
-		if(types.isEmpty() || (RPOConfig.netherPortals.forceCreateVanillaType &&
+		if(types.isEmpty() || (RPOConfig.NetherPortals.forceCreateVanillaType &&
 				!types.containsKey(VANILLA_NETHER_PORTAL_ID))) {
 			write(directory, VANILLA_NETHER_PORTAL);
 		}

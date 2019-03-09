@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypeGroup;
@@ -244,7 +244,7 @@ public class NetherPortalActivator {
 		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
 			//Allow players to create colorful patterns
 			if(portalBlock != null &&
-					!RPOConfig.netherPortals.replaceUserPlacedPortalsOnActivation) {
+					!RPOConfig.NetherPortals.replaceUserPlacedPortalsOnActivation) {
 				final IBlockState innerState = world.getBlockState(innerPos);
 
 				if(innerState.getBlock().getClass() == blockClass &&
@@ -279,7 +279,7 @@ public class NetherPortalActivator {
 			);
 		}
 
-		if(player != null && RPOConfig.misc.advancements &&
+		if(player != null && RPOConfig.Misc.advancements &&
 				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
 			final EntityPlayerMP playerMP = (EntityPlayerMP) player;
 

@@ -2,8 +2,8 @@ package com.therandomlabs.randomportals.world;
 
 import java.util.List;
 import com.therandomlabs.randompatches.common.RPTeleporter;
-import com.therandomlabs.randompatches.config.RPStaticConfig;
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randompatches.config.RPConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.DestinationData;
 import com.therandomlabs.randomportals.api.config.FrameBlock;
@@ -58,7 +58,7 @@ public class RPOTeleporter extends Teleporter {
 					return;
 				}
 
-				if((RPOConfig.netherPortals.allEntitiesCanCausePortalGeneration ||
+				if((RPOConfig.NetherPortals.allEntitiesCanCausePortalGeneration ||
 						entity instanceof EntityPlayerMP) &&
 						type.destination.generatePortalIfNotFound) {
 					makePortal(entity);
@@ -130,7 +130,7 @@ public class RPOTeleporter extends Teleporter {
 		final NetherPortal sendingPortal = data.getPortal();
 		Frame receivingFrame;
 
-		if(RPOConfig.netherPortals.persistentReceivingPortals) {
+		if(RPOConfig.NetherPortals.persistentReceivingPortals) {
 			receivingFrame = sendingPortal == null ? null : sendingPortal.getReceivingFrame();
 		} else {
 			receivingFrame = null;
@@ -291,7 +291,7 @@ public class RPOTeleporter extends Teleporter {
 						final int maxY;
 
 						if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
-							maxY = y + RPOConfig.netherPortals.portalSearchRadius;
+							maxY = y + RPOConfig.NetherPortals.portalSearchRadius;
 						} else {
 							maxY = world.getActualHeight();
 						}
@@ -429,7 +429,7 @@ public class RPOTeleporter extends Teleporter {
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		final int worldHeight = type == FrameType.LATERAL ? maxY - 1 : maxY - height;
 
-		final int radius = RPOConfig.netherPortals.portalGenerationLocationSearchRadius;
+		final int radius = RPOConfig.NetherPortals.portalGenerationLocationSearchRadius;
 
 		for(int checkX = entityX - radius; checkX <= entityX + radius; checkX++) {
 			final double xDistance = checkX + 0.5 - entity.posX;
@@ -657,7 +657,7 @@ public class RPOTeleporter extends Teleporter {
 		BlockPos preferedPos = null;
 		double preferedDistanceSq = -1.0;
 
-		final int radius = RPOConfig.netherPortals.portalSearchRadius;
+		final int radius = RPOConfig.NetherPortals.portalSearchRadius;
 
 		for(int xOffset = -radius; xOffset <= radius; xOffset++) {
 			BlockPos checkPos;
@@ -716,8 +716,8 @@ public class RPOTeleporter extends Teleporter {
 	private Tuple<Integer, Integer> getYBounds(int referenceY) {
 		if(RandomPortals.CUBIC_CHUNKS_INSTALLED) {
 			return new Tuple<>(
-					referenceY - RPOConfig.netherPortals.portalSearchRadius,
-					referenceY + RPOConfig.netherPortals.portalSearchRadius
+					referenceY - RPOConfig.NetherPortals.portalSearchRadius,
+					referenceY + RPOConfig.NetherPortals.portalSearchRadius
 			);
 		}
 
@@ -770,7 +770,7 @@ public class RPOTeleporter extends Teleporter {
 	}
 
 	public static void register() {
-		if(RPStaticConfig.replaceTeleporter) {
+		if(RPConfig.Misc.replaceTeleporter) {
 			RPTeleporter.setTeleporter(RPOTeleporter.class);
 		} else {
 			RandomPortals.LOGGER.error(

@@ -1,6 +1,6 @@
 package com.therandomlabs.randomportals.client;
 
-import com.therandomlabs.randomportals.RPOConfig;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.block.BlockLateralNetherPortal;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
@@ -36,7 +36,7 @@ public final class RPOPortalRenderer {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
-		if(RPOConfig.netherPortals.enabled &&
+		if(RPOConfig.NetherPortals.enabled &&
 				event.getType() == RenderGameOverlayEvent.ElementType.PORTAL) {
 			final float timeInPortal = mc.player.prevTimeInPortal +
 					(mc.player.timeInPortal - mc.player.prevTimeInPortal) * event.getPartialTicks();
