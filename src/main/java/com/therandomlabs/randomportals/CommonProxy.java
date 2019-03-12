@@ -24,11 +24,12 @@ import net.minecraftforge.common.MinecraftForge;
 public class CommonProxy {
 	public void preInit() {
 		ConfigManager.register(RPOConfig.class);
-		RPOConfig.reload();
 		RPOTeleporter.register();
 	}
 
 	public void init() {
+		RPOConfig.reload();
+
 		if(RandomPortals.MOVINGWORLD_INSTALLED) {
 			try {
 				handleMovingWorld();
