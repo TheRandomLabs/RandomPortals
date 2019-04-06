@@ -17,7 +17,7 @@ import com.therandomlabs.randomportals.api.config.FrameSizes;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import org.apache.commons.lang3.StringUtils;
 
-@Config(modid = RandomPortals.MOD_ID, path = RandomPortals.MOD_ID + "/" + RandomPortals.MOD_ID)
+@Config(value = RandomPortals.MOD_ID, path = RandomPortals.MOD_ID + "/" + RandomPortals.MOD_ID)
 public final class RPOConfig {
 	public static final class Client {
 		@Config.Property("Enables the Portals creative tab.")
