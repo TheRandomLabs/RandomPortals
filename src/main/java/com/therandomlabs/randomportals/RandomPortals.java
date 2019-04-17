@@ -1,6 +1,6 @@
 package com.therandomlabs.randomportals;
 
-import com.therandomlabs.randomportals.command.CommandRPOReload;
+import com.therandomlabs.randomlib.config.CommandConfigReload;
 import com.therandomlabs.randomportals.config.RPOConfig;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -58,7 +58,9 @@ public final class RandomPortals {
 	@Mod.EventHandler
 	public static void serverStarting(FMLServerStartingEvent event) {
 		if(RPOConfig.Misc.rporeloadCommand) {
-			event.registerServerCommand(new CommandRPOReload(Side.SERVER));
+			event.registerServerCommand(new CommandConfigReload(
+					"rporeload", RPOConfig.class, Side.SERVER, "RandomPortals configuration reloaded!"
+			));
 		}
 	}
 }

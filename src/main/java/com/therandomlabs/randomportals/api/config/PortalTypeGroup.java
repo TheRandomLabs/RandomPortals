@@ -11,7 +11,7 @@ public final class PortalTypeGroup {
 	public int defaultDimensionID;
 	//Chance that a zombie pigman spawns each tick is d in n, where d is the difficulty
 	//from 0 to 3 and n is the defined spawn rate
-	public Map<Integer, Integer> zombiePigmanSpawnRates = new HashMap<>();
+	public Map<Integer, EntitySpawns> entitySpawns = new HashMap<>();
 
 	public transient Map<Integer, PortalType> types = new HashMap<>();
 
@@ -26,7 +26,7 @@ public final class PortalTypeGroup {
 			this.id = id;
 		}
 
-		zombiePigmanSpawnRates.put(0, 2000);
+		entitySpawns.put(0, new EntitySpawns());
 	}
 
 	@Override
@@ -35,17 +35,14 @@ public final class PortalTypeGroup {
 	}
 
 	public void ensureCorrect() {
-		zombiePigmanSpawnRates.entrySet().stream().
-				filter(entry -> entry.getValue() < 1).
-				map(Map.Entry::getKey).
-				forEach(zombiePigmanSpawnRates::remove);
+		entitySpawns.values().forEach(EntitySpawns::ensureCorrect);
 	}
 
 	public boolean isValid() {
 		return types.containsKey(defaultDimensionID);
 	}
 
-	public boolean testActivationDimensionID(int dimensionID) {
+	public boolean canActivateInDimension(int dimensionID) {
 		if(blacklistAllUndefinedDimensions) {
 			if(types.containsKey(dimensionID)) {
 				return true;

@@ -143,9 +143,13 @@ public class RPOTeleporter extends Teleporter {
 				dimensionID == portalType.destination.dimensionID;
 
 		if(forceInitial) {
-			receivingFrame = savedData.getNetherPortalByFrame(
+			final NetherPortal initialPortal = savedData.getNetherPortalByFrame(
 					portalType.destination.initialLocation.toBlockPos()
-			).getFrame();
+			);
+
+			if(initialPortal != null) {
+				receivingFrame = initialPortal.getFrame();
+			}
 		} else if(RPOConfig.NetherPortals.persistentReceivingPortals && sendingPortal != null) {
 			receivingFrame = sendingPortal.getReceivingFrame();
 		}

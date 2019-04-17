@@ -7,13 +7,14 @@ import java.util.Map;
 import java.util.Random;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.api.config.ColorData;
+import com.therandomlabs.randomportals.api.config.EntitySpawns;
 import com.therandomlabs.randomportals.api.config.FrameSize;
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
+import com.therandomlabs.randomportals.api.config.SpawnRate;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
 import com.therandomlabs.randomportals.api.frame.Frame;
 import com.therandomlabs.randomportals.api.frame.FrameDetector;
@@ -23,6 +24,7 @@ import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
 import com.therandomlabs.randomportals.api.util.FrameStatePredicate;
 import com.therandomlabs.randomportals.client.RPOPortalRenderer;
 import com.therandomlabs.randomportals.client.particle.ParticleRPOPortal;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
@@ -37,27 +39,31 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -183,10 +189,11 @@ public class BlockNetherPortal extends BlockPortal {
 		final NetherPortal portal = RPOSavedData.get(world).getNetherPortalByInner(pos);
 		final PortalType portalType =
 				portal == null ? PortalTypes.getDefault(world) : portal.getType();
-		final Integer spawnRate =
-				portalType.group.zombiePigmanSpawnRates.get(world.provider.getDimension());
+		final EntitySpawns spawns =
+				portalType.group.entitySpawns.get(world.provider.getDimension());
 
-		if(spawnRate == null || random.nextInt(spawnRate) > world.getDifficulty().getId()) {
+		if(spawns == null || spawns.rates.isEmpty() ||
+				random.nextInt(spawns.rate) > world.getDifficulty().getId()) {
 			return;
 		}
 
@@ -206,17 +213,44 @@ public class BlockNetherPortal extends BlockPortal {
 			return;
 		}
 
-		final Entity entity = ItemMonsterPlacer.spawnCreature(
-				world,
-				EntityList.getKey(EntityPigZombie.class),
-				pos.getX() + 0.5,
-				pos.getY() + 1.1,
-				pos.getZ() + 0.5
+		final SpawnRate spawnRate = spawns.getRandom(random);
+		NBTTagCompound compound = null;
+
+		try {
+			compound = JsonToNBT.getTagFromJson(spawnRate.nbt);
+		} catch(NBTException ignored) {}
+
+		compound.setString("id", spawnRate.key);
+
+		final float x = pos.getX() + 0.5F;
+		final float y = pos.getY() + 1.1F;
+		final float z = pos.getZ() + 0.5F;
+
+		final Entity entity = AnvilChunkLoader.readWorldEntityPos(compound, world, x, y, z, true);
+
+		if(entity == null) {
+			return;
+		}
+
+		final EntityLiving living = entity instanceof EntityLiving ? (EntityLiving) entity : null;
+
+		if(living != null && ForgeEventFactory.doSpecialSpawn(living, world, x, y, z, null)) {
+			world.removeEntity(entity);
+			return;
+		}
+
+		entity.setLocationAndAngles(
+				x, y, z, MathHelper.wrapDegrees(random.nextFloat() * 360.0F), 0.0F
 		);
 
-		if(entity != null) {
-			entity.timeUntilPortal = entity.getPortalCooldown();
+		if(living != null) {
+			living.rotationYawHead = entity.rotationYaw;
+			living.renderYawOffset = entity.rotationYaw;
+			living.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(living)), null);
+			living.playLivingSound();
 		}
+
+		entity.timeUntilPortal = entity.getPortalCooldown();
 	}
 
 	@Override
