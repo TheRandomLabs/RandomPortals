@@ -1,7 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
-		"1.12.2-1.8.0.0": "Replaced \"blacklistAllUndefinedActivationDimensions\" with \"blacklistAllUndefinedDimensions\" in portal type groups.\nSpawned entities are now configurable for each dimension.\nThe vanilla Nether portal can now only be activated in the Overworld and the Nether by default.\nInitial portal locations, coordinate multipliers and entity spawns can now be configured for custom portal types.\nFixed a compatibility issue relating to the RightClickBlock event.",
+		"1.12.2-1.8.0.0": "Replaced \"blacklistAllUndefinedActivationDimensions\" with \"blacklistAllUndefinedDimensions\" in portal type groups.\nSpawned entities are now configurable for each dimension.\nThe vanilla Nether portal can now only be activated in the Overworld and the Nether by default.\nInitial portal locations, coordinate multipliers and entity spawns can now be configured for custom portal types.\nFixed a compatibility issue relating to the RightClickBlock event.\nFixed the portal entity spawn chances being slightly off.",
 		"1.12.2-1.7.0.1": "Fixed modded portal frame blocks being reset.",
 		"1.12.2-1.7.0.0": "Switched to RandomLib for the main configuration.",
 		"1.12.2-1.6.5.1": "Fixed the portal type configuration loading too early, causing modded blocks to be removed.",
