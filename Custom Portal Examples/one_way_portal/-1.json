@@ -47,6 +47,13 @@
 	},
 	"destination": {
 		"dimensionID": 0,
+		"locationDetectionBehavior": "IGNORE_INITIAL",
+		"initialLocation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"coordinateMultiplier": 1.0,
 		"teleportToPortal": true,
 		"oneWay": true,
 		"generatePortalIfNotFound": true,

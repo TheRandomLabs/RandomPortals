@@ -98,6 +98,30 @@
 	},
 	"destination": {
 		"dimensionID": 1,
+		//Valid values:
+		//"IGNORE_INITIAL": ignore initialLocation
+		//"USE_INITIAL": initialLocation is used as the destination portal location if there
+		//are no other portals in the destination world
+		//"FORCE_INITIAL": initialLocation is always used as the destination portal
+		"locationDetectionBehavior": "FORCE_INITIAL",
+		//If this is used, then this should point to the bottom left block of the destination
+		//portal frame, unless the frame is lateral, in which case this should point to the
+		//top left block.
+		//If the frame is lateral, a two-block-high empty space will be created above the portal.
+		//This only takes effect if the destination dimension has the ID specified by dimensionID.
+		"initialLocation": {
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		//What the entity's X and Z coordinates should be multiplied by.
+		//If the destination dimension does not have the ID specified by dimensionID,
+		//the X and Z coordinates are divided instead.
+		//This respects dimensions' movement factors, so in this case, an entity teleporting to
+		//the Nether from the Overworld will have its coordinates first divided by 8,
+		//then multiplied by 2, and an entity teleporting to the Overworld from the Nether will
+		//have its coordinates first multiplied by 8, then divided by 2.
+		"coordinateMultiplier": 2.0,
 		//Whether to teleport to a receiving portal
 		"teleportToPortal": true,
 		//Whether this portal is a one-way. If true, the corresponding portal generated in the
