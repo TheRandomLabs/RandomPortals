@@ -88,7 +88,7 @@ public final class FrameData {
 			for(FrameBlock block : blocks) {
 				if(block.test(state)) {
 					if(!corner || cornerBlocksContributeToMinimumAmount) {
-						detectedBlocks.merge(block, 1, (a, b) -> a + b);
+						detectedBlocks.merge(block, 1, Integer::sum);
 					}
 
 					found = true;
