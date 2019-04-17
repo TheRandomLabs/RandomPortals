@@ -192,7 +192,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final EntitySpawns spawns =
 				portalType.group.entitySpawns.get(world.provider.getDimension());
 
-		if(spawns == null || spawns.rates.isEmpty() ||
+		if(spawns == null || spawns.entities.isEmpty() ||
 				random.nextInt(spawns.rate) > world.getDifficulty().getId()) {
 			return;
 		}

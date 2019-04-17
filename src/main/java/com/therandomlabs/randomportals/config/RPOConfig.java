@@ -178,7 +178,7 @@ public final class RPOConfig {
 
 		try {
 			if(parent != null) {
-				if(parent.toFile().exists() && parent.toFile().isFile()) {
+				if(Files.isRegularFile(parent)) {
 					Files.delete(parent);
 				}
 

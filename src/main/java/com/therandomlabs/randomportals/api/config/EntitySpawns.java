@@ -11,12 +11,12 @@ import org.apache.commons.lang3.ArrayUtils;
 
 public final class EntitySpawns {
 	public int rate = 2000;
-	public Map<String, SpawnRate> rates = new HashMap<>();
+	public Map<String, SpawnRate> entities = new HashMap<>();
 
 	public transient double totalWeight;
 
 	public EntitySpawns() {
-		rates.put("minecraft:zombie_pigman", new SpawnRate());
+		entities.put("minecraft:zombie_pigman", new SpawnRate());
 	}
 
 	public void ensureCorrect() {
@@ -24,14 +24,14 @@ public final class EntitySpawns {
 			rate = 2000;
 		}
 
-		final Map<String, SpawnRate> newRates = new HashMap<>(rates.size());
+		final Map<String, SpawnRate> newEntities = new HashMap<>(entities.size());
 		final ResourceLocation[] entityNames =
 				EntityList.getEntityNameList().toArray(new ResourceLocation[0]);
 
 		totalWeight = 0.0;
 
-		final List<String> registryNames = new ArrayList<>(rates.keySet());
-		final List<SpawnRate> spawnRates = new ArrayList<>(rates.values());
+		final List<String> registryNames = new ArrayList<>(entities.keySet());
+		final List<SpawnRate> spawnRates = new ArrayList<>(entities.values());
 
 		for(int i = 0; i < registryNames.size(); i++) {
 			final int index = ArrayUtils.indexOf(
@@ -46,18 +46,18 @@ public final class EntitySpawns {
 
 				totalWeight += spawnRate.weight;
 
-				newRates.put(key, spawnRate);
+				newEntities.put(key, spawnRate);
 			}
 		}
 
-		rates = newRates;
+		entities = newEntities;
 	}
 
 	public SpawnRate getRandom(Random random) {
 		final double result = random.nextDouble() * totalWeight;
 		double weight = 0.0;
 
-		for(SpawnRate spawnRate : rates.values()) {
+		for(SpawnRate spawnRate : entities.values()) {
 			weight += spawnRate.weight;
 
 			if(weight >= result) {
