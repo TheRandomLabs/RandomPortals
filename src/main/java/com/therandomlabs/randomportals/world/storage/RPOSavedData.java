@@ -170,7 +170,7 @@ public class RPOSavedData extends WorldSavedData {
 		return nbt;
 	}
 
-	public Map<BlockPos, NetherPortal> getUserCreatedNetherPortals() {
+	public Map<BlockPos, NetherPortal> getNetherPortals() {
 		return netherPortals;
 	}
 

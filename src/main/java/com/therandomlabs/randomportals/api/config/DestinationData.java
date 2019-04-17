@@ -11,7 +11,23 @@ public final class DestinationData {
 		USE_RECEIVING_DIMENSION_PORTAL_TYPE
 	}
 
+	public enum LocationDetectionBehavior {
+		IGNORE_INITIAL,
+		USE_INITIAL,
+		FORCE_INITIAL
+	}
+
 	public int dimensionID = -1;
+
+	public LocationDetectionBehavior locationDetectionBehavior =
+			LocationDetectionBehavior.IGNORE_INITIAL;
+	//Bottom left if vertical and top left if lateral so that RPOTeleporter doesn't try to spawn
+	//portals in the void
+	//If lateral, a two-block-high empty space will be created above the portal
+	//This only takes effect if the destination dimension has the ID specified by dimensionID
+	public PosData initialLocation = new PosData();
+
+	public double coordinateMultiplier = 1.0;
 
 	public boolean teleportToPortal = true;
 	public boolean oneWay;
@@ -33,6 +49,7 @@ public final class DestinationData {
 	}
 
 	public void ensureCorrect() {
+		initialLocation.ensureCorrect();
 		ensureCorrect(generatedFrameSize.lateral);
 		ensureCorrect(generatedFrameSize.verticalX);
 		ensureCorrect(generatedFrameSize.verticalZ);

@@ -134,6 +134,13 @@ public final class RPOConfig {
 						"to more easily create colored patterns in portals."
 		})
 		public static boolean replaceUserPlacedPortalsOnActivation;
+
+		@Config.Property({
+				"Whether portal ambient sounds should be server-sided instead of client-sided " +
+						"as in vanilla.",
+				"This must be enabled for custom portal ambient sounds to work."
+		})
+		public static boolean serverSidedAmbientSounds = true;
 	}
 
 	@Config.Category("Options related to features that only work client-side.")

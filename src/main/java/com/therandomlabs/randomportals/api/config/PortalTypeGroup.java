@@ -5,7 +5,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 
 public final class PortalTypeGroup {
-	public boolean blacklistAllUndefinedActivationDimensions;
+	public boolean blacklistAllUndefinedDimensions = true;
 	public int[] activationDimensionIDBlacklist = new int[0];
 
 	public int defaultDimensionID;
@@ -46,8 +46,18 @@ public final class PortalTypeGroup {
 	}
 
 	public boolean testActivationDimensionID(int dimensionID) {
-		if(blacklistAllUndefinedActivationDimensions) {
-			return types.containsKey(dimensionID);
+		if(blacklistAllUndefinedDimensions) {
+			if(types.containsKey(dimensionID)) {
+				return true;
+			}
+
+			for(PortalType type : types.values()) {
+				if(type.destination.dimensionID == dimensionID) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		return !ArrayUtils.contains(activationDimensionIDBlacklist, dimensionID);

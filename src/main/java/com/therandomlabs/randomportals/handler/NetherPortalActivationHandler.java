@@ -47,6 +47,12 @@ public final class NetherPortalActivationHandler {
 		final BlockPos pos = event.getPos();
 		final EntityPlayer player = event.getEntityPlayer();
 		final EnumFacing face = event.getFace();
+
+		if(face == null) {
+			//Apparently this happens
+			return;
+		}
+
 		final BlockPos portalPos = pos.offset(face);
 
 		if(stack.getItem() == Items.FLINT_AND_STEEL) {

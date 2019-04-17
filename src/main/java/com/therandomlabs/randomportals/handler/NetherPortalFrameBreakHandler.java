@@ -15,6 +15,7 @@ public final class NetherPortalFrameBreakHandler {
 	private static final Map<Map.Entry<World, BlockPos>, PortalType> positions =
 			new HashMap<>();
 
+	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event) {
 		final World world = event.getWorld();

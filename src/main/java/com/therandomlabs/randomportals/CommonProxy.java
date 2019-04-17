@@ -2,8 +2,7 @@ package com.therandomlabs.randomportals;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import com.elytradev.movingworld.MovingWorldMod;
-import com.elytradev.movingworld.common.config.priority.AssemblePriorityConfig;
+import java.lang.reflect.InvocationTargetException;
 import com.therandomlabs.randomlib.TRLUtils;
 import com.therandomlabs.randomlib.config.ConfigManager;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
@@ -33,7 +32,8 @@ public class CommonProxy {
 		if(RandomPortals.MOVINGWORLD_INSTALLED) {
 			try {
 				handleMovingWorld();
-			} catch(NoSuchFieldException | IllegalAccessException ex) {
+			} catch(ClassNotFoundException | NoSuchFieldException | NoSuchMethodException |
+					IllegalAccessException | InvocationTargetException ex) {
 				RandomPortals.LOGGER.error("Failed to fix MovingWorld compatibility", ex);
 			}
 		}
@@ -61,16 +61,28 @@ public class CommonProxy {
 		RPOCriteriaTriggers.register();
 	}
 
-	private void handleMovingWorld() throws NoSuchFieldException, IllegalAccessException {
+	private void handleMovingWorld() throws ClassNotFoundException, NoSuchFieldException,
+			NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		//https://github.com/elytra/MovingWorld/blob/1c547d75d9e681473cbc04a58dc6b803d5ef19fa/
 		//src/main/java/com/elytradev/movingworld/common/config/priority/
 		//AssemblePriorityConfig.java
 		//MovingWorld loads Blocks.PORTAL and Blocks.END_PORTAL in preInit before
 		//RandomPortals can register its replacements
 		//It then uses the vanilla portal and End portal in init, causing an NPE
-		final AssemblePriorityConfig config =
-				MovingWorldMod.INSTANCE.getLocalConfig().getShared().assemblePriorityConfig;
-		final Class<?> clazz = AssemblePriorityConfig.class;
+		final Class<?> movingWorldMod = Class.forName("com.elytradev.movingworld.MovingWorldMod");
+		final Object movingWorldInstance = movingWorldMod.getDeclaredField("INSTANCE").get(null);
+
+		final Object localConfigInstance =
+				movingWorldMod.getDeclaredMethod("getLocalConfig").invoke(movingWorldInstance);
+		final Class<?> mainConfig = localConfigInstance.getClass();
+
+		final Object sharedConfigInstance =
+				mainConfig.getDeclaredMethod("getShared").invoke(localConfigInstance);
+		final Class<?> sharedConfig = sharedConfigInstance.getClass();
+
+		final Object config =
+				sharedConfig.getDeclaredField("assemblePriorityConfig").get(sharedConfigInstance);
+		final Class<?> clazz = config.getClass();
 
 		final Field defaultHighPriorityAssemblyBlocks =
 				clazz.getDeclaredField("defaultHighPriorityAssemblyBlocks");

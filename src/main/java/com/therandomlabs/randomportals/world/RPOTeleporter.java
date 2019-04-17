@@ -3,7 +3,6 @@ package com.therandomlabs.randomportals.world;
 import java.util.List;
 import com.therandomlabs.randompatches.common.RPTeleporter;
 import com.therandomlabs.randompatches.config.RPConfig;
-import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.DestinationData;
 import com.therandomlabs.randomportals.api.config.FrameBlock;
@@ -19,6 +18,7 @@ import com.therandomlabs.randomportals.api.netherportal.NetherPortalActivator;
 import com.therandomlabs.randomportals.api.netherportal.PortalBlockRegistry;
 import com.therandomlabs.randomportals.api.netherportal.TeleportData;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.frame.NetherPortalFrames;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
 import com.therandomlabs.randomportals.world.storage.RPOSavedData;
@@ -52,6 +52,14 @@ public class RPOTeleporter extends Teleporter {
 
 		if(data != null) {
 			final PortalType type = data.getPortalType();
+
+			if(dimensionID == type.destination.dimensionID) {
+				entity.posX *= type.destination.coordinateMultiplier;
+				entity.posZ *= type.destination.coordinateMultiplier;
+			} else {
+				entity.posX /= type.destination.coordinateMultiplier;
+				entity.posZ /= type.destination.coordinateMultiplier;
+			}
 
 			if(type.destination.teleportToPortal) {
 				if(placeInExistingPortal(entity, yaw)) {
@@ -128,12 +136,18 @@ public class RPOTeleporter extends Teleporter {
 		final PortalType portalType = data.getPortalType();
 		final String groupID = portalType.group.toString();
 		final NetherPortal sendingPortal = data.getPortal();
-		Frame receivingFrame;
+		Frame receivingFrame = null;
 
-		if(RPOConfig.NetherPortals.persistentReceivingPortals) {
-			receivingFrame = sendingPortal == null ? null : sendingPortal.getReceivingFrame();
-		} else {
-			receivingFrame = null;
+		final boolean forceInitial = portalType.destination.locationDetectionBehavior ==
+				DestinationData.LocationDetectionBehavior.FORCE_INITIAL &&
+				dimensionID == portalType.destination.dimensionID;
+
+		if(forceInitial) {
+			receivingFrame = savedData.getNetherPortalByFrame(
+					portalType.destination.initialLocation.toBlockPos()
+			).getFrame();
+		} else if(RPOConfig.NetherPortals.persistentReceivingPortals && sendingPortal != null) {
+			receivingFrame = sendingPortal.getReceivingFrame();
 		}
 
 		NetherPortal receivingPortal = null;
@@ -167,6 +181,10 @@ public class RPOTeleporter extends Teleporter {
 		}
 
 		if(receivingFrame == null) {
+			if(forceInitial) {
+				return false;
+			}
+
 			final PortalPosition cachedPos = destinationCoordinateCache.get(entityChunkPos);
 
 			if(cachedPos == null) {
@@ -215,7 +233,7 @@ public class RPOTeleporter extends Teleporter {
 			zOffset = 0.0;
 			forwards = EnumFacing.NORTH;
 		} else {
-			if(sendingPortal != null) {
+			if(sendingPortal != null && !forceInitial) {
 				sendingPortal.setReceivingFrame(frame);
 
 				if(receivingPortal == null) {
@@ -398,157 +416,29 @@ public class RPOTeleporter extends Teleporter {
 			portalType = portalType.group.getType(portalType.destination.dimensionID);
 		}
 
-		final int platformWidth = width;
-		final int platformLength = type == FrameType.LATERAL ? height : 3;
-		final int spaceHeight = type == FrameType.LATERAL ? 2 : height;
-
-		final int fallbackWidth = width == 3 ? 3 : 4;
-		final int fallbackLength = 1;
-		final int fallbackSpaceHeight = type == FrameType.LATERAL ? 2 : 4;
-
-		final int entityX = (int) entity.posX;
-		final int entityY = (int) entity.posY;
-		final int entityZ = (int) entity.posZ;
-
-		int portalX = 0;
-		int portalY = 0;
-		int portalZ = 0;
-
-		double distanceSq = -1.0;
-
-		int fallbackX = 0;
-		int fallbackY = 0;
-		int fallbackZ = 0;
-
-		double fallbackDistanceSq = -1.0;
-
-		final Tuple<Integer, Integer> yBounds = getYBounds(entityY);
-		final int minY = yBounds.getFirst();
-		final int maxY = yBounds.getSecond();
-
-		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-		final int worldHeight = type == FrameType.LATERAL ? maxY - 1 : maxY - height;
-
-		final int radius = RPOConfig.NetherPortals.portalGenerationLocationSearchRadius;
-
-		for(int checkX = entityX - radius; checkX <= entityX + radius; checkX++) {
-			final double xDistance = checkX + 0.5 - entity.posX;
-
-			for(int checkZ = entityZ - radius; checkZ <= entityZ + radius; checkZ++) {
-				final double zDistance = checkZ + 0.5 - entity.posZ;
-
-				for(int checkY = worldHeight; checkY >= minY; checkY--) {
-					//Check for space above the platform first
-					if(!world.isAirBlock(pos.setPos(checkX, checkY, checkZ))) {
-						continue;
-					}
-
-					//Find the highest air block with a non-air block below it
-					while(checkY > minY &&
-							world.isAirBlock(pos.setPos(checkX, checkY - 1, checkZ))) {
-						checkY--;
-					}
-
-					final double yDistance = checkY + 0.5 - entity.posY;
-					final double newDistance = xDistance * xDistance +
-							yDistance * yDistance +
-							zDistance * zDistance;
-
-					if(distanceSq != -1.0 && newDistance > distanceSq) {
-						continue;
-					}
-
-					boolean valid = isValidPortalPosition(
-							pos, checkX, checkY, checkZ, platformWidth, platformLength,
-							spaceHeight, type
-					);
-
-					if(valid) {
-						distanceSq = newDistance;
-						portalX = checkX;
-						portalY = checkY;
-						portalZ = checkZ;
-
-						continue;
-					}
-
-					if(distanceSq != -1.0 ||
-							(fallbackDistanceSq != -1.0 && newDistance >= fallbackDistanceSq)) {
-						continue;
-					}
-
-					valid = isValidPortalPosition(
-							pos, checkX, checkY, checkZ, fallbackWidth, fallbackLength,
-							fallbackSpaceHeight, type
-					);
-
-					if(valid) {
-						fallbackDistanceSq = newDistance;
-						fallbackX = checkX;
-						fallbackY = checkY;
-						fallbackZ = checkZ;
-					}
-				}
-			}
-		}
-
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		final IBlockState air = Blocks.AIR.getDefaultState();
 
-		if(distanceSq == -1.0) {
-			if(fallbackDistanceSq == -1.0) {
-				portalX = entityX;
-				portalY = MathHelper.clamp((int) entity.posY, 70, maxY - 10);
-				portalZ = entityZ;
+		final DestinationData.LocationDetectionBehavior behavior =
+				dimensionID == portalType.destination.dimensionID ?
+						portalType.destination.locationDetectionBehavior :
+						DestinationData.LocationDetectionBehavior.IGNORE_INITIAL;
+		final boolean initial =
+				behavior == DestinationData.LocationDetectionBehavior.FORCE_INITIAL ||
+						(behavior == DestinationData.LocationDetectionBehavior.USE_INITIAL &&
+								savedData.getNetherPortals().isEmpty());
 
-				for(int widthOffset = 0; widthOffset < platformWidth; widthOffset++) {
-					for(int lengthOffset = 0; lengthOffset < platformLength; lengthOffset++) {
-						final Tuple<Integer, Integer> offsets =
-								getOffsets(type, widthOffset, lengthOffset);
-						final int offsetX = portalX + offsets.getFirst();
-						final int offsetZ = portalZ + offsets.getSecond();
+		BlockPos topLeft;
 
-						//Don't use a MutableBlockPos because we're adding this to the saved data
-						final BlockPos platformPos = new BlockPos(offsetX, portalY - 1, offsetZ);
-						savedData.addGeneratedNetherPortalFrame(platformPos, portalType);
+		if(initial) {
+			topLeft = portalType.destination.initialLocation.toBlockPos();
 
-						final int index = random.nextInt(portalType.frame.blocks.size());
-						world.setBlockState(
-								platformPos, portalType.frame.blocks.get(index).getActualState(), 2
-						);
-
-						for(int yOffset = 0; yOffset < spaceHeight; yOffset++) {
-							world.setBlockState(
-									pos.setPos(offsetX, portalY + yOffset, offsetZ), air, 2
-							);
-						}
-					}
-				}
-			} else {
-				portalX = fallbackX;
-				portalY = fallbackY;
-				portalZ = fallbackZ;
-				width = 4;
-				height = 5;
+			//initialLocation is the bottom left if the frame is vertical
+			if(type != FrameType.LATERAL) {
+				topLeft = topLeft.up(height - 1);
 			}
-		}
-
-		BlockPos topLeft = new BlockPos(portalX, portalY, portalZ);
-
-		if(type == FrameType.LATERAL) {
-			topLeft = topLeft.down();
 		} else {
-			//portalX, portalY, portalZ point to the bottom left of the frame, so we offset the
-			//position in type.getHeightDirection().getOpposite(), then offset it an extra time
-			//so that the bottom is in the platform
-			//Then we offset it once so the frame is centered in the platform
-			topLeft = topLeft.up(height - 2).
-					offset(type == FrameType.VERTICAL_Z ? EnumFacing.EAST : EnumFacing.SOUTH);
-
-			//The portal position should be the northmost block but topLeft should be the southmost
-			if(type == FrameType.VERTICAL_Z) {
-				topLeft = topLeft.south(width - 1);
-			}
+			topLeft = findTopLeft(savedData, entity, portalType, type, width, height, air);
 		}
 
 		final World sendingWorld = data.getSendingPortalWorld();
@@ -563,8 +453,12 @@ public class RPOTeleporter extends Teleporter {
 			clone(
 					portalType, newFrame, newFrame.getFrameBlockPositions(), frame.getFrameBlocks()
 			);
-
 			clone(null, null, newFrame.getInnerBlockPositions(), frame.getInnerBlocks());
+
+			//Ensure the entity has space to spawn at the initial portal coordinates
+			if(initial && type == FrameType.LATERAL) {
+				clearAbove(newFrame, air);
+			}
 
 			final NetherPortal portal = new NetherPortal(
 					newFrame, receivingFrame, portalType, oneWay ? FunctionType.ONE_WAY : null
@@ -587,17 +481,25 @@ public class RPOTeleporter extends Teleporter {
 			world.setBlockState(innerPos, air, 2);
 		}
 
+		//Ensure the entity has space to spawn at the initial portal coordinates
+		if(initial && type == FrameType.LATERAL) {
+			clearAbove(newFrame, air);
+		}
+
 		//We offset the position once in type.getWidthDirection() and type.getHeightDirection()
 		//because NetherPortalActivator only works with inner blocks
 		final BlockPos activationPos =
 				topLeft.offset(type.getWidthDirection()).offset(type.getHeightDirection());
 
-		new NetherPortalActivator().
+		final NetherPortal portal = new NetherPortalActivator().
 				forcePortalType(portalType).
 				setUserCreated(false).
 				setFunctionType(oneWay ? FunctionType.ONE_WAY : null).
-				activate(world, activationPos, null).
-				setReceivingFrame(receivingFrame);
+				activate(world, activationPos, null);
+
+		if(!initial) {
+			portal.setReceivingFrame(receivingFrame);
+		}
 
 		return true;
 	}
@@ -757,6 +659,177 @@ public class RPOTeleporter extends Teleporter {
 			}
 
 			world.setBlockState(newPos, oldState, 2);
+		}
+	}
+
+	private BlockPos findTopLeft(RPOSavedData savedData, Entity entity, PortalType portalType,
+			FrameType type, int width, int height, IBlockState air) {
+		int portalX = 0;
+		int portalY = 0;
+		int portalZ = 0;
+
+		final int platformWidth = width;
+		final int platformLength = type == FrameType.LATERAL ? height : 3;
+		final int spaceHeight = type == FrameType.LATERAL ? 2 : height;
+
+		final int fallbackWidth = width == 3 ? 3 : 4;
+		final int fallbackLength = 1;
+		final int fallbackSpaceHeight = type == FrameType.LATERAL ? 2 : 4;
+
+		final int entityX = (int) entity.posX;
+		final int entityY = (int) entity.posY;
+		final int entityZ = (int) entity.posZ;
+
+		double distanceSq = -1.0;
+
+		int fallbackX = 0;
+		int fallbackY = 0;
+		int fallbackZ = 0;
+
+		double fallbackDistanceSq = -1.0;
+
+		final Tuple<Integer, Integer> yBounds = getYBounds(entityY);
+		final int minY = yBounds.getFirst();
+		final int maxY = yBounds.getSecond();
+
+		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		final int worldHeight = type == FrameType.LATERAL ? maxY - 1 : maxY - height;
+
+		final int radius = RPOConfig.NetherPortals.portalGenerationLocationSearchRadius;
+
+		for(int checkX = entityX - radius; checkX <= entityX + radius; checkX++) {
+			final double xDistance = checkX + 0.5 - entity.posX;
+
+			for(int checkZ = entityZ - radius; checkZ <= entityZ + radius; checkZ++) {
+				final double zDistance = checkZ + 0.5 - entity.posZ;
+
+				for(int checkY = worldHeight; checkY >= minY; checkY--) {
+					//Check for space above the platform first
+					if(!world.isAirBlock(pos.setPos(checkX, checkY, checkZ))) {
+						continue;
+					}
+
+					//Find the highest air block with a non-air block below it
+					while(checkY > minY &&
+							world.isAirBlock(pos.setPos(checkX, checkY - 1, checkZ))) {
+						checkY--;
+					}
+
+					final double yDistance = checkY + 0.5 - entity.posY;
+					final double newDistance = xDistance * xDistance +
+							yDistance * yDistance +
+							zDistance * zDistance;
+
+					if(distanceSq != -1.0 && newDistance > distanceSq) {
+						continue;
+					}
+
+					boolean valid = isValidPortalPosition(
+							pos, checkX, checkY, checkZ, platformWidth, platformLength,
+							spaceHeight, type
+					);
+
+					if(valid) {
+						distanceSq = newDistance;
+						portalX = checkX;
+						portalY = checkY;
+						portalZ = checkZ;
+
+						continue;
+					}
+
+					if(distanceSq != -1.0 ||
+							(fallbackDistanceSq != -1.0 && newDistance >= fallbackDistanceSq)) {
+						continue;
+					}
+
+					valid = isValidPortalPosition(
+							pos, checkX, checkY, checkZ, fallbackWidth, fallbackLength,
+							fallbackSpaceHeight, type
+					);
+
+					if(valid) {
+						fallbackDistanceSq = newDistance;
+						fallbackX = checkX;
+						fallbackY = checkY;
+						fallbackZ = checkZ;
+					}
+				}
+			}
+		}
+
+		if(distanceSq == -1.0) {
+			if(fallbackDistanceSq == -1.0) {
+				portalX = entityX;
+				portalY = MathHelper.clamp((int) entity.posY, 70, maxY - 10);
+				portalZ = entityZ;
+
+				for(int widthOffset = 0; widthOffset < platformWidth; widthOffset++) {
+					for(int lengthOffset = 0; lengthOffset < platformLength; lengthOffset++) {
+						final Tuple<Integer, Integer> offsets =
+								getOffsets(type, widthOffset, lengthOffset);
+						final int offsetX = portalX + offsets.getFirst();
+						final int offsetZ = portalZ + offsets.getSecond();
+
+						//Don't use a MutableBlockPos because we're adding this to the saved data
+						final BlockPos platformPos = new BlockPos(offsetX, portalY - 1, offsetZ);
+						savedData.addGeneratedNetherPortalFrame(platformPos, portalType);
+
+						final int index = random.nextInt(portalType.frame.blocks.size());
+						world.setBlockState(
+								platformPos, portalType.frame.blocks.get(index).getActualState(),
+								2
+						);
+
+						for(int yOffset = 0; yOffset < spaceHeight; yOffset++) {
+							world.setBlockState(
+									pos.setPos(offsetX, portalY + yOffset, offsetZ), air, 2
+							);
+						}
+					}
+				}
+			} else {
+				portalX = fallbackX;
+				portalY = fallbackY;
+				portalZ = fallbackZ;
+				width = 4;
+				height = 5;
+			}
+		}
+
+		BlockPos topLeft = new BlockPos(portalX, portalY, portalZ);
+
+		if(type == FrameType.LATERAL) {
+			topLeft = topLeft.down();
+		} else {
+			//portalX, portalY, portalZ point to the bottom left of the frame, so we offset the
+			//position in type.getHeightDirection().getOpposite(), then offset it an extra time
+			//so that the bottom is in the platform
+			//Then we offset it once so the frame is centered in the platform
+			topLeft = topLeft.up(height - 2).
+					offset(type == FrameType.VERTICAL_Z ? EnumFacing.EAST : EnumFacing.SOUTH);
+
+			//If the frame is on the z-axis, the found position is the northmost block but
+			//topLeft should be the southmost
+			if(type == FrameType.VERTICAL_Z) {
+				topLeft = topLeft.south(width - 1);
+			}
+		}
+
+		return topLeft;
+	}
+
+	private void clearAbove(Frame frame, IBlockState air) {
+		for(BlockPos pos : frame.getFrameBlockPositions()) {
+			final BlockPos up = pos.up();
+			world.setBlockState(up, air);
+			world.setBlockState(up.up(), air);
+		}
+
+		for(BlockPos pos : frame.getInnerBlockPositions()) {
+			final BlockPos up = pos.up();
+			world.setBlockState(up, air);
+			world.setBlockState(up.up(), air);
 		}
 	}
 
