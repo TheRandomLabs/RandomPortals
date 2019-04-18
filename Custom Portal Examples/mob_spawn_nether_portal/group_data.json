@@ -5,6 +5,8 @@
 	"entitySpawns": {
 		"0": {
 			//Lower the rate from n in 2000 to n in 500 where n is the difficulty
+			//This means that every random portal block tick, there is an n in 500
+			//chance that one of the following mobs spawns
 			"rate": 500,
 			"entities": {
 				//Zombie pigman is very common
