@@ -14,6 +14,9 @@ portal must be activated, and when entered, the generated sponge portal in the o
 cannot be entered to return to the Nether. You can see this portal type group in action
 [here](https://gfycat.com/FittingSecondaryHoiho).
 
+`mob_spawn_nether_portal` is the default vanilla Nether portal but with different mob spawns
+defined in `group_data.json`.
+
 Note that `vanilla_nether_portal` only defines a portal type for the dimension with ID `0`.
 If a player goes through a vanilla Nether portal from the Nether, even though the destination
 dimension ID is set to `-1`, RandomPortals recognizes that the player is already in the Nether

@@ -1,0 +1,33 @@
+{
+	"blacklistAllUndefinedDimensions": false,
+	"activationDimensionIDBlacklist": [],
+	"defaultDimensionID": 0,
+	"entitySpawns": {
+		"0": {
+			//Lower the rate from n in 2000 to n in 500 where n is the difficulty
+			"rate": 500,
+			"entities": {
+				//Zombie pigman is very common
+				"minecraft:zombie_pigman": {
+					"nbt": "{}",
+					"weight": 70.0
+				},
+				//Flying golem minecart bat is less common
+				"minecraft:bat": {
+					"nbt": "{Passengers:[{id:villager_golem,Passengers:[{id:minecart}]}]}",
+					"weight": 20.0
+				},
+				//Blaze is even less common
+				"minecraft:blaze": {
+					"nbt": "{}",
+					"weight": 5.0
+				},
+				//Wither is rare
+				"minecraft:wither": {
+					"nbt": "{}",
+					"weight": 1.0
+				}
+			}
+		}
+	}
+}
