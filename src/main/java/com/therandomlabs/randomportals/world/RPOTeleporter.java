@@ -881,7 +881,7 @@ public class RPOTeleporter extends Teleporter {
 		if(!(teleporter instanceof RPTeleporter)) {
 			if(worldTeleporter == null) {
 				worldTeleporter = TRLUtils.removeFinalModifier(
-						ObfuscationReflectionHelper.findField(WorldServer.class, "worldTeleporter")
+						ObfuscationReflectionHelper.findField(WorldServer.class, "field_85177_Q")
 				);
 			}
 
