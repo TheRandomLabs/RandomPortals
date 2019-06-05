@@ -1,9 +1,9 @@
 package com.therandomlabs.randomportals.client;
 
-import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.block.BlockLateralNetherPortal;
 import com.therandomlabs.randomportals.block.BlockNetherPortal;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;

@@ -2,9 +2,9 @@ package com.therandomlabs.randomportals.client.creativetab;
 
 import java.lang.reflect.Field;
 import com.therandomlabs.randomlib.TRLUtils;
-import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.block.RPOBlocks;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.creativetab.CreativeTabs;

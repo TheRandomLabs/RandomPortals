@@ -346,6 +346,7 @@ public class BlockNetherPortal extends BlockPortal {
 	@Override
 	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
 			EnumFacing side) {
+		//I adapted this from vanilla and am assuming it is an optimization of some sort
 		pos = pos.offset(side);
 		EnumFacing.Axis axis = null;
 

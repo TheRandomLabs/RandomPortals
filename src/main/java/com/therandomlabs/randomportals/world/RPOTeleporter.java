@@ -3,8 +3,6 @@ package com.therandomlabs.randomportals.world;
 import java.lang.reflect.Field;
 import java.util.List;
 import com.therandomlabs.randomlib.TRLUtils;
-import com.therandomlabs.randompatches.common.RPTeleporter;
-import com.therandomlabs.randompatches.config.RPConfig;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.DestinationData;
 import com.therandomlabs.randomportals.api.config.FrameBlock;
@@ -855,17 +853,6 @@ public class RPOTeleporter extends Teleporter {
 				!state.getBlock().isFoliage(world, pos);
 	}
 
-	public static void register() {
-		if(RPConfig.Misc.replaceTeleporter) {
-			RPTeleporter.setTeleporter(RPOTeleporter.class);
-		} else {
-			RandomPortals.LOGGER.error(
-					"RandomPatches' Teleporter replacement has been disabled. " +
-							"This will cause issues with Nether portal teleportation."
-			);
-		}
-	}
-
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event) {
 		final World world = event.getWorld();
@@ -877,8 +864,7 @@ public class RPOTeleporter extends Teleporter {
 		final WorldServer serverWorld = (WorldServer) world;
 		final Teleporter teleporter = serverWorld.getDefaultTeleporter();
 
-		//SpongeForge uses its own Teleporter
-		if(!(teleporter instanceof RPTeleporter)) {
+		if(!(teleporter instanceof RPOTeleporter)) {
 			if(worldTeleporter == null) {
 				worldTeleporter = TRLUtils.removeFinalModifier(
 						ObfuscationReflectionHelper.findField(WorldServer.class, "field_85177_Q")
@@ -886,7 +872,7 @@ public class RPOTeleporter extends Teleporter {
 			}
 
 			try {
-				worldTeleporter.set(world, new RPTeleporter(serverWorld));
+				worldTeleporter.set(world, new RPOTeleporter(serverWorld));
 			} catch(IllegalAccessException ex) {
 				TRLUtils.crashReport("Failed to set Teleporter", ex);
 			}

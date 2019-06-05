@@ -15,7 +15,6 @@ import com.therandomlabs.randomportals.handler.FrameHeadVillagerHandler;
 import com.therandomlabs.randomportals.handler.NetherPortalActivationHandler;
 import com.therandomlabs.randomportals.handler.NetherPortalFrameBreakHandler;
 import com.therandomlabs.randomportals.handler.NetherPortalTeleportHandler;
-import com.therandomlabs.randomportals.world.RPOTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,7 +22,6 @@ import net.minecraftforge.common.MinecraftForge;
 public class CommonProxy {
 	public void preInit() {
 		ConfigManager.register(RPOConfig.class);
-		RPOTeleporter.register();
 	}
 
 	public void init() {

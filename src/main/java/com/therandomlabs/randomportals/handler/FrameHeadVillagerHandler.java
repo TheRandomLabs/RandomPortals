@@ -1,7 +1,7 @@
 package com.therandomlabs.randomportals.handler;
 
-import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.block.RPOBlocks;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.inventory.EntityEquipmentSlot;

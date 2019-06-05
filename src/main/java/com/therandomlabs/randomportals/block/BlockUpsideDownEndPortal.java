@@ -36,13 +36,7 @@ public class BlockUpsideDownEndPortal extends BlockLateralEndPortal {
 	@Override
 	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
 			EnumFacing side) {
-		if(side != EnumFacing.UP && side != EnumFacing.DOWN) {
-			return false;
-		}
-
-		return !world.getBlockState(pos.offset(side)).doesSideBlockRendering(
-				world, pos.offset(side), side.getOpposite()
-		);
+		return side == EnumFacing.UP || side == EnumFacing.DOWN;
 	}
 
 	@Override

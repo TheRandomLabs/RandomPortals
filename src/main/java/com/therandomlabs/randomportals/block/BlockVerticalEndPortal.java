@@ -62,41 +62,7 @@ public class BlockVerticalEndPortal extends BlockLateralEndPortal {
 	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
 			EnumFacing side) {
 		final EnumFacing facing = state.getValue(FACING);
-
-		if(side != facing && side != facing.getOpposite()) {
-			return false;
-		}
-
-		final AxisAlignedBB axisAlignedBB = state.getBoundingBox(world, pos);
-
-		switch(side) {
-		case NORTH:
-			if(axisAlignedBB.minZ > 0.0D) {
-				return true;
-			}
-
-			break;
-		case SOUTH:
-			if(axisAlignedBB.maxZ < 1.0D) {
-				return true;
-			}
-
-			break;
-		case WEST:
-			if(axisAlignedBB.minX > 0.0D) {
-				return true;
-			}
-
-			break;
-		case EAST:
-			if(axisAlignedBB.maxX < 1.0D) {
-				return true;
-			}
-		}
-
-		return !world.getBlockState(pos.offset(side)).doesSideBlockRendering(
-				world, pos.offset(side), side.getOpposite()
-		);
+		return side == facing || side == facing.getOpposite();
 	}
 
 	@Override

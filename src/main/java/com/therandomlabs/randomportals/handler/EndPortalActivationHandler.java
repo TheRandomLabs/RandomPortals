@@ -1,9 +1,9 @@
 package com.therandomlabs.randomportals.handler;
 
 import java.util.Random;
-import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
 import com.therandomlabs.randomportals.block.RPOBlocks;
+import com.therandomlabs.randomportals.config.RPOConfig;
 import com.therandomlabs.randomportals.frame.endportal.EndPortalFrames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortalFrame;
