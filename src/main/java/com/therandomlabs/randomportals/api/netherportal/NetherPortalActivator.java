@@ -150,8 +150,11 @@ public class NetherPortalActivator {
 
 	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,
 			IBlockState lateralPortal, IBlockState verticalXPortal, IBlockState verticalZPortal) {
-		return activate(world, pos, activator, (axis, color) ->
-				FrameType.get(axis, lateralPortal, verticalXPortal, verticalZPortal));
+		return activate(
+				world, pos, activator, (axis, color) -> FrameType.get(
+						axis, lateralPortal, verticalXPortal, verticalZPortal
+				)
+		);
 	}
 
 	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,

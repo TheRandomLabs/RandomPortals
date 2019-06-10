@@ -27,6 +27,10 @@ repositories {
 		url "https://jitpack.io"
 	}
 
+	maven {
+		url "https://minecraft.curseforge.com/api/maven"
+	}
+
 	mavenCentral()
 }
 
@@ -35,6 +39,7 @@ dependencies {
 	compile "com.github.TheRandomLabs:RandomLib:1.12-SNAPSHOT"
 	shadow "blue.endless:jankson:1.1.0"
 	compile "blue.endless:jankson:1.1.0"
+	deobfCompile "randompatches:randompatches:1.12.2:1.16.1.0"
 }
 
 shadowJar {
