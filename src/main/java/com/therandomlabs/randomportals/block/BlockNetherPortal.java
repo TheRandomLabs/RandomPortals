@@ -521,18 +521,8 @@ public class BlockNetherPortal extends BlockPortal {
 			userPlaced = false;
 		}
 
-		final EnumFacing.Axis axis;
-
-		if(meta == 0) {
-			axis = EnumFacing.Axis.Y;
-		} else if(meta == 1) {
-			axis = EnumFacing.Axis.X;
-		} else {
-			axis = EnumFacing.Axis.Z;
-		}
-
 		return getDefaultState().
-				withProperty(AXIS, axis).
+				withProperty(AXIS, meta == 1 ? EnumFacing.Axis.X : EnumFacing.Axis.Z).
 				withProperty(USER_PLACED, userPlaced);
 	}
 
