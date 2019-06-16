@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.8.1.1": "Portals are now localized as just \"Portal\" rather than \"Nether Portal\".\nFixed a BlockState error.",
 		"1.12.2-1.8.1.0": "Now requires RandomPatches 1.12.2-1.16.0.0 or higher.",
 		"1.12.2-1.8.0.2": "Improved SpongeForge compatibility.",
 		"1.12.2-1.8.0.1": "Fixed the texture for the End portal items.",
@@ -41,7 +42,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.8.1.0",
-		"1.12.2-recommended": "1.12.2-1.8.1.0"
+		"1.12.2-latest": "1.12.2-1.8.1.1",
+		"1.12.2-recommended": "1.12.2-1.8.1.1"
 	}
 }
