@@ -24,26 +24,27 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public final class NetherPortalTeleportHandler {
-	private static final Map<WeakReference<Entity>, TeleportData> preTeleportData = new HashMap<>();
+	private static final Map<WeakReference<Entity>, TeleportData> preTeleportData =
+			new HashMap<>();
 	private static final Map<WeakReference<Entity>, TeleportData> teleportData = new HashMap<>();
 
 	public static void setPortal(Entity entity, @Nullable NetherPortal portal, BlockPos pos) {
 		final World world = entity.getEntityWorld();
 
-		if(portal != null && portal.getFunctionType() != FunctionType.NORMAL) {
+		if (portal != null && portal.getFunctionType() != FunctionType.NORMAL) {
 			return;
 		}
 
-		if(!world.getMinecraftServer().getAllowNether()) {
+		if (!world.getMinecraftServer().getAllowNether()) {
 			final PortalType type =
 					portal == null ? PortalTypes.getDefault(world) : portal.getType();
 
-			if(type.destination.dimensionID == DimensionType.NETHER.getId()) {
+			if (type.destination.dimensionID == DimensionType.NETHER.getId()) {
 				return;
 			}
 		}
 
-		if(entity.timeUntilPortal > 0) {
+		if (entity.timeUntilPortal > 0) {
 			entity.timeUntilPortal = entity.getPortalCooldown();
 			return;
 		}
@@ -51,16 +52,16 @@ public final class NetherPortalTeleportHandler {
 		WeakReference<Entity> reference = null;
 		boolean found = false;
 
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : preTeleportData.entrySet()) {
+		for (Map.Entry<WeakReference<Entity>, TeleportData> entry : preTeleportData.entrySet()) {
 			reference = entry.getKey();
 
-			if(reference.get() == entity) {
+			if (reference.get() == entity) {
 				found = true;
 				break;
 			}
 		}
 
-		if(!found) {
+		if (!found) {
 			reference = new WeakReference<>(entity);
 		}
 
@@ -73,8 +74,8 @@ public final class NetherPortalTeleportHandler {
 	}
 
 	public static TeleportData getTeleportData(Entity entity) {
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : preTeleportData.entrySet()) {
-			if(entry.getKey().get() == entity) {
+		for (Map.Entry<WeakReference<Entity>, TeleportData> entry : preTeleportData.entrySet()) {
+			if (entry.getKey().get() == entity) {
 				return entry.getValue();
 			}
 		}
@@ -82,13 +83,13 @@ public final class NetherPortalTeleportHandler {
 		final List<WeakReference<Entity>> toRemove = new ArrayList<>();
 		TeleportData data = null;
 
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : teleportData.entrySet()) {
+		for (Map.Entry<WeakReference<Entity>, TeleportData> entry : teleportData.entrySet()) {
 			final WeakReference<Entity> entityReference = entry.getKey();
 			final Entity referencedEntity = entityReference.get();
 
-			if(referencedEntity == null) {
+			if (referencedEntity == null) {
 				toRemove.add(entityReference);
-			} else if(referencedEntity == entity) {
+			} else if (referencedEntity == entity) {
 				data = entry.getValue();
 			}
 		}
@@ -100,11 +101,11 @@ public final class NetherPortalTeleportHandler {
 	public static void clearTeleportData(Entity entity) {
 		final List<WeakReference<Entity>> toRemove = new ArrayList<>();
 
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : teleportData.entrySet()) {
+		for (Map.Entry<WeakReference<Entity>, TeleportData> entry : teleportData.entrySet()) {
 			final WeakReference<Entity> entityReference = entry.getKey();
 			final Entity referencedEntity = entityReference.get();
 
-			if(referencedEntity == null || referencedEntity == entity) {
+			if (referencedEntity == null || referencedEntity == entity) {
 				toRemove.add(entityReference);
 			}
 		}
@@ -114,15 +115,15 @@ public final class NetherPortalTeleportHandler {
 
 	@SubscribeEvent
 	public static void onServerTick(TickEvent.ServerTickEvent event) {
-		if(event.phase != TickEvent.Phase.END) {
+		if (event.phase != TickEvent.Phase.END) {
 			return;
 		}
 
-		for(Map.Entry<WeakReference<Entity>, TeleportData> entry : preTeleportData.entrySet()) {
+		for (Map.Entry<WeakReference<Entity>, TeleportData> entry : preTeleportData.entrySet()) {
 			final WeakReference<Entity> reference = entry.getKey();
 			final Entity entity = entry.getKey().get();
 
-			if(entity != null) {
+			if (entity != null) {
 				handle(
 						reference, entity, entry.getValue(),
 						entity.getEntityWorld().provider.getDimension()
@@ -133,9 +134,11 @@ public final class NetherPortalTeleportHandler {
 		preTeleportData.clear();
 	}
 
-	private static void handle(WeakReference<Entity> reference, Entity entity, TeleportData data,
-			int dimensionID) {
-		if(entity.isRiding()) {
+	private static void handle(
+			WeakReference<Entity> reference, Entity entity, TeleportData data,
+			int dimensionID
+	) {
+		if (entity.isRiding()) {
 			return;
 		}
 
@@ -145,7 +148,7 @@ public final class NetherPortalTeleportHandler {
 
 		final int maxInPortalTime;
 
-		if(block instanceof BlockNetherPortal) {
+		if (block instanceof BlockNetherPortal) {
 			maxInPortalTime = type.teleportationDelay.getMaxInPortalTime(
 					((BlockNetherPortal) block).getEffectiveAxis(state), entity
 			);
@@ -153,7 +156,7 @@ public final class NetherPortalTeleportHandler {
 			maxInPortalTime = entity.getMaxInPortalTime();
 		}
 
-		if(entity.portalCounter++ < maxInPortalTime) {
+		if (entity.portalCounter++ < maxInPortalTime) {
 			//Entity decrements this by 4 every tick because inPortal is false
 			entity.portalCounter += 4;
 			return;
@@ -162,7 +165,7 @@ public final class NetherPortalTeleportHandler {
 		entity.portalCounter = maxInPortalTime;
 		entity.timeUntilPortal = entity.getPortalCooldown();
 
-		if(MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport.Pre(entity, data))) {
+		if (MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Teleport.Pre(entity, data))) {
 			return;
 		}
 

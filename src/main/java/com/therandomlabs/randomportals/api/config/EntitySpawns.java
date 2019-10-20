@@ -20,7 +20,7 @@ public final class EntitySpawns {
 	}
 
 	public void ensureCorrect() {
-		if(rate < 3) {
+		if (rate < 3) {
 			rate = 2000;
 		}
 
@@ -33,12 +33,12 @@ public final class EntitySpawns {
 		final List<String> registryNames = new ArrayList<>(entities.keySet());
 		final List<SpawnRate> spawnRates = new ArrayList<>(entities.values());
 
-		for(int i = 0; i < registryNames.size(); i++) {
+		for (int i = 0; i < registryNames.size(); i++) {
 			final int index = ArrayUtils.indexOf(
 					entityNames, new ResourceLocation(registryNames.get(i))
 			);
 
-			if(index != ArrayUtils.INDEX_NOT_FOUND) {
+			if (index != ArrayUtils.INDEX_NOT_FOUND) {
 				final String key = entityNames[index].toString();
 
 				final SpawnRate spawnRate = spawnRates.get(i);
@@ -57,10 +57,10 @@ public final class EntitySpawns {
 		final double result = random.nextDouble() * totalWeight;
 		double weight = 0.0;
 
-		for(SpawnRate spawnRate : entities.values()) {
+		for (SpawnRate spawnRate : entities.values()) {
 			weight += spawnRate.weight;
 
-			if(weight >= result) {
+			if (weight >= result) {
 				return spawnRate;
 			}
 		}

@@ -24,7 +24,7 @@ public final class NetherPortalFrameBreakHandler {
 		//Exchangers compatibility
 		//If the replaced block is not replaceable (i.e. not air, snow or similar blocks),
 		//then it can be assumed that this event was posted by Exchangers or a similar mod
-		if(!event.getBlockSnapshot().getReplacedBlock().getMaterial().isReplaceable() &&
+		if (!event.getBlockSnapshot().getReplacedBlock().getMaterial().isReplaceable() &&
 				RPOSavedData.get(world).getGeneratedNetherPortalType(pos) != null) {
 			event.setCanceled(true);
 		}
@@ -47,29 +47,29 @@ public final class NetherPortalFrameBreakHandler {
 				event.getWorld(), event.getPos()
 		));
 
-		if(type != null && !type.frame.doGeneratedFramesDrop) {
+		if (type != null && !type.frame.doGeneratedFramesDrop) {
 			event.getDrops().clear();
 		}
 	}
 
 	@SubscribeEvent
 	public static void onWorldTick(TickEvent.WorldTickEvent event) {
-		if(event.phase != TickEvent.Phase.END) {
+		if (event.phase != TickEvent.Phase.END) {
 			return;
 		}
 
 		final RPOSavedData savedData = RPOSavedData.get(event.world);
 
-		for(Map.Entry<Map.Entry<World, BlockPos>, PortalType> entry : positions.entrySet()) {
+		for (Map.Entry<Map.Entry<World, BlockPos>, PortalType> entry : positions.entrySet()) {
 			final PortalType type = entry.getValue();
 
-			if(type == null) {
+			if (type == null) {
 				continue;
 			}
 
 			final Map.Entry<World, BlockPos> key = entry.getKey();
 
-			if(key.getKey() == event.world) {
+			if (key.getKey() == event.world) {
 				savedData.removeGeneratedNetherPortalFramePos(type.toString(), key.getValue());
 			}
 		}
@@ -77,7 +77,7 @@ public final class NetherPortalFrameBreakHandler {
 
 	@SubscribeEvent
 	public static void onServerTick(TickEvent.ServerTickEvent event) {
-		if(event.phase == TickEvent.Phase.END) {
+		if (event.phase == TickEvent.Phase.END) {
 			positions.clear();
 		}
 	}

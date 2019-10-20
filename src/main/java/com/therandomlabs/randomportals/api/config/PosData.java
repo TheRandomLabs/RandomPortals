@@ -9,12 +9,12 @@ public final class PosData {
 	public int z;
 
 	public void ensureCorrect() {
-		if(!RandomPortals.CUBIC_CHUNKS_INSTALLED) {
-			if(y < 0) {
+		if (!RandomPortals.CUBIC_CHUNKS_INSTALLED) {
+			if (y < 0) {
 				y = 0;
 			}
 
-			if(y > 256) {
+			if (y > 256) {
 				y = 256;
 			}
 		}

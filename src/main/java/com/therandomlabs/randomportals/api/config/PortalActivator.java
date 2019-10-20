@@ -10,7 +10,8 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public final class PortalActivator {
-	private static final IForgeRegistry<Item> ITEM_REGISTRY = GameRegistry.findRegistry(Item.class);
+	private static final IForgeRegistry<Item> ITEM_REGISTRY =
+			GameRegistry.findRegistry(Item.class);
 
 	public String registryName;
 	public int meta = OreDictionary.WILDCARD_VALUE;
@@ -38,10 +39,10 @@ public final class PortalActivator {
 	}
 
 	public Item getItem() {
-		if(!itemRetrieved && !registryName.startsWith("ore:")) {
+		if (!itemRetrieved && !registryName.startsWith("ore:")) {
 			item = ITEM_REGISTRY.getValue(new ResourceLocation(registryName));
 
-			if(item != null) {
+			if (item != null) {
 				registryName = item.getRegistryName().toString();
 			}
 
@@ -63,8 +64,8 @@ public final class PortalActivator {
 		final Item item = stack.getItem();
 		final int meta = stack.getMetadata();
 
-		for(PortalActivator activator : getItems()) {
-			if(activator.getItem() == item &&
+		for (PortalActivator activator : getItems()) {
+			if (activator.getItem() == item &&
 					(activator.meta == OreDictionary.WILDCARD_VALUE || activator.meta == meta)) {
 				return true;
 			}
@@ -74,12 +75,12 @@ public final class PortalActivator {
 	}
 
 	private PortalActivator[] getItems() {
-		if(items != null) {
+		if (items != null) {
 			return items;
 		}
 
-		if(!registryName.startsWith("ore:")) {
-			if(getItem() == null) {
+		if (!registryName.startsWith("ore:")) {
+			if (getItem() == null) {
 				items = new PortalActivator[0];
 				return items;
 			}
@@ -92,14 +93,14 @@ public final class PortalActivator {
 
 		final List<ItemStack> ores = OreDictionary.getOres(registryName.substring(4));
 
-		if(ores.isEmpty()) {
+		if (ores.isEmpty()) {
 			items = new PortalActivator[0];
 			return items;
 		}
 
 		final List<PortalActivator> items = new ArrayList<>(ores.size());
 
-		for(ItemStack ore : ores) {
+		for (ItemStack ore : ores) {
 			items.add(new PortalActivator(ore.getItem(), ore.getMetadata()));
 		}
 

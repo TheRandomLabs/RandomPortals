@@ -89,7 +89,7 @@ public final class RPOBlocks {
 		final List<Block> blocksWithItems = new ArrayList<>();
 		final IForgeRegistry<Block> registry = event.getRegistry();
 
-		if(RPOConfig.EndPortals.enabled) {
+		if (RPOConfig.EndPortals.enabled) {
 			Collections.addAll(
 					blocksWithItems,
 					new BlockVerticalEndPortalFrame(),
@@ -100,11 +100,11 @@ public final class RPOBlocks {
 			);
 		}
 
-		if(RPOConfig.NetherPortals.enabled) {
+		if (RPOConfig.NetherPortals.enabled) {
 			registry.register(new BlockRPOFire());
 
-			if(RPOConfig.NetherPortals.coloredPortals) {
-				for(EnumDyeColor color : EnumDyeColor.values()) {
+			if (RPOConfig.NetherPortals.coloredPortals) {
+				for (EnumDyeColor color : EnumDyeColor.values()) {
 					Collections.addAll(
 							blocksWithItems,
 							new BlockNetherPortal(color),
@@ -122,11 +122,11 @@ public final class RPOBlocks {
 			}
 		}
 
-		if(RPOConfig.Misc.addEndGatewayItem) {
+		if (RPOConfig.Misc.addEndGatewayItem) {
 			blocksWithItems.add(new BlockRPOEndGateway());
 		}
 
-		for(Block block : blocksWithItems) {
+		for (Block block : blocksWithItems) {
 			registry.register(block);
 		}
 

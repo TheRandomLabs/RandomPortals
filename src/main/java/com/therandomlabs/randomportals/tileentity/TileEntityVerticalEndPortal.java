@@ -10,11 +10,11 @@ public class TileEntityVerticalEndPortal extends TileEntityEndPortal {
 
 	@Override
 	public boolean shouldRenderFace(EnumFacing facing) {
-		if(this.facing == null) {
+		if (this.facing == null) {
 			//https://github.com/TechReborn/TechReborn/issues/1515
 			final IBlockState state = world.getBlockState(pos);
 
-			if(!state.getProperties().containsKey(FACING)) {
+			if (!state.getProperties().containsKey(FACING)) {
 				return false;
 			}
 

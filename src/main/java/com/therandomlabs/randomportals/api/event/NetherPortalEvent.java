@@ -23,8 +23,10 @@ public class NetherPortalEvent extends Event {
 		private final boolean userCreated;
 		private final boolean activatedByFire;
 
-		public Activate(World world, NetherPortal portal, BlockPos activatedFramePos,
-				boolean userCreated, boolean activatedByFire) {
+		public Activate(
+				World world, NetherPortal portal, BlockPos activatedFramePos,
+				boolean userCreated, boolean activatedByFire
+		) {
 			super(world, portal.getFrame());
 			this.portal = portal;
 			this.activatedFramePos = activatedFramePos;
@@ -113,8 +115,10 @@ public class NetherPortalEvent extends Event {
 			private final float yaw;
 			private final float pitch;
 
-			public DestinationFound(Entity entity, TeleportData data, Frame receivingFrame,
-					double x, double y, double z, float yaw, float pitch) {
+			public DestinationFound(
+					Entity entity, TeleportData data, Frame receivingFrame,
+					double x, double y, double z, float yaw, float pitch
+			) {
 				super(entity, data);
 				this.receivingFrame = receivingFrame;
 				this.x = x;
@@ -199,8 +203,10 @@ public class NetherPortalEvent extends Event {
 		public static class Pre extends Dye {
 			private final EntityItem dyeEntity;
 
-			public Pre(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
-					EnumDyeColor oldColor, EnumDyeColor newColor, EntityItem dyeEntity) {
+			public Pre(
+					World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
+					EnumDyeColor oldColor, EnumDyeColor newColor, EntityItem dyeEntity
+			) {
 				super(world, portal, dyedPortalPositions, oldColor, newColor);
 				this.dyeEntity = dyeEntity;
 			}
@@ -219,9 +225,11 @@ public class NetherPortalEvent extends Event {
 		public static class Post extends Dye {
 			private final boolean rightClickSinglePortalBlock;
 
-			public Post(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
+			public Post(
+					World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
 					EnumDyeColor oldColor, EnumDyeColor newColor,
-					boolean rightClickSinglePortalBlock) {
+					boolean rightClickSinglePortalBlock
+			) {
 				super(world, portal, dyedPortalPositions, oldColor, newColor);
 				this.rightClickSinglePortalBlock = rightClickSinglePortalBlock;
 			}
@@ -237,8 +245,10 @@ public class NetherPortalEvent extends Event {
 		private final EnumDyeColor oldColor;
 		private final EnumDyeColor newColor;
 
-		protected Dye(World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
-				EnumDyeColor oldColor, EnumDyeColor newColor) {
+		protected Dye(
+				World world, NetherPortal portal, Collection<BlockPos> dyedPortalPositions,
+				EnumDyeColor oldColor, EnumDyeColor newColor
+		) {
 			super(world, portal == null ? null : portal.getFrame());
 			this.portal = portal;
 			this.dyedPortalPositions = ImmutableList.copyOf(dyedPortalPositions);

@@ -46,16 +46,16 @@ public final class NetherPortalFrames {
 	public static boolean isEmpty(World world, BlockPos pos, IBlockState state, FrameType type) {
 		final Material material = state.getMaterial();
 
-		if(material == Material.AIR || material == Material.FIRE) {
+		if (material == Material.AIR || material == Material.FIRE) {
 			return true;
 		}
 
 		final Block block = state.getBlock();
 
-		if(block instanceof BlockNetherPortal) {
+		if (block instanceof BlockNetherPortal) {
 			final BlockNetherPortal portalBlock = (BlockNetherPortal) block;
 
-			if(portalBlock.getEffectiveAxis(state) == type.getAxis()) {
+			if (portalBlock.getEffectiveAxis(state) == type.getAxis()) {
 				return true;
 			}
 		}
@@ -67,21 +67,25 @@ public final class NetherPortalFrames {
 		return isActivated(frame, BlockNetherPortal.Matcher::ofType);
 	}
 
-	public static boolean isActivated(Frame frame, FrameStatePredicate lateralPortal,
-			FrameStatePredicate verticalXPortal, FrameStatePredicate verticalZPortal) {
+	public static boolean isActivated(
+			Frame frame, FrameStatePredicate lateralPortal,
+			FrameStatePredicate verticalXPortal, FrameStatePredicate verticalZPortal
+	) {
 		return isActivated(
 				frame, type -> type.get(lateralPortal, verticalXPortal, verticalZPortal)
 		);
 	}
 
-	public static boolean isActivated(Frame frame,
-			Function<FrameType, FrameStatePredicate> portalFunction) {
+	public static boolean isActivated(
+			Frame frame,
+			Function<FrameType, FrameStatePredicate> portalFunction
+	) {
 		final FrameType type = frame.getType();
 		final FrameStatePredicate portal = portalFunction.apply(type);
 		final World world = frame.getWorld();
 
-		for(BlockPos pos : frame.getInnerBlockPositions()) {
-			if(!portal.test(world, pos, world.getBlockState(pos), type)) {
+		for (BlockPos pos : frame.getInnerBlockPositions()) {
+			if (!portal.test(world, pos, world.getBlockState(pos), type)) {
 				return false;
 			}
 		}

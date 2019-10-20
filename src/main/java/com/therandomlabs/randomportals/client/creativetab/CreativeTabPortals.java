@@ -38,7 +38,7 @@ public final class CreativeTabPortals extends CreativeTabs {
 
 	@SubscribeEvent
 	public static void onConfigChanged(ConfigChangedEvent.PostConfigChangedEvent event) {
-		if(event.getModID().equals(RandomPortals.MOD_ID)) {
+		if (event.getModID().equals(RandomPortals.MOD_ID)) {
 			init();
 		}
 	}
@@ -46,29 +46,29 @@ public final class CreativeTabPortals extends CreativeTabs {
 	public static void init() {
 		register();
 
-		if(RPOConfig.Client.portalsCreativeTab) {
+		if (RPOConfig.Client.portalsCreativeTab) {
 			originalLateralEndPortalFrameTab = Blocks.END_PORTAL_FRAME.getCreativeTab();
 			firstInit = true;
 
 			Blocks.END_PORTAL_FRAME.setCreativeTab(INSTANCE);
 			Blocks.END_GATEWAY.setCreativeTab(INSTANCE);
 
-			for(Block block : RPOBlocks.getBlocksWithItems()) {
+			for (Block block : RPOBlocks.getBlocksWithItems()) {
 				block.setCreativeTab(INSTANCE);
 			}
-		} else if(firstInit) {
+		} else if (firstInit) {
 			Blocks.END_PORTAL_FRAME.setCreativeTab(originalLateralEndPortalFrameTab);
 			Blocks.END_GATEWAY.setCreativeTab(DECORATIONS);
 
-			for(Block block : RPOBlocks.getBlocksWithItems()) {
+			for (Block block : RPOBlocks.getBlocksWithItems()) {
 				block.setCreativeTab(DECORATIONS);
 			}
 		}
 	}
 
 	private static void register() {
-		if(RPOConfig.Client.portalsCreativeTab) {
-			if(!ArrayUtils.contains(CreativeTabs.CREATIVE_TAB_ARRAY, INSTANCE)) {
+		if (RPOConfig.Client.portalsCreativeTab) {
+			if (!ArrayUtils.contains(CreativeTabs.CREATIVE_TAB_ARRAY, INSTANCE)) {
 				CreativeTabs.CREATIVE_TAB_ARRAY =
 						ArrayUtils.add(CreativeTabs.CREATIVE_TAB_ARRAY, INSTANCE);
 				INSTANCE.index = CreativeTabs.CREATIVE_TAB_ARRAY.length - 1;
@@ -77,20 +77,20 @@ public final class CreativeTabPortals extends CreativeTabs {
 			return;
 		}
 
-		if(!firstInit) {
+		if (!firstInit) {
 			return;
 		}
 
 		final int index = ArrayUtils.indexOf(CreativeTabs.CREATIVE_TAB_ARRAY, INSTANCE);
 
-		if(index != ArrayUtils.INDEX_NOT_FOUND) {
+		if (index != ArrayUtils.INDEX_NOT_FOUND) {
 			CreativeTabs.CREATIVE_TAB_ARRAY =
 					ArrayUtils.remove(CreativeTabs.CREATIVE_TAB_ARRAY, index);
 			GuiContainerCreative.selectedTabIndex = CreativeTabs.BUILDING_BLOCKS.index;
 
 			try {
 				TAB_PAGE.set(null, 0);
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				TRLUtils.crashReport("Error while disabling creative tab", ex);
 			}
 		}

@@ -54,9 +54,11 @@ public class Frame {
 		);
 	}
 
-	private Frame(World world, FrameType type, BlockPos topLeft, BlockPos topRight,
-			BlockPos bottomLeft, BlockPos bottomRight, int width, int height) {
-		if(width < 3 || height < 3) {
+	private Frame(
+			World world, FrameType type, BlockPos topLeft, BlockPos topRight,
+			BlockPos bottomLeft, BlockPos bottomRight, int width, int height
+	) {
+		if (width < 3 || height < 3) {
 			throw new IllegalArgumentException("Frame cannot be smaller than 3 blocks");
 		}
 
@@ -74,7 +76,7 @@ public class Frame {
 
 		this.topLeft = topLeft;
 
-		if(topRight == null) {
+		if (topRight == null) {
 			this.topRight = topLeft.offset(widthDirection, width - 1);
 			this.bottomLeft = topLeft.offset(heightDirection, height - 1);
 			this.bottomRight = this.bottomLeft.offset(widthDirection, width - 1);
@@ -92,11 +94,11 @@ public class Frame {
 
 	@Override
 	public boolean equals(Object object) {
-		if(this == object) {
+		if (this == object) {
 			return true;
 		}
 
-		if(!(object instanceof Frame)) {
+		if (!(object instanceof Frame)) {
 			return false;
 		}
 
@@ -182,7 +184,7 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getTopBlockPositions() {
-		if(topBlocks == null) {
+		if (topBlocks == null) {
 			topBlocks = getPositions(true, false);
 		}
 
@@ -199,7 +201,7 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getRightBlockPositions() {
-		if(rightBlocks == null) {
+		if (rightBlocks == null) {
 			rightBlocks = getPositions(false, true);
 		}
 
@@ -216,7 +218,7 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getBottomBlockPositions() {
-		if(bottomBlocks == null) {
+		if (bottomBlocks == null) {
 			bottomBlocks = getPositions(true, true);
 		}
 
@@ -233,7 +235,7 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getLeftBlockPositions() {
-		if(leftBlocks == null) {
+		if (leftBlocks == null) {
 			leftBlocks = getPositions(false, false);
 		}
 
@@ -250,7 +252,7 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getFrameBlockPositions() {
-		if(frameBlocks == null) {
+		if (frameBlocks == null) {
 			getTopBlockPositions();
 			getRightBlockPositions();
 			getBottomBlockPositions();
@@ -284,11 +286,11 @@ public class Frame {
 	}
 
 	public ImmutableList<BlockPos> getInnerBlockPositions() {
-		if(innerBlocks == null) {
+		if (innerBlocks == null) {
 			final List<BlockPos> innerBlocks = new ArrayList<>((width - 2) * (height - 2));
 
-			for(int widthOffset = 1; widthOffset < width - 1; widthOffset++) {
-				for(int heightOffset = 1; heightOffset < height - 1; heightOffset++) {
+			for (int widthOffset = 1; widthOffset < width - 1; widthOffset++) {
+				for (int heightOffset = 1; heightOffset < height - 1; heightOffset++) {
 					innerBlocks.add(
 							topLeft.offset(widthDirection, widthOffset).
 									offset(heightDirection, heightOffset)
@@ -308,7 +310,7 @@ public class Frame {
 	}
 
 	public List<BlockPos> getInnerRow(int row) {
-		if(row < 1 || row > height - 2) {
+		if (row < 1 || row > height - 2) {
 			throw new IllegalArgumentException(String.format(
 					"Invalid row %s for frame with width %s and height %s", row, width, height
 			));
@@ -324,14 +326,16 @@ public class Frame {
 	}
 
 	public List<BlockPos> getInnerColumn(int column) {
-		if(column < 1 || column > width - 2) {
+		if (column < 1 || column > width - 2) {
 			throw new IllegalArgumentException(String.format(
-					"Invalid column %s for frame with width %s and height %s", column, width, height
+					"Invalid column %s for frame with width %s and height %s", column, width,
+					height
 			));
 		}
 
 		return getPositions(
-				topLeft.offset(heightDirection), height - 2, heightDirection, column, widthDirection
+				topLeft.offset(heightDirection), height - 2, heightDirection, column,
+				widthDirection
 		);
 	}
 
@@ -340,27 +344,27 @@ public class Frame {
 	}
 
 	public FrameSide getSide(BlockPos pos) {
-		if(isCorner(pos)) {
+		if (isCorner(pos)) {
 			return FrameSide.CORNER;
 		}
 
-		if(isTopBlock(pos)) {
+		if (isTopBlock(pos)) {
 			return FrameSide.TOP;
 		}
 
-		if(isRightBlock(pos)) {
+		if (isRightBlock(pos)) {
 			return FrameSide.RIGHT;
 		}
 
-		if(isBottomBlock(pos)) {
+		if (isBottomBlock(pos)) {
 			return FrameSide.BOTTOM;
 		}
 
-		if(isLeftBlock(pos)) {
+		if (isLeftBlock(pos)) {
 			return FrameSide.LEFT;
 		}
 
-		if(isInnerBlock(pos)) {
+		if (isInnerBlock(pos)) {
 			return FrameSide.INNER;
 		}
 
@@ -372,7 +376,7 @@ public class Frame {
 	}
 
 	public boolean isFacingInwards(BlockPos pos, EnumFacing facing) {
-		switch(getSide(pos)) {
+		switch (getSide(pos)) {
 		case TOP:
 			return facing == heightDirection;
 		case RIGHT:
@@ -387,16 +391,16 @@ public class Frame {
 	}
 
 	public boolean isEmpty() {
-		for(BlockPos innerPos : getInnerBlockPositions()) {
+		for (BlockPos innerPos : getInnerBlockPositions()) {
 			final IBlockState state = world.getBlockState(innerPos);
 
-			if(state.getMaterial() == Material.FIRE) {
+			if (state.getMaterial() == Material.FIRE) {
 				continue;
 			}
 
 			final Block block = state.getBlock();
 
-			if(!block.isReplaceable(world, innerPos)) {
+			if (!block.isReplaceable(world, innerPos)) {
 				return false;
 			}
 		}
@@ -405,8 +409,8 @@ public class Frame {
 	}
 
 	public boolean testInnerBlocks(FrameStatePredicate predicate) {
-		for(BlockPos innerPos : getInnerBlockPositions()) {
-			if(!predicate.test(world, innerPos, world.getBlockState(innerPos), type)) {
+		for (BlockPos innerPos : getInnerBlockPositions()) {
+			if (!predicate.test(world, innerPos, world.getBlockState(innerPos), type)) {
 				return false;
 			}
 		}
@@ -418,7 +422,8 @@ public class Frame {
 		return isBetween(pos, corner1, corner2, true);
 	}
 
-	private boolean isBetween(BlockPos pos, BlockPos corner1, BlockPos corner2, boolean inclusive) {
+	private boolean isBetween(BlockPos pos, BlockPos corner1, BlockPos corner2,
+			boolean inclusive) {
 		final int corner1X = corner1.getX();
 		final int corner1Y = corner1.getY();
 		final int corner1Z = corner1.getZ();
@@ -439,13 +444,13 @@ public class Frame {
 		final int y = pos.getY();
 		final int z = pos.getZ();
 
-		if(inclusive) {
+		if (inclusive) {
 			return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
 		}
 
 		//Because the frame is only on one axis
 
-		switch(type.getAxis()) {
+		switch (type.getAxis()) {
 		case X:
 			return x > minX && y > minY && x < maxX && y < maxY && z == minZ;
 		case Y:
@@ -456,7 +461,7 @@ public class Frame {
 	}
 
 	private ImmutableList<BlockPos> getPositions(boolean width, boolean offsetBoth) {
-		if(width) {
+		if (width) {
 			return getPositions(
 					topLeft, this.width, widthDirection, offsetBoth ? height - 1 : 0,
 					heightDirection
@@ -468,14 +473,16 @@ public class Frame {
 		);
 	}
 
-	private ImmutableList<BlockPos> getPositions(BlockPos startingPos, int maxOffset,
-			EnumFacing offsetDirection, int otherOffset, EnumFacing otherOffsetDirection) {
+	private ImmutableList<BlockPos> getPositions(
+			BlockPos startingPos, int maxOffset,
+			EnumFacing offsetDirection, int otherOffset, EnumFacing otherOffsetDirection
+	) {
 		final List<BlockPos> positions = new ArrayList<>(maxOffset);
 		final BlockPos toOffset = startingPos.offset(otherOffsetDirection, otherOffset);
 
 		positions.add(toOffset);
 
-		for(int offset = 1; offset < maxOffset; offset++) {
+		for (int offset = 1; offset < maxOffset; offset++) {
 			positions.add(toOffset.offset(offsetDirection, offset));
 		}
 

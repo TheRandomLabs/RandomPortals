@@ -18,11 +18,11 @@ public final class RegistryNameAndMeta {
 
 	@Override
 	public boolean equals(Object object) {
-		if(this == object) {
+		if (this == object) {
 			return true;
 		}
 
-		if(object instanceof RegistryNameAndMeta) {
+		if (object instanceof RegistryNameAndMeta) {
 			final RegistryNameAndMeta registryNameAndMeta = (RegistryNameAndMeta) object;
 			return registryName.equals(registryNameAndMeta.registryName) &&
 					(meta == OreDictionary.WILDCARD_VALUE || meta == registryNameAndMeta.meta);

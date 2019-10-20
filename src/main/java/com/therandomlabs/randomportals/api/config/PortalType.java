@@ -43,7 +43,7 @@ public final class PortalType {
 		final int id = sendingDimensionID == destination.dimensionID ?
 				group.defaultDimensionID : destination.dimensionID;
 
-		if(DimensionManager.getWorld(sendingDimensionID) == null) {
+		if (DimensionManager.getWorld(sendingDimensionID) == null) {
 			return sendingDimensionID == -1 ? 0 : -1;
 		}
 

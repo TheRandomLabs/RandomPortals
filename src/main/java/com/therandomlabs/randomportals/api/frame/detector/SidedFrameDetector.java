@@ -20,10 +20,12 @@ public abstract class SidedFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected final boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
-			FrameSide side, int position) {
-		if(position == CORNER) {
-			switch(side) {
+	protected final boolean test(
+			World world, FrameType type, BlockPos pos, IBlockState state,
+			FrameSide side, int position
+	) {
+		if (position == CORNER) {
+			switch (side) {
 			case TOP:
 				return testTopLeftCorner(type, pos, state);
 			case RIGHT:
@@ -35,7 +37,7 @@ public abstract class SidedFrameDetector extends FrameDetector {
 			}
 		}
 
-		switch(side) {
+		switch (side) {
 		case TOP:
 			return testTop(type, pos, state, position);
 		case RIGHT:
@@ -63,15 +65,23 @@ public abstract class SidedFrameDetector extends FrameDetector {
 		return true;
 	}
 
-	protected abstract boolean testTop(FrameType type, BlockPos pos, IBlockState state,
-			int position);
+	protected abstract boolean testTop(
+			FrameType type, BlockPos pos, IBlockState state,
+			int position
+	);
 
-	protected abstract boolean testRight(FrameType type, BlockPos pos, IBlockState state,
-			int position);
+	protected abstract boolean testRight(
+			FrameType type, BlockPos pos, IBlockState state,
+			int position
+	);
 
-	protected abstract boolean testBottom(FrameType type, BlockPos pos, IBlockState state,
-			int position);
+	protected abstract boolean testBottom(
+			FrameType type, BlockPos pos, IBlockState state,
+			int position
+	);
 
-	protected abstract boolean testLeft(FrameType type, BlockPos pos, IBlockState state,
-			int position);
+	protected abstract boolean testLeft(
+			FrameType type, BlockPos pos, IBlockState state,
+			int position
+	);
 }

@@ -64,8 +64,10 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 	}
 
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
-			Entity entity) {
+	public boolean canEntityDestroy(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			Entity entity
+	) {
 		return false;
 	}
 
@@ -77,14 +79,16 @@ public class BlockVerticalEndPortalFrame extends BlockEndPortalFrame {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos,
+	public void addCollisionBoxToList(
+			IBlockState state, World world, BlockPos pos,
 			AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entity,
-			boolean isActualState) {
+			boolean isActualState
+	) {
 		final EnumFacing facing = state.getValue(FACING);
 
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_BLOCK.get(facing));
 
-		if(state.getValue(EYE)) {
+		if (state.getValue(EYE)) {
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_EYE.get(facing));
 		}
 	}

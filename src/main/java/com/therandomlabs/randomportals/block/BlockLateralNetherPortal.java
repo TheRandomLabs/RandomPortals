@@ -27,7 +27,7 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 						translationKey.substring(1)
 		);
 
-		if(!colors.containsKey(color)) {
+		if (!colors.containsKey(color)) {
 			colors.put(color, this);
 		}
 	}
@@ -43,8 +43,10 @@ public class BlockLateralNetherPortal extends BlockNetherPortal {
 	}
 
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(
+			World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer
+	) {
 		return getDefaultState();
 	}
 

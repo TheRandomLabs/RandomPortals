@@ -22,7 +22,7 @@ public final class PortalTypeGroup {
 	}
 
 	public PortalTypeGroup(String id) {
-		if(id != null) {
+		if (id != null) {
 			this.id = id;
 		}
 
@@ -43,13 +43,13 @@ public final class PortalTypeGroup {
 	}
 
 	public boolean canActivateInDimension(int dimensionID) {
-		if(blacklistAllUndefinedDimensions) {
-			if(types.containsKey(dimensionID)) {
+		if (blacklistAllUndefinedDimensions) {
+			if (types.containsKey(dimensionID)) {
 				return true;
 			}
 
-			for(PortalType type : types.values()) {
-				if(type.destination.dimensionID == dimensionID) {
+			for (PortalType type : types.values()) {
+				if (type.destination.dimensionID == dimensionID) {
 					return true;
 				}
 			}

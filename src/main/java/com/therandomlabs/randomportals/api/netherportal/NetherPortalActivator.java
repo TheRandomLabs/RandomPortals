@@ -63,17 +63,17 @@ public class NetherPortalActivator {
 	}
 
 	public NetherPortalActivator setPortalTypes(PortalType... portalTypes) {
-		if(portalTypes.length == 0) {
+		if (portalTypes.length == 0) {
 			portalTypes = null;
 		} else {
-			for(PortalType type : portalTypes) {
-				if(type == null) {
+			for (PortalType type : portalTypes) {
+				if (type == null) {
 					throw new NullPointerException("portalTypes");
 				}
 			}
 		}
 
-		if(portalTypes != null && forcePortalType != null) {
+		if (portalTypes != null && forcePortalType != null) {
 			throw new IllegalStateException(
 					"setPortalTypes cannot be called when forcePortalType is not null"
 			);
@@ -132,7 +132,7 @@ public class NetherPortalActivator {
 		return activate(world, pos, activator, (axis, color) -> {
 			final IBlockState state;
 
-			switch(axis) {
+			switch (axis) {
 			case X:
 				state = ((BlockNetherPortal) Blocks.PORTAL).getByColor(color).getDefaultState();
 				break;
@@ -148,8 +148,10 @@ public class NetherPortalActivator {
 		});
 	}
 
-	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,
-			IBlockState lateralPortal, IBlockState verticalXPortal, IBlockState verticalZPortal) {
+	public NetherPortal activate(
+			World world, BlockPos pos, ItemStack activator,
+			IBlockState lateralPortal, IBlockState verticalXPortal, IBlockState verticalZPortal
+	) {
 		return activate(
 				world, pos, activator, (axis, color) -> FrameType.get(
 						axis, lateralPortal, verticalXPortal, verticalZPortal
@@ -157,16 +159,18 @@ public class NetherPortalActivator {
 		);
 	}
 
-	public NetherPortal activate(World world, BlockPos pos, ItemStack activator,
-			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
-		if(NetherPortalActivationHandler.isDelayedActivationQueued(world, pos)) {
+	public NetherPortal activate(
+			World world, BlockPos pos, ItemStack activator,
+			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks
+	) {
+		if (NetherPortalActivationHandler.isDelayedActivationQueued(world, pos)) {
 			return null;
 		}
 
 		final FrameStatePredicate validBlocks;
 
-		if(forcePortalType == null) {
-			if(portalTypes == null) {
+		if (forcePortalType == null) {
+			if (portalTypes == null) {
 				validBlocks = PortalTypes.getValidBlocks();
 			} else {
 				validBlocks = PortalTypes.getValidBlocks(portalTypes);
@@ -179,11 +183,11 @@ public class NetherPortalActivator {
 		BlockPos framePos = null;
 		FrameType type = FrameType.LATERAL_OR_VERTICAL;
 
-		for(EnumFacing facing : EnumFacing.values()) {
+		for (EnumFacing facing : EnumFacing.values()) {
 			final BlockPos offset = pos.offset(facing);
 			final IBlockState state = world.getBlockState(offset);
 
-			if(!validBlocks.test(world, pos, state)) {
+			if (!validBlocks.test(world, pos, state)) {
 				continue;
 			}
 
@@ -191,7 +195,7 @@ public class NetherPortalActivator {
 				final NetherPortal result =
 						testFrame(frame, offset, facing.getOpposite(), activator);
 
-				if(result == null) {
+				if (result == null) {
 					return false;
 				}
 
@@ -199,20 +203,20 @@ public class NetherPortalActivator {
 				return true;
 			});
 
-			if(portal.portal != null) {
+			if (portal.portal != null) {
 				framePos = offset;
 				break;
 			}
 
 			//Optimization black magic
-			if(facing == EnumFacing.DOWN || facing == EnumFacing.UP) {
+			if (facing == EnumFacing.DOWN || facing == EnumFacing.UP) {
 				type = FrameType.LATERAL;
 			} else {
 				break;
 			}
 		}
 
-		if(portal.portal == null) {
+		if (portal.portal == null) {
 			return null;
 		}
 
@@ -220,7 +224,7 @@ public class NetherPortalActivator {
 				world, portal.portal, framePos, userCreated, activatedByFire
 		);
 
-		if(MinecraftForge.EVENT_BUS.post(event)) {
+		if (MinecraftForge.EVENT_BUS.post(event)) {
 			return null;
 		}
 
@@ -229,8 +233,10 @@ public class NetherPortalActivator {
 		return result;
 	}
 
-	protected void onActivate(World world, NetherPortal portal, BlockPos pos,
-			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks) {
+	protected void onActivate(
+			World world, NetherPortal portal, BlockPos pos,
+			BiFunction<EnumFacing.Axis, EnumDyeColor, IBlockState> portalBlocks
+	) {
 		RPOSavedData.get(world).addNetherPortal(portal, userCreated);
 
 		final Frame frame = portal.getFrame();
@@ -244,13 +250,13 @@ public class NetherPortalActivator {
 
 		final List<BlockPos> portalPositions = new ArrayList<>();
 
-		for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+		for (BlockPos innerPos : frame.getInnerBlockPositions()) {
 			//Allow players to create colorful patterns
-			if(portalBlock != null &&
+			if (portalBlock != null &&
 					!RPOConfig.NetherPortals.replaceUserPlacedPortalsOnActivation) {
 				final IBlockState innerState = world.getBlockState(innerPos);
 
-				if(innerState.getBlock().getClass() == blockClass &&
+				if (innerState.getBlock().getClass() == blockClass &&
 						innerState.getValue(BlockNetherPortal.USER_PLACED) &&
 						portalBlock.getEffectiveAxis(innerState) == axis) {
 					continue;
@@ -260,10 +266,10 @@ public class NetherPortalActivator {
 			portalPositions.add(innerPos);
 		}
 
-		if(activationDelayed) {
+		if (activationDelayed) {
 			NetherPortalActivationHandler.queueDelayedActivation(world, portalPositions, state);
 		} else {
-			for(BlockPos portalPos : portalPositions) {
+			for (BlockPos portalPos : portalPositions) {
 				world.setBlockState(portalPos, state, 2);
 			}
 		}
@@ -271,7 +277,7 @@ public class NetherPortalActivator {
 		final PortalType portalType = portal.getType();
 		final SoundEvent[] sounds = portalType.activation.getActivationSoundEvents();
 
-		if(sounds.length != 0) {
+		if (sounds.length != 0) {
 			world.playSound(
 					null,
 					pos,
@@ -282,7 +288,7 @@ public class NetherPortalActivator {
 			);
 		}
 
-		if(player != null && RPOConfig.Misc.advancements &&
+		if (player != null && RPOConfig.Misc.advancements &&
 				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
 			final EntityPlayerMP playerMP = (EntityPlayerMP) player;
 
@@ -293,27 +299,29 @@ public class NetherPortalActivator {
 		}
 	}
 
-	protected NetherPortal testFrame(Frame frame, BlockPos framePos, EnumFacing inwards,
-			ItemStack activator) {
-		if(!frame.isFacingInwards(framePos, inwards)) {
+	protected NetherPortal testFrame(
+			Frame frame, BlockPos framePos, EnumFacing inwards,
+			ItemStack activator
+	) {
+		if (!frame.isFacingInwards(framePos, inwards)) {
 			return null;
 		}
 
-		if(forcePortalType != null) {
+		if (forcePortalType != null) {
 			return new NetherPortal(frame, null, forcePortalType, functionType);
 		}
 
 		final List<PortalType> types;
 
-		if(portalTypes == null) {
+		if (portalTypes == null) {
 			final int dimensionID = frame.getWorld().provider.getDimension();
 			types = new ArrayList<>();
 
-			for(PortalTypeGroup group : PortalTypes.getGroups().values()) {
+			for (PortalTypeGroup group : PortalTypes.getGroups().values()) {
 				final PortalType type = group.types.get(dimensionID);
 
-				if(type == null) {
-					if(group.canActivateInDimension(dimensionID)) {
+				if (type == null) {
+					if (group.canActivateInDimension(dimensionID)) {
 						types.add(group.getDefaultType());
 					}
 				} else {
@@ -324,8 +332,8 @@ public class NetherPortalActivator {
 			types = Arrays.asList(portalTypes);
 		}
 
-		for(PortalType type : types) {
-			if((!activatedByFire || type.activation.canBeActivatedByFire) && type.test(frame) &&
+		for (PortalType type : types) {
+			if ((!activatedByFire || type.activation.canBeActivatedByFire) && type.test(frame) &&
 					(forcePortalType != null || activator == null ||
 							type.testActivator(activator))) {
 				return new NetherPortal(frame, null, type, functionType);

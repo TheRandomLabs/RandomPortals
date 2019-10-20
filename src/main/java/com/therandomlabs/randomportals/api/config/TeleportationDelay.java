@@ -10,15 +10,15 @@ public final class TeleportationDelay {
 	public int verticalZ;
 
 	public void ensureCorrect() {
-		if(lateral < 0) {
+		if (lateral < 0) {
 			lateral = 0;
 		}
 
-		if(verticalX < 0) {
+		if (verticalX < 0) {
 			verticalX = 0;
 		}
 
-		if(verticalZ < 0) {
+		if (verticalZ < 0) {
 			verticalZ = 0;
 		}
 	}

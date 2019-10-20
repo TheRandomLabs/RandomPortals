@@ -19,8 +19,10 @@ public class TeleportData {
 
 	private boolean portalChecked;
 
-	public TeleportData(World world, BlockPos portalPos, IBlockState portalState,
-			NetherPortal portal) {
+	public TeleportData(
+			World world, BlockPos portalPos, IBlockState portalState,
+			NetherPortal portal
+	) {
 		this.world = world;
 		this.portalPos = portalPos;
 		this.portalState = portalState;
@@ -54,11 +56,11 @@ public class TeleportData {
 
 	@Nullable
 	public NetherPortal getPortal() {
-		if(portal == null && !portalChecked) {
+		if (portal == null && !portalChecked) {
 			final Tuple<Boolean, NetherPortal> tuple =
 					BlockNetherPortal.findFrame(world, portalPos);
 
-			if(tuple != null) {
+			if (tuple != null) {
 				portal = tuple.getSecond();
 			}
 

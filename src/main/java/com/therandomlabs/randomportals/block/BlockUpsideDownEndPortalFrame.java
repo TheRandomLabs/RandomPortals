@@ -31,8 +31,10 @@ public class BlockUpsideDownEndPortalFrame extends BlockEndPortalFrame {
 	}
 
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
-			Entity entity) {
+	public boolean canEntityDestroy(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			Entity entity
+	) {
 		return false;
 	}
 
@@ -44,12 +46,14 @@ public class BlockUpsideDownEndPortalFrame extends BlockEndPortalFrame {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos,
+	public void addCollisionBoxToList(
+			IBlockState state, World world, BlockPos pos,
 			AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entity,
-			boolean isActualState) {
+			boolean isActualState
+	) {
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_BLOCK);
 
-		if(state.getValue(EYE)) {
+		if (state.getValue(EYE)) {
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_EYE);
 		}
 	}

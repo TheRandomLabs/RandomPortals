@@ -22,29 +22,37 @@ public class BasicFrameDetector extends FrameDetector {
 	private final Predicate<Frame> framePredicate;
 	private final FrameStatePredicate innerPredicate;
 
-	public BasicFrameDetector(Block block, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate) {
+	public BasicFrameDetector(
+			Block block, RequiredCorner requiredCorner,
+			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate
+	) {
 		this(() -> FrameStatePredicate.of(block), requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(Supplier<FrameStatePredicate> blockMatcher,
+	public BasicFrameDetector(
+			Supplier<FrameStatePredicate> blockMatcher,
 			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
-			FrameStatePredicate innerPredicate) {
+			FrameStatePredicate innerPredicate
+	) {
 		this(null, blockMatcher, requiredCorner, framePredicate, innerPredicate);
 	}
 
-	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize, Block block,
+	public BasicFrameDetector(
+			Function<FrameType, FrameSize> defaultSize, Block block,
 			RequiredCorner requiredCorner, Predicate<Frame> framePredicate,
-			FrameStatePredicate innerPredicate) {
+			FrameStatePredicate innerPredicate
+	) {
 		this(
 				defaultSize, () -> FrameStatePredicate.of(block), requiredCorner, framePredicate,
 				innerPredicate
 		);
 	}
 
-	public BasicFrameDetector(Function<FrameType, FrameSize> defaultSize,
+	public BasicFrameDetector(
+			Function<FrameType, FrameSize> defaultSize,
 			Supplier<FrameStatePredicate> blockMatcher, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate) {
+			Predicate<Frame> framePredicate, FrameStatePredicate innerPredicate
+	) {
 		this.defaultSize = defaultSize;
 		this.blockMatcher = blockMatcher;
 		this.requiredCorner = requiredCorner;
@@ -63,9 +71,11 @@ public class BasicFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
-			FrameSide side, int position) {
-		if(position == CORNER && requiredCorner != RequiredCorner.SAME) {
+	protected boolean test(
+			World world, FrameType type, BlockPos pos, IBlockState state,
+			FrameSide side, int position
+	) {
+		if (position == CORNER && requiredCorner != RequiredCorner.SAME) {
 			return requiredCorner.test(world, pos, state);
 		}
 

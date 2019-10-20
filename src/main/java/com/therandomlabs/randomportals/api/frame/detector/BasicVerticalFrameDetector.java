@@ -23,16 +23,20 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 	private final EnumFacing facing;
 	private final Predicate<Frame> framePredicate;
 
-	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
+	public BasicVerticalFrameDetector(
+			Function<FrameType, FrameSize> defaultSize,
 			FrameStatePredicate blockMatcher, RequiredCorner requiredCorner,
-			Predicate<Frame> framePredicate) {
+			Predicate<Frame> framePredicate
+	) {
 		this(defaultSize, blockMatcher, requiredCorner, null, framePredicate);
 	}
 
-	public BasicVerticalFrameDetector(Function<FrameType, FrameSize> defaultSize,
+	public BasicVerticalFrameDetector(
+			Function<FrameType, FrameSize> defaultSize,
 			FrameStatePredicate blockMatcher, RequiredCorner requiredCorner,
-			EnumFacing facing, Predicate<Frame> framePredicate) {
-		if(facing == null) {
+			EnumFacing facing, Predicate<Frame> framePredicate
+	) {
+		if (facing == null) {
 			defaultType = FrameType.VERTICAL;
 		} else {
 			defaultType = facing.getAxis() == EnumFacing.Axis.X ?
@@ -57,13 +61,15 @@ public class BasicVerticalFrameDetector extends FrameDetector {
 	}
 
 	@Override
-	protected boolean test(World world, FrameType type, BlockPos pos, IBlockState state,
-			FrameSide side, int position) {
-		if(position == CORNER && requiredCorner != RequiredCorner.SAME) {
+	protected boolean test(
+			World world, FrameType type, BlockPos pos, IBlockState state,
+			FrameSide side, int position
+	) {
+		if (position == CORNER && requiredCorner != RequiredCorner.SAME) {
 			return requiredCorner.test(world, pos, state);
 		}
 
-		if(facing == null) {
+		if (facing == null) {
 			return blockMatcher.test(world, pos, state);
 		}
 

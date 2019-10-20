@@ -41,8 +41,10 @@ public enum FrameType {
 	private final EnumFacing.Axis axis;
 	private final boolean vertical;
 
-	FrameType(EnumFacing.Axis axis, EnumFacing right, EnumFacing down, EnumFacing left,
-			EnumFacing up, boolean vertical) {
+	FrameType(
+			EnumFacing.Axis axis, EnumFacing right, EnumFacing down, EnumFacing left,
+			EnumFacing up, boolean vertical
+	) {
 		this.axis = axis;
 		rightDownLeftUp = new EnumFacing[] {
 				right, down, left, up
@@ -63,7 +65,7 @@ public enum FrameType {
 	}
 
 	public List<FrameType> getTypes() {
-		switch(this) {
+		switch (this) {
 		case VERTICAL:
 			return Arrays.asList(VERTICAL_X, VERTICAL_Z);
 		case LATERAL_OR_VERTICAL:
@@ -82,19 +84,19 @@ public enum FrameType {
 	}
 
 	public boolean test(FrameType type) {
-		if(this == type || this == LATERAL_OR_VERTICAL) {
+		if (this == type || this == LATERAL_OR_VERTICAL) {
 			return true;
 		}
 
-		if(this == VERTICAL) {
+		if (this == VERTICAL) {
 			return type == VERTICAL_X || type == VERTICAL_Z;
 		}
 
-		if(this == LATERAL_OR_VERTICAL_X) {
+		if (this == LATERAL_OR_VERTICAL_X) {
 			return type == LATERAL || type == VERTICAL_X;
 		}
 
-		if(this == LATERAL_OR_VERTICAL_Z) {
+		if (this == LATERAL_OR_VERTICAL_Z) {
 			return type == LATERAL || type == VERTICAL_Z;
 		}
 
@@ -106,7 +108,7 @@ public enum FrameType {
 	}
 
 	public static <T> T get(EnumFacing.Axis axis, T lateral, T verticalX, T verticalZ) {
-		switch(axis) {
+		switch (axis) {
 		case X:
 			return verticalX;
 		case Y:

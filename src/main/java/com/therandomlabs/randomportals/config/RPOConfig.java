@@ -163,7 +163,7 @@ public final class RPOConfig {
 
 		try {
 			PortalTypes.reload();
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			RandomPortals.LOGGER.error("Error while reloading Nether portal types", ex);
 		}
 	}
@@ -177,14 +177,14 @@ public final class RPOConfig {
 		final Path parent = path.getParent();
 
 		try {
-			if(parent != null) {
-				if(Files.isRegularFile(parent)) {
+			if (parent != null) {
+				if (Files.isRegularFile(parent)) {
 					Files.delete(parent);
 				}
 
 				Files.createDirectories(parent);
 			}
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			RandomPortals.LOGGER.error("Failed to create parent: " + path, ex);
 		}
 
@@ -195,15 +195,15 @@ public final class RPOConfig {
 		final Path path = getConfig(name);
 
 		try {
-			if(Files.exists(path)) {
-				if(Files.isRegularFile(path)) {
+			if (Files.exists(path)) {
+				if (Files.isRegularFile(path)) {
 					Files.delete(path);
 					Files.createDirectory(path);
 				}
 			} else {
 				Files.createDirectory(path);
 			}
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			RandomPortals.LOGGER.error("Failed to create directory " + path, ex);
 		}
 
@@ -213,7 +213,7 @@ public final class RPOConfig {
 	public static String read(Path path) {
 		try {
 			return StringUtils.join(Files.readAllLines(path), System.lineSeparator());
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			RandomPortals.LOGGER.error("Failed to read file: " + path, ex);
 		}
 
@@ -225,18 +225,18 @@ public final class RPOConfig {
 	}
 
 	public static <T> T readJson(Path path, Class<T> clazz) {
-		if(!Files.exists(path)) {
+		if (!Files.exists(path)) {
 			return null;
 		}
 
 		String raw = read(path);
 
-		if(raw != null) {
+		if (raw != null) {
 			try {
 				final Jankson jankson = Jankson.builder().build();
 				raw = jankson.load(raw).toJson();
 				return GSON.fromJson(raw, clazz);
-			} catch(SyntaxError | JsonSyntaxException ex) {
+			} catch (SyntaxError | JsonSyntaxException ex) {
 				RandomPortals.LOGGER.error("Failed to read JSON: " + path, ex);
 			}
 		}
@@ -253,7 +253,7 @@ public final class RPOConfig {
 
 		try {
 			Files.write(path, (raw + System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			RandomPortals.LOGGER.error("Failed to write to: " + path, ex);
 		}
 	}

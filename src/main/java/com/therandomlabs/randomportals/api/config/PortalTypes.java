@@ -67,7 +67,7 @@ public final class PortalTypes {
 	public static PortalType getSpecific(String id) {
 		final String[] split = StringUtils.split(id, ':');
 
-		if(split.length == 1) {
+		if (split.length == 1) {
 			return getGroup(id).getDefaultType();
 		}
 
@@ -102,15 +102,15 @@ public final class PortalTypes {
 	public static FrameStatePredicate getValidBlocks(Collection<PortalType> types) {
 		final List<Predicate<IBlockState>> matchers = new ArrayList<>();
 
-		for(PortalType type : types) {
-			for(FrameBlock block : type.frame.blocks) {
+		for (PortalType type : types) {
+			for (FrameBlock block : type.frame.blocks) {
 				matchers.add(block::test);
 			}
 		}
 
 		return (world, pos, state, type) -> {
-			for(Predicate<IBlockState> matcher : matchers) {
-				if(matcher.test(state)) {
+			for (Predicate<IBlockState> matcher : matchers) {
+				if (matcher.test(state)) {
 					return true;
 				}
 			}
@@ -126,15 +126,15 @@ public final class PortalTypes {
 	public static Predicate<ItemStack> getValidActivators(Collection<PortalType> types) {
 		final List<Predicate<ItemStack>> matchers = new ArrayList<>();
 
-		for(PortalType type : types) {
-			for(PortalActivator activator : type.activation.activators) {
+		for (PortalType type : types) {
+			for (PortalActivator activator : type.activation.activators) {
 				matchers.add(activator::test);
 			}
 		}
 
 		return stack -> {
-			for(Predicate<ItemStack> matcher : matchers) {
-				if(matcher.test(stack)) {
+			for (Predicate<ItemStack> matcher : matchers) {
+				if (matcher.test(stack)) {
 					return true;
 				}
 			}
@@ -152,9 +152,9 @@ public final class PortalTypes {
 	}
 
 	public static PortalType get(Frame frame) {
-		for(PortalTypeGroup group : groups.values()) {
-			for(PortalType type : group.types.values()) {
-				if(type.test(frame)) {
+		for (PortalTypeGroup group : groups.values()) {
+			for (PortalType type : group.types.values()) {
+				if (type.test(frame)) {
 					return type;
 				}
 			}
@@ -168,14 +168,14 @@ public final class PortalTypes {
 		final Path directory = RPOConfig.getDirectory("portal_types");
 		List<Path> paths;
 
-		try(final Stream<Path> pathStream = Files.list(directory)) {
+		try (final Stream<Path> pathStream = Files.list(directory)) {
 			paths = pathStream.collect(Collectors.toList());
 		}
 
 		final Map<String, PortalTypeGroup> types = new HashMap<>(paths.size());
 
-		for(Path groupPath : paths) {
-			if(!Files.isDirectory(groupPath)) {
+		for (Path groupPath : paths) {
+			if (!Files.isDirectory(groupPath)) {
 				Files.delete(groupPath);
 				continue;
 			}
@@ -183,14 +183,14 @@ public final class PortalTypes {
 			final String id = groupPath.getFileName().toString();
 			final Path groupData = groupPath.resolve("group_data.json");
 
-			if(!Files.exists(groupData) || !Files.isRegularFile(groupData)) {
+			if (!Files.exists(groupData) || !Files.isRegularFile(groupData)) {
 				RandomPortals.LOGGER.error("Invalid portal type group: " + id);
 				continue;
 			}
 
 			final PortalTypeGroup group = RPOConfig.readJson(groupData, PortalTypeGroup.class);
 
-			if(group == null) {
+			if (group == null) {
 				RandomPortals.LOGGER.error("Invalid portal type group: " + id);
 				continue;
 			}
@@ -201,23 +201,23 @@ public final class PortalTypes {
 
 			List<Path> typePaths;
 
-			try(final Stream<Path> pathStream = Files.list(groupPath)) {
+			try (final Stream<Path> pathStream = Files.list(groupPath)) {
 				typePaths = pathStream.collect(Collectors.toList());
 			}
 
-			for(Path typePath : typePaths) {
-				if(groupData.equals(typePath)) {
+			for (Path typePath : typePaths) {
+				if (groupData.equals(typePath)) {
 					continue;
 				}
 
-				if(Files.isDirectory(typePath)) {
+				if (Files.isDirectory(typePath)) {
 					FileUtils.deleteDirectory(typePath.toFile());
 					continue;
 				}
 
 				final String typeFileName = typePath.getFileName().toString();
 
-				if(!typeFileName.endsWith(".json")) {
+				if (!typeFileName.endsWith(".json")) {
 					Files.delete(typePath);
 					continue;
 				}
@@ -226,14 +226,14 @@ public final class PortalTypes {
 
 				try {
 					dimensionID = Integer.parseInt(StringUtils.removeEnd(typeFileName, ".json"));
-				} catch(NumberFormatException ex) {
+				} catch (NumberFormatException ex) {
 					Files.delete(typePath);
 					continue;
 				}
 
 				final PortalType type = RPOConfig.readJson(typePath, PortalType.class);
 
-				if(type == null) {
+				if (type == null) {
 					continue;
 				}
 
@@ -245,7 +245,7 @@ public final class PortalTypes {
 				group.types.put(dimensionID, type);
 			}
 
-			if(group.isValid()) {
+			if (group.isValid()) {
 				group.ensureCorrect();
 				RPOConfig.writeJson(groupData, group);
 				types.put(id, group);
@@ -254,17 +254,17 @@ public final class PortalTypes {
 			}
 		}
 
-		if(types.isEmpty() || (RPOConfig.NetherPortals.forceCreateVanillaType &&
+		if (types.isEmpty() || (RPOConfig.NetherPortals.forceCreateVanillaType &&
 				!types.containsKey(VANILLA_NETHER_PORTAL_ID))) {
 			write(directory, VANILLA_NETHER_PORTAL);
 		}
 
 		types.putAll(builtinGroups);
 
-		for(Map.Entry<String, PortalTypeGroup> entry : builtinTypes.entrySet()) {
+		for (Map.Entry<String, PortalTypeGroup> entry : builtinTypes.entrySet()) {
 			final String name = entry.getKey();
 
-			if(!types.containsKey(name)) {
+			if (!types.containsKey(name)) {
 				final PortalTypeGroup group = entry.getValue();
 				write(directory, group);
 				types.put(name, group);
@@ -308,8 +308,8 @@ public final class PortalTypes {
 	private static void write(Path directory, PortalTypeGroup group) throws IOException {
 		final Path groupPath = directory.resolve(group.id);
 
-		if(Files.exists(groupPath)) {
-			if(!Files.isDirectory(groupPath)) {
+		if (Files.exists(groupPath)) {
+			if (!Files.isDirectory(groupPath)) {
 				Files.delete(groupPath);
 				Files.createDirectories(groupPath);
 			}
@@ -330,23 +330,23 @@ public final class PortalTypes {
 		int minHeight = Integer.MAX_VALUE;
 		int maxHeight = 3;
 
-		for(PortalTypeGroup group : PortalTypes.getGroups().values()) {
-			for(PortalType portalType : group.types.values()) {
+		for (PortalTypeGroup group : PortalTypes.getGroups().values()) {
+			for (PortalType portalType : group.types.values()) {
 				final FrameSize size = portalType.frame.size.get(type);
 
-				if(size.minWidth < minWidth) {
+				if (size.minWidth < minWidth) {
 					minWidth = size.minWidth;
 				}
 
-				if(size.maxWidth > maxWidth) {
+				if (size.maxWidth > maxWidth) {
 					maxWidth = size.maxWidth;
 				}
 
-				if(size.minHeight < minHeight) {
+				if (size.minHeight < minHeight) {
 					minHeight = size.minHeight;
 				}
 
-				if(size.maxHeight > maxHeight) {
+				if (size.maxHeight > maxHeight) {
 					maxHeight = size.maxHeight;
 				}
 			}

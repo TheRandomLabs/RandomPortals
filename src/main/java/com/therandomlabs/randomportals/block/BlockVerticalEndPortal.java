@@ -59,8 +59,10 @@ public class BlockVerticalEndPortal extends BlockLateralEndPortal {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
-			EnumFacing side) {
+	public boolean shouldSideBeRendered(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			EnumFacing side
+	) {
 		final EnumFacing facing = state.getValue(FACING);
 		return side == facing || side == facing.getOpposite();
 	}
@@ -95,8 +97,10 @@ public class BlockVerticalEndPortal extends BlockLateralEndPortal {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(
+			World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer
+	) {
 		return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
 	}
 
@@ -106,8 +110,10 @@ public class BlockVerticalEndPortal extends BlockLateralEndPortal {
 	}
 
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
-			Entity entity) {
+	public boolean canEntityDestroy(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			Entity entity
+	) {
 		return false;
 	}
 }

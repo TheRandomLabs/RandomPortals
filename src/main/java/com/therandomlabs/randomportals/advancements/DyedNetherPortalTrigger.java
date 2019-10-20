@@ -41,8 +41,10 @@ public class DyedNetherPortalTrigger extends RPOCriterionTrigger<DyedNetherPorta
 		);
 	}
 
-	public void trigger(EntityPlayerMP player, EnumDyeColor color,
-			boolean rightClickSinglePortalBlock) {
+	public void trigger(
+			EntityPlayerMP player, EnumDyeColor color,
+			boolean rightClickSinglePortalBlock
+	) {
 		trigger(player, instance -> instance.test(color, rightClickSinglePortalBlock));
 	}
 }

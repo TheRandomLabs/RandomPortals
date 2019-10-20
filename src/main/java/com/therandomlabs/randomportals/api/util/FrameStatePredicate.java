@@ -23,8 +23,10 @@ public interface FrameStatePredicate {
 				state.getValue(property).equals(value);
 	}
 
-	default <T extends Comparable<T>> FrameStatePredicate where(IProperty<T> property,
-			Predicate<? super T> is) {
+	default <T extends Comparable<T>> FrameStatePredicate where(
+			IProperty<T> property,
+			Predicate<? super T> is
+	) {
 		return (world, pos, state, type) ->
 				test(world, pos, state, type) && is.test(state.getValue(property));
 	}

@@ -63,10 +63,10 @@ public abstract class RPOCriterionTrigger<I extends ICriterionInstance>
 	public void removeListener(PlayerAdvancements advancements, Listener<I> listener) {
 		final ListenerContainer container = listeners.get(advancements);
 
-		if(container != null) {
+		if (container != null) {
 			container.remove(listener);
 
-			if(listeners.isEmpty()) {
+			if (listeners.isEmpty()) {
 				listeners.remove(advancements);
 			}
 		}
@@ -80,7 +80,7 @@ public abstract class RPOCriterionTrigger<I extends ICriterionInstance>
 	protected void trigger(EntityPlayerMP player, Predicate<I> predicate) {
 		final ListenerContainer container = listeners.get(player.getAdvancements());
 
-		if(container != null) {
+		if (container != null) {
 			container.trigger(predicate);
 		}
 	}

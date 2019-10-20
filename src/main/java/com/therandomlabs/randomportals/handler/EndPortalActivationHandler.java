@@ -32,7 +32,7 @@ public final class EndPortalActivationHandler {
 		final IBlockState state = world.getBlockState(pos);
 		final Block block = state.getBlock();
 
-		if(stack.getItem() != Items.ENDER_EYE || !isFrameBlock(block) ||
+		if (stack.getItem() != Items.ENDER_EYE || !isFrameBlock(block) ||
 				!player.canPlayerEdit(pos, event.getFace(), stack) ||
 				state.getValue(BlockEndPortalFrame.EYE)) {
 			return;
@@ -40,7 +40,7 @@ public final class EndPortalActivationHandler {
 
 		event.setCanceled(true);
 
-		if(world.isRemote) {
+		if (world.isRemote) {
 			event.setCancellationResult(EnumActionResult.SUCCESS);
 			return;
 		}
@@ -48,11 +48,11 @@ public final class EndPortalActivationHandler {
 		world.setBlockState(pos, state.withProperty(BlockEndPortalFrame.EYE, true), 2);
 		world.updateComparatorOutputLevel(pos, block);
 
-		if(!player.capabilities.isCreativeMode) {
+		if (!player.capabilities.isCreativeMode) {
 			stack.shrink(1);
 		}
 
-		for(int i = 0; i < 16; i++) {
+		for (int i = 0; i < 16; i++) {
 			world.spawnParticle(
 					EnumParticleTypes.SMOKE_NORMAL,
 					pos.getX() + (5.0 + random.nextDouble() * 6.0) / 16.0,
@@ -64,10 +64,10 @@ public final class EndPortalActivationHandler {
 			);
 		}
 
-		if(EndPortalFrames.activate(world, pos) == null) {
+		if (EndPortalFrames.activate(world, pos) == null) {
 			event.setCancellationResult(EnumActionResult.FAIL);
 		} else {
-			if(RPOConfig.Misc.advancements) {
+			if (RPOConfig.Misc.advancements) {
 				RPOCriteriaTriggers.PORTALS.trigger((EntityPlayerMP) player);
 			}
 

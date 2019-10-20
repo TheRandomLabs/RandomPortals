@@ -16,11 +16,12 @@ buildscript {
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: "com.github.johnrengelman.shadow"
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 version = "1.12.2-1.8.1.1"
 group = "com.therandomlabs.randomportals"
 archivesBaseName = "randomportals"
-
-sourceCompatibility = targetCompatibility = "1.8"
 
 repositories {
 	maven {
@@ -39,7 +40,7 @@ dependencies {
 	compile "com.github.TheRandomLabs:RandomLib:1.12-SNAPSHOT"
 	shadow "blue.endless:jankson:1.1.0"
 	compile "blue.endless:jankson:1.1.0"
-	deobfCompile "randompatches:randompatches:1.12.2:1.16.1.0"
+	deobfCompile "randompatches:randompatches:1.12.2:1.16.2.0"
 }
 
 shadowJar {
@@ -62,7 +63,7 @@ artifacts {
 }
 
 minecraft {
-	version = "1.12.2-14.23.5.2838"
+	version = "1.12.2-14.23.5.2847"
 	runDir = "run"
 	mappings = "stable_39"
 

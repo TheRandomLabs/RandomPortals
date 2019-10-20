@@ -128,31 +128,31 @@ public final class EndPortalFrames {
 
 		Frame frame;
 
-		if(block == Blocks.END_PORTAL_FRAME) {
+		if (block == Blocks.END_PORTAL_FRAME) {
 			frame = LATERAL.detect(world, framePos);
-		} else if(block == RPOBlocks.vertical_end_portal_frame) {
+		} else if (block == RPOBlocks.vertical_end_portal_frame) {
 			frame = LATERAL_WITH_VERTICAL_FRAMES.detect(world, framePos);
 		} else {
 			frame = UPSIDE_DOWN.detect(world, framePos);
 		}
 
-		if(frame != null && !frame.isCorner(framePos)) {
+		if (frame != null && !frame.isCorner(framePos)) {
 			final EndPortalEvent.Activate event =
 					new EndPortalEvent.Activate(world, frame, framePos);
 
-			if(MinecraftForge.EVENT_BUS.post(event)) {
+			if (MinecraftForge.EVENT_BUS.post(event)) {
 				return null;
 			}
 
 			final IBlockState portalState;
 
-			if(block == RPOBlocks.upside_down_end_portal_frame) {
+			if (block == RPOBlocks.upside_down_end_portal_frame) {
 				portalState = RPOBlocks.upside_down_end_portal.getDefaultState();
 			} else {
 				portalState = Blocks.END_PORTAL.getDefaultState();
 			}
 
-			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+			for (BlockPos innerPos : frame.getInnerBlockPositions()) {
 				world.setBlockState(innerPos, portalState, 2);
 			}
 
@@ -165,27 +165,27 @@ public final class EndPortalFrames {
 		final EnumFacing facing = state.getValue(FACING);
 		EnumFacing portalFacing = null;
 
-		if(block == RPOBlocks.vertical_end_portal_frame) {
+		if (block == RPOBlocks.vertical_end_portal_frame) {
 			frame = VERTICAL.get(facing).detect(world, framePos);
 			portalFacing = facing;
 		}
 
-		if(frame == null) {
+		if (frame == null) {
 			frame = VERTICAL_INWARDS_FACING.detect(world, framePos);
 
-			if(frame != null) {
+			if (frame != null) {
 				portalFacing = frame.getType() == FrameType.VERTICAL_X ?
 						EnumFacing.NORTH : EnumFacing.EAST;
 			}
 		}
 
-		if(frame == null || frame.isCorner(framePos)) {
+		if (frame == null || frame.isCorner(framePos)) {
 			return null;
 		}
 
 		final EndPortalEvent.Activate event = new EndPortalEvent.Activate(world, frame, framePos);
 
-		if(MinecraftForge.EVENT_BUS.post(event)) {
+		if (MinecraftForge.EVENT_BUS.post(event)) {
 			return null;
 		}
 
@@ -193,7 +193,7 @@ public final class EndPortalFrames {
 		final IBlockState portalState =
 				RPOBlocks.vertical_end_portal.getDefaultState().withProperty(FACING, portalFacing);
 
-		for(BlockPos innerPos : innerBlockPositions) {
+		for (BlockPos innerPos : innerBlockPositions) {
 			world.setBlockState(innerPos, portalState, 2);
 		}
 

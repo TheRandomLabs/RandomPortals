@@ -43,23 +43,23 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 
 	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(world.isRemote || entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
+		if (world.isRemote || entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
 			return;
 		}
 
 		final AxisAlignedBB aabb = entity.getEntityBoundingBox();
 
-		if(!aabb.intersects(state.getBoundingBox(world, pos).offset(pos))) {
+		if (!aabb.intersects(state.getBoundingBox(world, pos).offset(pos))) {
 			return;
 		}
 
 		final Frame frame = findFrame(world, pos);
 
-		if(MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Teleport.Pre(frame, entity, pos))) {
+		if (MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Teleport.Pre(frame, entity, pos))) {
 			return;
 		}
 
-		if(world.provider.getDimensionType() == DimensionType.THE_END) {
+		if (world.provider.getDimensionType() == DimensionType.THE_END) {
 			entity.changeDimension(DimensionType.OVERWORLD.getId());
 		} else {
 			entity.changeDimension(DimensionType.THE_END.getId());
@@ -74,12 +74,14 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 	}
 
 	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
-			EntityPlayer player, boolean willHarvest) {
+	public boolean removedByPlayer(
+			IBlockState state, World world, BlockPos pos,
+			EntityPlayer player, boolean willHarvest
+	) {
 		final boolean actuallyRemoved =
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
-		if(actuallyRemoved && !world.isRemote) {
+		if (actuallyRemoved && !world.isRemote) {
 			RPOSavedData.get(world).removeEndPortalByInner(pos);
 		}
 
@@ -90,7 +92,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		Frame frame = savedData.getEndPortalByInner(portalPos);
 
-		if(frame != null) {
+		if (frame != null) {
 			return frame;
 		}
 
@@ -102,7 +104,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		final EnumFacing frameDirection;
 		final FrameType type;
 
-		if(block == Blocks.END_PORTAL || block == RPOBlocks.upside_down_end_portal) {
+		if (block == Blocks.END_PORTAL || block == RPOBlocks.upside_down_end_portal) {
 			facing = null;
 			portalMatcher = FrameStatePredicate.of(block);
 			frameDirection = EnumFacing.NORTH;
@@ -117,13 +119,13 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 
 		int maxSize = 0;
 
-		for(Function<FrameType, FrameSize> sizeFunction : EndPortalFrames.SIZES) {
+		for (Function<FrameType, FrameSize> sizeFunction : EndPortalFrames.SIZES) {
 			final FrameSize frameSize = sizeFunction.apply(type);
 
-			if(frameSize != null) {
+			if (frameSize != null) {
 				final int size = frameSize.getMaxSize(frameDirection == EnumFacing.DOWN);
 
-				if(size > maxSize) {
+				if (size > maxSize) {
 					maxSize = size;
 				}
 			}
@@ -133,31 +135,32 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 		Block frameBlock = null;
 		BlockPos checkPos = portalPos;
 
-		for(int offset = 1; offset < maxSize - 1; offset++) {
+		for (int offset = 1; offset < maxSize - 1; offset++) {
 			checkPos = checkPos.offset(frameDirection);
 
 			final IBlockState checkState = world.getBlockState(checkPos);
 			frameBlock = checkState.getBlock();
 
-			if(EndPortalActivationHandler.isFrameBlock(frameBlock)) {
+			if (EndPortalActivationHandler.isFrameBlock(frameBlock)) {
 				framePos = checkPos;
 				break;
 			}
 
-			if(!portalMatcher.test(world, checkPos, checkState)) {
+			if (!portalMatcher.test(world, checkPos, checkState)) {
 				break;
 			}
 		}
 
-		if(framePos == null) {
+		if (framePos == null) {
 			return null;
 		}
 
-		final Predicate<Frame> condition = potentialFrame -> potentialFrame.isInnerBlock(portalPos);
+		final Predicate<Frame> condition =
+				potentialFrame -> potentialFrame.isInnerBlock(portalPos);
 
-		if(frameBlock == Blocks.END_PORTAL_FRAME) {
+		if (frameBlock == Blocks.END_PORTAL_FRAME) {
 			frame = EndPortalFrames.LATERAL.detectWithCondition(world, framePos, condition);
-		} else if(frameBlock == RPOBlocks.vertical_end_portal_frame) {
+		} else if (frameBlock == RPOBlocks.vertical_end_portal_frame) {
 			frame = EndPortalFrames.LATERAL_WITH_VERTICAL_FRAMES.detectWithCondition(
 					world, framePos, condition
 			);
@@ -165,17 +168,17 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 			frame = EndPortalFrames.UPSIDE_DOWN.detectWithCondition(world, framePos, condition);
 		}
 
-		if(frame != null) {
+		if (frame != null) {
 			savedData.addEndPortal(frame);
 			return frame;
 		}
 
-		if(frameBlock == RPOBlocks.vertical_end_portal_frame) {
+		if (frameBlock == RPOBlocks.vertical_end_portal_frame) {
 			frame = EndPortalFrames.VERTICAL.get(facing).detectWithCondition(
 					world, framePos, condition
 			);
 
-			if(frame != null) {
+			if (frame != null) {
 				savedData.addEndPortal(frame);
 				return frame;
 			}
@@ -185,7 +188,7 @@ public class BlockLateralEndPortal extends BlockEndPortal {
 				world, framePos, condition
 		);
 
-		if(frame != null) {
+		if (frame != null) {
 			savedData.addEndPortal(frame);
 		}
 

@@ -44,7 +44,7 @@ public final class PortalBlockRegistry {
 	}
 
 	public static IBlockState getState(Block block, EnumFacing.Axis axis, boolean userPlaced) {
-		if(block instanceof BlockNetherPortal) {
+		if (block instanceof BlockNetherPortal) {
 			return block.getDefaultState().
 					withProperty(BlockPortal.AXIS, axis).
 					withProperty(BlockNetherPortal.USER_PLACED, userPlaced);
@@ -53,11 +53,11 @@ public final class PortalBlockRegistry {
 		IBlockState state = block.getDefaultState();
 		final Collection<IProperty<?>> properties = state.getPropertyKeys();
 
-		if(properties.contains(BlockPortal.AXIS)) {
+		if (properties.contains(BlockPortal.AXIS)) {
 			state = state.withProperty(BlockPortal.AXIS, axis);
 		}
 
-		if(properties.contains(BlockNetherPortal.USER_PLACED)) {
+		if (properties.contains(BlockNetherPortal.USER_PLACED)) {
 			state = state.withProperty(BlockNetherPortal.USER_PLACED, userPlaced);
 		}
 

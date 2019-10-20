@@ -27,21 +27,21 @@ public class CommonProxy {
 	public void init() {
 		RPOConfig.reload();
 
-		if(RandomPortals.MOVINGWORLD_INSTALLED) {
+		if (RandomPortals.MOVINGWORLD_INSTALLED) {
 			try {
 				handleMovingWorld();
-			} catch(ClassNotFoundException | NoSuchFieldException | NoSuchMethodException |
+			} catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException |
 					IllegalAccessException | InvocationTargetException ex) {
 				RandomPortals.LOGGER.error("Failed to fix MovingWorld compatibility", ex);
 			}
 		}
 
-		if(RPOConfig.EndPortals.enabled) {
+		if (RPOConfig.EndPortals.enabled) {
 			MinecraftForge.EVENT_BUS.register(EndPortalActivationHandler.class);
 			MinecraftForge.EVENT_BUS.register(FrameHeadVillagerHandler.class);
 		}
 
-		if(RPOConfig.NetherPortals.enabled) {
+		if (RPOConfig.NetherPortals.enabled) {
 			MinecraftForge.EVENT_BUS.register(NetherPortalTeleportHandler.class);
 			MinecraftForge.EVENT_BUS.register(NetherPortalFrameBreakHandler.class);
 			MinecraftForge.EVENT_BUS.register(NetherPortalActivationHandler.class);
@@ -52,7 +52,7 @@ public class CommonProxy {
 
 		try {
 			PortalTypes.reload();
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			TRLUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
 
@@ -98,12 +98,12 @@ public class CommonProxy {
 	}
 
 	private void replace(Block[] blocks) {
-		for(int i = 0; i < blocks.length; i++) {
+		for (int i = 0; i < blocks.length; i++) {
 			final String registryName = blocks[i].getRegistryName().toString();
 
-			if(registryName.equals("minecraft:portal")) {
+			if (registryName.equals("minecraft:portal")) {
 				blocks[i] = Blocks.PORTAL;
-			} else if(registryName.equals("minecraft:end_portal")) {
+			} else if (registryName.equals("minecraft:end_portal")) {
 				blocks[i] = Blocks.END_PORTAL;
 			}
 		}

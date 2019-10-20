@@ -10,7 +10,6 @@ import com.therandomlabs.randomportals.tileentity.TileEntityVerticalEndPortal;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.lang3.StringUtils;
 
 public final class ClientProxy extends CommonProxy {
@@ -18,21 +17,22 @@ public final class ClientProxy extends CommonProxy {
 	public void preInit() {
 		super.preInit();
 
-		if(RPOConfig.Client.rporeloadclientCommand) {
-			ClientCommandHandler.instance.registerCommand(new CommandConfigReload(
-					"rporeloadclient", RPOConfig.class,
+		if (RPOConfig.Client.rporeloadclientCommand) {
+			ClientCommandHandler.instance.registerCommand(CommandConfigReload.client(
+					"rporeloadclient",
+					RPOConfig.class,
 					(phase, command, sender) -> {
-						if(phase == CommandConfigReload.ReloadPhase.POST) {
+						if (phase == CommandConfigReload.ReloadPhase.POST) {
 							sender.sendMessage(new TextComponentTranslation(
 									"commands.rporeload.loadedPortalTypes",
 									StringUtils.join(PortalTypes.getGroups().keySet(), ", ")
 							));
 						}
-					}, Side.CLIENT
+					}
 			));
 		}
 
-		if(RPOConfig.EndPortals.enabled) {
+		if (RPOConfig.EndPortals.enabled) {
 			ClientRegistry.bindTileEntitySpecialRenderer(
 					TileEntityVerticalEndPortal.class, new RPTileEntityEndPortalRenderer()
 			);

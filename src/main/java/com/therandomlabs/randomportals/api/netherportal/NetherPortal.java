@@ -19,14 +19,16 @@ public final class NetherPortal {
 		this(frame, receivingFrame, type, null);
 	}
 
-	public NetherPortal(Frame frame, Frame receivingFrame, PortalType type,
-			FunctionType functionType) {
+	public NetherPortal(
+			Frame frame, Frame receivingFrame, PortalType type,
+			FunctionType functionType
+	) {
 		this.frame = frame;
 		world = frame.getWorld();
 		this.receivingFrame = receivingFrame;
 		typeID = type.toString();
 
-		if(functionType == null) {
+		if (functionType == null) {
 			this.functionType = type.decorative ? FunctionType.DECORATIVE : FunctionType.NORMAL;
 		} else {
 			this.functionType = functionType;

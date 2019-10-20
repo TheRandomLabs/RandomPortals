@@ -36,12 +36,12 @@ public final class RPOPortalRenderer {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
-		if(RPOConfig.NetherPortals.enabled &&
+		if (RPOConfig.NetherPortals.enabled &&
 				event.getType() == RenderGameOverlayEvent.ElementType.PORTAL) {
 			final float timeInPortal = mc.player.prevTimeInPortal +
 					(mc.player.timeInPortal - mc.player.prevTimeInPortal) * event.getPartialTicks();
 
-			if(timeInPortal > 0.0F) {
+			if (timeInPortal > 0.0F) {
 				render(timeInPortal, event.getResolution());
 			}
 
@@ -50,7 +50,7 @@ public final class RPOPortalRenderer {
 	}
 
 	public static void render(float timeInPortal, ScaledResolution resolution) {
-		if(timeInPortal < 1.0F) {
+		if (timeInPortal < 1.0F) {
 			timeInPortal *= timeInPortal * timeInPortal * 0.8F;
 			timeInPortal += 0.2F;
 		}
@@ -91,7 +91,7 @@ public final class RPOPortalRenderer {
 	}
 
 	public static void resetSprite(BlockPos pos, Block block) {
-		if(RPOPortalRenderer.pos == null || pos.distanceSq(RPOPortalRenderer.pos) > 2.0 ||
+		if (RPOPortalRenderer.pos == null || pos.distanceSq(RPOPortalRenderer.pos) > 2.0 ||
 				isPlayerCloser(pos) ||
 				(pos.equals(RPOPortalRenderer.pos) && block != RPOPortalRenderer.block)) {
 			//pos is a PooledMutableBlockPos
@@ -100,14 +100,14 @@ public final class RPOPortalRenderer {
 
 			final IBlockState stateToRender;
 
-			if(block instanceof BlockNetherPortal) {
-				if(block instanceof BlockLateralNetherPortal) {
+			if (block instanceof BlockNetherPortal) {
+				if (block instanceof BlockLateralNetherPortal) {
 					stateToRender = block.getDefaultState();
 				} else {
 					//If the portal is vertical, get the portal at eye-level
 					final Block block2 = mc.world.getBlockState(pos.up()).getBlock();
 
-					if(block2 instanceof BlockNetherPortal) {
+					if (block2 instanceof BlockNetherPortal) {
 						stateToRender = block2.getDefaultState();
 					} else {
 						stateToRender = block.getDefaultState();

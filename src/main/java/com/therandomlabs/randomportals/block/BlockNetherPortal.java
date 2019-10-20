@@ -147,7 +147,7 @@ public class BlockNetherPortal extends BlockPortal {
 						translationKey.substring(1)
 		);
 
-		if(!colors.containsKey(color)) {
+		if (!colors.containsKey(color)) {
 			colors.put(color, this);
 		}
 	}
@@ -170,7 +170,7 @@ public class BlockNetherPortal extends BlockPortal {
 	@SuppressWarnings("deprecation")
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		switch(getEffectiveAxis(state)) {
+		switch (getEffectiveAxis(state)) {
 		case X:
 			return AABB_X;
 		case Y:
@@ -182,7 +182,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 	@Override
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
-		if(!world.getGameRules().getBoolean("doMobSpawning")) {
+		if (!world.getGameRules().getBoolean("doMobSpawning")) {
 			return;
 		}
 
@@ -192,7 +192,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final EntitySpawns spawns =
 				portalType.group.entitySpawns.get(world.provider.getDimension());
 
-		if(spawns == null || spawns.entities.isEmpty() ||
+		if (spawns == null || spawns.entities.isEmpty() ||
 				random.nextInt(spawns.rate) >= world.getDifficulty().getId()) {
 			return;
 		}
@@ -200,16 +200,16 @@ public class BlockNetherPortal extends BlockPortal {
 		final int minY = RandomPortals.CUBIC_CHUNKS_INSTALLED ? pos.getY() - 256 : 0;
 		boolean found = false;
 
-		while(pos.getY() > minY) {
+		while (pos.getY() > minY) {
 			pos = pos.down();
 
-			if(world.getBlockState(pos).isSideSolid(world, pos, EnumFacing.UP)) {
+			if (world.getBlockState(pos).isSideSolid(world, pos, EnumFacing.UP)) {
 				found = true;
 				break;
 			}
 		}
 
-		if(!found || world.getBlockState(pos.up()).isNormalCube()) {
+		if (!found || world.getBlockState(pos.up()).isNormalCube()) {
 			return;
 		}
 
@@ -218,7 +218,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		try {
 			compound = JsonToNBT.getTagFromJson(spawnRate.nbt);
-		} catch(NBTException ignored) {}
+		} catch (NBTException ignored) {}
 
 		compound.setString("id", spawnRate.key);
 
@@ -228,13 +228,13 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final Entity entity = AnvilChunkLoader.readWorldEntityPos(compound, world, x, y, z, true);
 
-		if(entity == null) {
+		if (entity == null) {
 			return;
 		}
 
 		final EntityLiving living = entity instanceof EntityLiving ? (EntityLiving) entity : null;
 
-		if(living != null && ForgeEventFactory.doSpecialSpawn(living, world, x, y, z, null)) {
+		if (living != null && ForgeEventFactory.doSpecialSpawn(living, world, x, y, z, null)) {
 			world.removeEntity(entity);
 			return;
 		}
@@ -243,7 +243,7 @@ public class BlockNetherPortal extends BlockPortal {
 				x, y, z, MathHelper.wrapDegrees(random.nextFloat() * 360.0F), 0.0F
 		);
 
-		if(living != null) {
+		if (living != null) {
 			living.rotationYawHead = entity.rotationYaw;
 			living.renderYawOffset = entity.rotationYaw;
 			living.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(living)), null);
@@ -254,9 +254,11 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block,
-			BlockPos fromPos) {
-		if(removing.contains(fromPos)) {
+	public void neighborChanged(
+			IBlockState state, World world, BlockPos pos, Block block,
+			BlockPos fromPos
+	) {
+		if (removing.contains(fromPos)) {
 			return;
 		}
 
@@ -264,34 +266,34 @@ public class BlockNetherPortal extends BlockPortal {
 		NetherPortal portal = savedData.getNetherPortalByInner(pos);
 
 		//If there is an activated portal here, then ignore userPlaced
-		if(state.getValue(USER_PLACED) && portal == null) {
+		if (state.getValue(USER_PLACED) && portal == null) {
 			return;
 		}
 
 		final EnumFacing.Axis axis = getEffectiveAxis(state);
 		final IBlockState fromState = world.getBlockState(fromPos);
 
-		if(fromState.getBlock() == this && !fromState.getValue(USER_PLACED) &&
+		if (fromState.getBlock() == this && !fromState.getValue(USER_PLACED) &&
 				getEffectiveAxis(fromState) == axis) {
 			return;
 		}
 
 		final EnumFacing irrelevantFacing = getIrrelevantFacing(axis);
 
-		if(pos.offset(irrelevantFacing).equals(fromPos) ||
+		if (pos.offset(irrelevantFacing).equals(fromPos) ||
 				pos.offset(irrelevantFacing.getOpposite()).equals(fromPos)) {
 			return;
 		}
 
 		final Tuple<Boolean, NetherPortal> tuple;
 
-		if(portal == null) {
+		if (portal == null) {
 			tuple = findFrame(world, pos);
 		} else {
 			tuple = new Tuple<>(true, portal);
 		}
 
-		if(tuple != null) {
+		if (tuple != null) {
 			portal = tuple.getSecond();
 			final Frame frame = portal.getFrame();
 
@@ -300,12 +302,12 @@ public class BlockNetherPortal extends BlockPortal {
 			//The following loop then ensures that the inner blocks are all portal blocks
 			boolean shouldBreak = tuple.getFirst() && !portal.getType().test(frame);
 
-			if(!shouldBreak) {
-				for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+			if (!shouldBreak) {
+				for (BlockPos innerPos : frame.getInnerBlockPositions()) {
 					final IBlockState innerState = world.getBlockState(innerPos);
 					final Block innerBlock = innerState.getBlock();
 
-					if(innerBlock.getClass() != clazz ||
+					if (innerBlock.getClass() != clazz ||
 							((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) != axis) {
 						shouldBreak = true;
 						break;
@@ -313,15 +315,15 @@ public class BlockNetherPortal extends BlockPortal {
 				}
 			}
 
-			if(!shouldBreak) {
+			if (!shouldBreak) {
 				return;
 			}
 
-			for(BlockPos innerPos : frame.getInnerBlockPositions()) {
+			for (BlockPos innerPos : frame.getInnerBlockPositions()) {
 				final IBlockState innerState = world.getBlockState(innerPos);
 				final Block innerBlock = innerState.getBlock();
 
-				if(innerBlock.getClass() == clazz &&
+				if (innerBlock.getClass() == clazz &&
 						((BlockNetherPortal) innerBlock).getEffectiveAxis(innerState) == axis) {
 					removing.add(innerPos);
 				}
@@ -334,7 +336,7 @@ public class BlockNetherPortal extends BlockPortal {
 			));
 		}
 
-		for(BlockPos removePos : removing) {
+		for (BlockPos removePos : removing) {
 			world.setBlockToAir(removePos);
 		}
 
@@ -344,24 +346,26 @@ public class BlockNetherPortal extends BlockPortal {
 	@SuppressWarnings("deprecation")
 	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
-			EnumFacing side) {
+	public boolean shouldSideBeRendered(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			EnumFacing side
+	) {
 		//I adapted this from vanilla and am assuming it is an optimization of some sort
 		pos = pos.offset(side);
 		EnumFacing.Axis axis = null;
 
-		if(state.getBlock() == this) {
+		if (state.getBlock() == this) {
 			axis = getEffectiveAxis(state);
 
-			if(axis == null) {
+			if (axis == null) {
 				return false;
 			}
 
-			if(axis == EnumFacing.Axis.Z && side != EnumFacing.EAST && side != EnumFacing.WEST) {
+			if (axis == EnumFacing.Axis.Z && side != EnumFacing.EAST && side != EnumFacing.WEST) {
 				return false;
 			}
 
-			if(axis == EnumFacing.Axis.X && side != EnumFacing.SOUTH && side != EnumFacing.NORTH) {
+			if (axis == EnumFacing.Axis.X && side != EnumFacing.SOUTH && side != EnumFacing.NORTH) {
 				return false;
 			}
 		}
@@ -381,7 +385,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final boolean x = west || east || axis == EnumFacing.Axis.X;
 		final boolean z = north || south || axis == EnumFacing.Axis.Z;
 
-		if(x) {
+		if (x) {
 			return side == EnumFacing.WEST || side == EnumFacing.EAST;
 		}
 
@@ -390,31 +394,31 @@ public class BlockNetherPortal extends BlockPortal {
 
 	@Override
 	public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
+		if (entity.isRiding() || entity.isBeingRidden() || !entity.isNonBoss()) {
 			return;
 		}
 
 		final AxisAlignedBB aabb = entity.getEntityBoundingBox();
 
-		if(!aabb.intersects(state.getBoundingBox(world, pos).offset(pos))) {
+		if (!aabb.intersects(state.getBoundingBox(world, pos).offset(pos))) {
 			return;
 		}
 
 		EnumDyeColor newColor = null;
 		EntityItem dyeEntity = null;
 
-		if(RPOConfig.NetherPortals.coloredPortals && RPOConfig.NetherPortals.dyeablePortals &&
+		if (RPOConfig.NetherPortals.coloredPortals && RPOConfig.NetherPortals.dyeablePortals &&
 				entity instanceof EntityItem) {
 			dyeEntity = (EntityItem) entity;
 			final ItemStack stack = dyeEntity.getItem();
 
-			if(stack.getItem() == Items.DYE) {
+			if (stack.getItem() == Items.DYE) {
 				newColor = EnumDyeColor.byDyeDamage(stack.getMetadata());
 			}
 		}
 
-		if(color == newColor) {
-			if(RPOConfig.NetherPortals.consumeDyesEvenIfSameColor) {
+		if (color == newColor) {
+			if (RPOConfig.NetherPortals.consumeDyesEvenIfSameColor) {
 				world.removeEntity(dyeEntity);
 				return;
 			}
@@ -422,12 +426,12 @@ public class BlockNetherPortal extends BlockPortal {
 			newColor = null;
 		}
 
-		if(world.isRemote) {
-			if(newColor == null) {
+		if (world.isRemote) {
+			if (newColor == null) {
 				//On the client, the Nether portal logic is not changed
 				entity.setPortal(pos);
 
-				if(entity == Minecraft.getMinecraft().player) {
+				if (entity == Minecraft.getMinecraft().player) {
 					RPOPortalRenderer.resetSprite(pos, this);
 				}
 			}
@@ -440,12 +444,12 @@ public class BlockNetherPortal extends BlockPortal {
 		final PortalType portalType =
 				portal == null ? PortalTypes.getDefault(world) : portal.getType();
 
-		if(newColor != null) {
-			if(portalType.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
+		if (newColor != null) {
+			if (portalType.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
 				newColor = null;
-			} else if(portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
+			} else if (portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
 					!ArrayUtils.contains(portalType.color.colors, newColor)) {
-				if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor) {
+				if (RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor) {
 					world.removeEntity(dyeEntity);
 					return;
 				}
@@ -454,7 +458,7 @@ public class BlockNetherPortal extends BlockPortal {
 			}
 		}
 
-		if(newColor == null) {
+		if (newColor == null) {
 			NetherPortalTeleportHandler.setPortal(entity, portal, pos);
 			return;
 		}
@@ -465,9 +469,9 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final List<BlockPos> dyedPortalPositions = new ArrayList<>(relevantPositions.size());
 
-		for(BlockPos portalPos : relevantPositions) {
+		for (BlockPos portalPos : relevantPositions) {
 			//Only replace blocks of the same color
-			if(world.getBlockState(portalPos).getBlock() == this) {
+			if (world.getBlockState(portalPos).getBlock() == this) {
 				dyedPortalPositions.add(portalPos);
 			}
 		}
@@ -476,7 +480,7 @@ public class BlockNetherPortal extends BlockPortal {
 				world, portal, dyedPortalPositions, color, newColor, dyeEntity
 		);
 
-		if(MinecraftForge.EVENT_BUS.post(event)) {
+		if (MinecraftForge.EVENT_BUS.post(event)) {
 			return;
 		}
 
@@ -484,7 +488,7 @@ public class BlockNetherPortal extends BlockPortal {
 				withProperty(AXIS, state.getValue(AXIS)).
 				withProperty(USER_PLACED, state.getValue(USER_PLACED));
 
-		for(BlockPos portalPos : dyedPortalPositions) {
+		for (BlockPos portalPos : dyedPortalPositions) {
 			world.setBlockState(portalPos, newState, 2);
 		}
 
@@ -496,7 +500,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		final String thrower = dyeEntity.getThrower();
 
-		if(RPOConfig.Misc.advancements &&
+		if (RPOConfig.Misc.advancements &&
 				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID) &&
 				thrower != null) {
 			final EntityPlayerMP player =
@@ -514,7 +518,7 @@ public class BlockNetherPortal extends BlockPortal {
 	public IBlockState getStateFromMeta(int meta) {
 		final boolean userPlaced;
 
-		if(meta > 2) {
+		if (meta > 2) {
 			userPlaced = true;
 			meta %= 3;
 		} else {
@@ -533,7 +537,7 @@ public class BlockNetherPortal extends BlockPortal {
 		final int y = pos.getY();
 		final int z = pos.getZ();
 
-		if(random.nextInt(100) == 0) {
+		if (random.nextInt(100) == 0) {
 			world.playSound(
 					x + 0.5,
 					y + 0.5,
@@ -546,7 +550,7 @@ public class BlockNetherPortal extends BlockPortal {
 			);
 		}
 
-		for(int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			final double particleX;
 			final double particleY = y + random.nextDouble();
 			final double particleZ;
@@ -557,7 +561,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 			final int offset = random.nextInt(2) * 2 - 1;
 
-			if(world.getBlockState(pos.west()).getBlock().getClass() != clazz &&
+			if (world.getBlockState(pos.west()).getBlock().getClass() != clazz &&
 					world.getBlockState(pos.east()).getBlock().getClass() != clazz) {
 				particleX = x + 0.5 + 0.25 * offset;
 				particleZ = z + random.nextDouble();
@@ -604,37 +608,39 @@ public class BlockNetherPortal extends BlockPortal {
 
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if(RPOConfig.NetherPortals.portalsContributeToBeaconColors && !world.isRemote) {
+		if (RPOConfig.NetherPortals.portalsContributeToBeaconColors && !world.isRemote) {
 			BlockBeacon.updateColorAsync(world, pos);
 		}
 	}
 
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		if(RPOConfig.NetherPortals.portalsContributeToBeaconColors && !world.isRemote) {
+		if (RPOConfig.NetherPortals.portalsContributeToBeaconColors && !world.isRemote) {
 			BlockBeacon.updateColorAsync(world, pos);
 		}
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
+	public boolean onBlockActivated(
+			World world, BlockPos pos, IBlockState state,
 			EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
-			float hitZ) {
-		if(world.isRemote || !RPOConfig.NetherPortals.coloredPortals ||
+			float hitZ
+	) {
+		if (world.isRemote || !RPOConfig.NetherPortals.coloredPortals ||
 				!RPOConfig.NetherPortals.dyeableSinglePortalBlocks) {
 			return false;
 		}
 
 		final ItemStack stack = player.getHeldItem(hand);
 
-		if(stack.getItem() != Items.DYE) {
+		if (stack.getItem() != Items.DYE) {
 			return false;
 		}
 
 		final EnumDyeColor newColor = EnumDyeColor.byDyeDamage(stack.getMetadata());
 
-		if(color == newColor) {
-			if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
+		if (color == newColor) {
+			if (RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
 					!player.capabilities.isCreativeMode) {
 				stack.shrink(1);
 			}
@@ -647,13 +653,13 @@ public class BlockNetherPortal extends BlockPortal {
 		final PortalType portalType =
 				portal == null ? PortalTypes.getDefault(world) : portal.getType();
 
-		if(portalType.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
+		if (portalType.color.dyeBehavior == ColorData.DyeBehavior.DISABLE) {
 			return false;
 		}
 
-		if(portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
+		if (portalType.color.dyeBehavior == ColorData.DyeBehavior.ONLY_DEFINED_COLORS &&
 				!ArrayUtils.contains(portalType.color.colors, newColor)) {
-			if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
+			if (RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
 					!player.capabilities.isCreativeMode) {
 				stack.shrink(1);
 			}
@@ -667,7 +673,7 @@ public class BlockNetherPortal extends BlockPortal {
 				world, portal, dyedPortalPositions, color, newColor, null
 		);
 
-		if(MinecraftForge.EVENT_BUS.post(event)) {
+		if (MinecraftForge.EVENT_BUS.post(event)) {
 			return false;
 		}
 
@@ -677,7 +683,7 @@ public class BlockNetherPortal extends BlockPortal {
 
 		world.setBlockState(pos, newState, 2);
 
-		if(RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
+		if (RPOConfig.NetherPortals.consumeDyesEvenIfInvalidColor &&
 				!player.capabilities.isCreativeMode) {
 			stack.shrink(1);
 		}
@@ -686,9 +692,10 @@ public class BlockNetherPortal extends BlockPortal {
 				world, portal, dyedPortalPositions, color, newColor, true
 		));
 
-		if(RPOConfig.Misc.advancements &&
+		if (RPOConfig.Misc.advancements &&
 				portalType.group.toString().equals(PortalTypes.VANILLA_NETHER_PORTAL_ID)) {
-			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger((EntityPlayerMP) player, newColor, true);
+			RPOCriteriaTriggers.DYED_NETHER_PORTAL.trigger((EntityPlayerMP) player, newColor,
+					true);
 		}
 
 		return true;
@@ -696,8 +703,10 @@ public class BlockNetherPortal extends BlockPortal {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(
+			World world, BlockPos pos, EnumFacing facing,
+			float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer
+	) {
 		final EnumFacing.Axis axis = placer.getHorizontalFacing().getAxis();
 		return getDefaultState().withProperty(
 				AXIS,
@@ -706,12 +715,14 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
-			EntityPlayer player, boolean willHarvest) {
+	public boolean removedByPlayer(
+			IBlockState state, World world, BlockPos pos,
+			EntityPlayer player, boolean willHarvest
+	) {
 		final boolean actuallyRemoved =
 				super.removedByPlayer(state, world, pos, player, willHarvest);
 
-		if(actuallyRemoved && !world.isRemote) {
+		if (actuallyRemoved && !world.isRemote) {
 			RPOSavedData.get(world).removeNetherPortalByInner(pos);
 		}
 
@@ -719,8 +730,10 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	@Override
-	public float[] getBeaconColorMultiplier(IBlockState state, World world, BlockPos pos,
-			BlockPos beaconPos) {
+	public float[] getBeaconColorMultiplier(
+			IBlockState state, World world, BlockPos pos,
+			BlockPos beaconPos
+	) {
 		return RPOConfig.NetherPortals.portalsContributeToBeaconColors ?
 				color.getColorComponentValues() : null;
 	}
@@ -742,21 +755,25 @@ public class BlockNetherPortal extends BlockPortal {
 		return block == null ? (BlockNetherPortal) Blocks.PORTAL : block;
 	}
 
-	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(World world,
-			BlockPos portalPos) {
+	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(
+			World world,
+			BlockPos portalPos
+	) {
 		return getRelevantPortalBlockPositions(world, portalPos, null);
 	}
 
-	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(World world,
-			BlockPos portalPos, Frame frame) {
+	public static ImmutableList<BlockPos> getRelevantPortalBlockPositions(
+			World world,
+			BlockPos portalPos, Frame frame
+	) {
 		final IBlockState state = world.getBlockState(portalPos);
 		final BlockNetherPortal block = (BlockNetherPortal) state.getBlock();
 		final EnumFacing.Axis axis = block.getEffectiveAxis(state);
 
-		if(frame == null) {
+		if (frame == null) {
 			final Tuple<Boolean, NetherPortal> tuple = findFrame(world, portalPos);
 
-			if(tuple != null) {
+			if (tuple != null) {
 				return tuple.getSecond().getFrame().getInnerBlockPositions();
 			}
 		} else {
@@ -770,19 +787,21 @@ public class BlockNetherPortal extends BlockPortal {
 		return findFrame(NetherPortalFrames.FRAMES, world, portalPos);
 	}
 
-	public static Tuple<Boolean, NetherPortal> findFrame(FrameDetector detector, World world,
-			BlockPos portalPos) {
+	public static Tuple<Boolean, NetherPortal> findFrame(
+			FrameDetector detector, World world,
+			BlockPos portalPos
+	) {
 		final RPOSavedData savedData = RPOSavedData.get(world);
 		NetherPortal portal = savedData.getNetherPortalByInner(portalPos);
 
-		if(portal != null) {
+		if (portal != null) {
 			return new Tuple<>(true, portal);
 		}
 
 		final IBlockState state = world.getBlockState(portalPos);
 		final Block block = state.getBlock();
 
-		if(!(state instanceof BlockNetherPortal)) {
+		if (!(state instanceof BlockNetherPortal)) {
 			return null;
 		}
 
@@ -799,26 +818,26 @@ public class BlockNetherPortal extends BlockPortal {
 		BlockPos framePos = null;
 		BlockPos checkPos = portalPos;
 
-		for(int offset = 1; offset < maxSize - 1; offset++) {
+		for (int offset = 1; offset < maxSize - 1; offset++) {
 			checkPos = checkPos.offset(frameDirection);
 
 			final IBlockState checkState = world.getBlockState(checkPos);
 			final Block checkBlock = checkState.getBlock();
 
 			//If the frame block is a portal, the portal must be user-placed
-			if(PortalTypes.getValidBlocks().test(world, checkPos, checkState) &&
+			if (PortalTypes.getValidBlocks().test(world, checkPos, checkState) &&
 					(!(checkBlock instanceof BlockNetherPortal) ||
 							checkState.getValue(USER_PLACED))) {
 				framePos = checkPos;
 				break;
 			}
 
-			if(!portalMatcher.test(world, checkPos, checkState)) {
+			if (!portalMatcher.test(world, checkPos, checkState)) {
 				break;
 			}
 		}
 
-		if(framePos == null) {
+		if (framePos == null) {
 			return null;
 		}
 
@@ -827,7 +846,7 @@ public class BlockNetherPortal extends BlockPortal {
 				potentialFrame -> potentialFrame.isInnerBlock(portalPos)
 		);
 
-		if(frame == null) {
+		if (frame == null) {
 			return null;
 		}
 
@@ -836,28 +855,30 @@ public class BlockNetherPortal extends BlockPortal {
 		return new Tuple<>(false, portal);
 	}
 
-	private static ImmutableList<BlockPos> getConnectedPortals(World world, BlockPos portalPos,
-			BlockNetherPortal block, EnumFacing.Axis axis, boolean userPlaced) {
+	private static ImmutableList<BlockPos> getConnectedPortals(
+			World world, BlockPos portalPos,
+			BlockNetherPortal block, EnumFacing.Axis axis, boolean userPlaced
+	) {
 		final List<BlockPos> positions = new ArrayList<>();
 		final EnumFacing[] relevantFacings = getRelevantFacings(axis);
 
 		positions.add(portalPos);
 		int previousSize = 0;
 
-		for(int i = 0; i < positions.size() || positions.size() != previousSize; i++) {
+		for (int i = 0; i < positions.size() || positions.size() != previousSize; i++) {
 			previousSize = positions.size();
 			final BlockPos removingPos = positions.get(i);
 
-			for(EnumFacing facing : relevantFacings) {
+			for (EnumFacing facing : relevantFacings) {
 				final BlockPos neighbor = removingPos.offset(facing);
 
-				if(positions.contains(neighbor)) {
+				if (positions.contains(neighbor)) {
 					continue;
 				}
 
 				final IBlockState neighborState = world.getBlockState(neighbor);
 
-				if(neighborState.getBlock() == block &&
+				if (neighborState.getBlock() == block &&
 						block.getEffectiveAxis(neighborState) == axis &&
 						neighborState.getValue(USER_PLACED) == userPlaced) {
 					positions.add(neighbor);
@@ -869,11 +890,11 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	private static EnumFacing getIrrelevantFacing(EnumFacing.Axis axis) {
-		if(axis == EnumFacing.Axis.X) {
+		if (axis == EnumFacing.Axis.X) {
 			return EnumFacing.NORTH;
 		}
 
-		if(axis == EnumFacing.Axis.Y) {
+		if (axis == EnumFacing.Axis.Y) {
 			return EnumFacing.UP;
 		}
 
@@ -881,11 +902,11 @@ public class BlockNetherPortal extends BlockPortal {
 	}
 
 	private static EnumFacing[] getRelevantFacings(EnumFacing.Axis axis) {
-		if(axis == EnumFacing.Axis.X) {
+		if (axis == EnumFacing.Axis.X) {
 			return xRelevantFacings;
 		}
 
-		if(axis == EnumFacing.Axis.Y) {
+		if (axis == EnumFacing.Axis.Y) {
 			return yRelevantFacings;
 		}
 

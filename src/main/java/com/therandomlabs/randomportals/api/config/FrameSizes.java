@@ -17,10 +17,10 @@ public final class FrameSizes {
 	}
 
 	public static void reload() {
-		for(String name : names) {
+		for (String name : names) {
 			FrameSize size = RPOConfig.readJson(name, FrameSize.class);
 
-			if(size == null) {
+			if (size == null) {
 				size = new FrameSize();
 			} else {
 				size.ensureCorrect();
@@ -40,7 +40,7 @@ public final class FrameSizes {
 	}
 
 	public static void register(String species, String... names) {
-		for(String name : names) {
+		for (String name : names) {
 			FrameSizes.names.add(species + "/" + name);
 		}
 	}

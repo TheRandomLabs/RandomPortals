@@ -12,11 +12,11 @@ public final class SpawnRate {
 	public void ensureCorrect() {
 		try {
 			JsonToNBT.getTagFromJson(nbt);
-		} catch(NBTException ex) {
+		} catch (NBTException ex) {
 			nbt = "{}";
 		}
 
-		if(weight <= 0.0) {
+		if (weight <= 0.0) {
 			weight = 100.0;
 		}
 	}

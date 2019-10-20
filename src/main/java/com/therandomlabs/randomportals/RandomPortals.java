@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,17 +59,20 @@ public final class RandomPortals {
 
 	@Mod.EventHandler
 	public static void serverStarting(FMLServerStartingEvent event) {
-		if(RPOConfig.Misc.rporeloadCommand) {
-			event.registerServerCommand(new CommandConfigReload(
-					"rporeload", RPOConfig.class,
+		if (RPOConfig.Misc.rporeloadCommand) {
+			event.registerServerCommand(CommandConfigReload.server(
+					"rporeload",
+					"rporeloadclient",
+					RPOConfig.class,
+					null,
 					(phase, command, sender) -> {
-						if(phase == CommandConfigReload.ReloadPhase.POST) {
+						if (phase == CommandConfigReload.ReloadPhase.POST) {
 							CommandBase.notifyCommandListener(
 									sender, command, "commands.rporeload.loadedPortalTypes",
 									StringUtils.join(PortalTypes.getGroups().keySet(), ", ")
 							);
 						}
-					}, Side.SERVER
+					}
 			));
 		}
 	}

@@ -19,13 +19,13 @@ public final class ColorData {
 	public void ensureCorrect() {
 		final Set<EnumDyeColor> colorSet = new HashSet<>();
 
-		for(EnumDyeColor color : colors) {
-			if(color != null) {
+		for (EnumDyeColor color : colors) {
+			if (color != null) {
 				colorSet.add(color);
 			}
 		}
 
-		if(colorSet.isEmpty()) {
+		if (colorSet.isEmpty()) {
 			colors = new EnumDyeColor[] {
 					EnumDyeColor.PURPLE
 			};

@@ -27,7 +27,7 @@ public final class FrameData {
 
 	@SuppressWarnings("Duplicates")
 	public void ensureCorrect() {
-		if(type == FrameType.SAME) {
+		if (type == FrameType.SAME) {
 			type = FrameType.LATERAL_OR_VERTICAL;
 		}
 
@@ -35,13 +35,13 @@ public final class FrameData {
 
 		final List<RegistryNameAndMeta> checkedBlocks = new ArrayList<>();
 
-		for(int i = 0; i < blocks.size(); i++) {
+		for (int i = 0; i < blocks.size(); i++) {
 			final FrameBlock block = blocks.get(i);
 			final RegistryNameAndMeta registryNameAndMeta = new RegistryNameAndMeta(
 					block.registryName, block.meta
 			);
 
-			if(!block.isValid() || checkedBlocks.contains(registryNameAndMeta)) {
+			if (!block.isValid() || checkedBlocks.contains(registryNameAndMeta)) {
 				blocks.remove(i--);
 				continue;
 			}
@@ -54,40 +54,40 @@ public final class FrameData {
 	public boolean test(Frame frame) {
 		final FrameType frameType = frame.getType();
 
-		if(!type.test(frameType)) {
+		if (!type.test(frameType)) {
 			return false;
 		}
 
 		final World world = frame.getWorld();
 
-		if(!size.test(frameType, frame.getWidth(), frame.getHeight())) {
+		if (!size.test(frameType, frame.getWidth(), frame.getHeight())) {
 			return false;
 		}
 
 		final Map<FrameBlock, Integer> detectedBlocks = new HashMap<>();
 
-		for(BlockPos pos : frame.getFrameBlockPositions()) {
+		for (BlockPos pos : frame.getFrameBlockPositions()) {
 			final IBlockState state = world.getBlockState(pos);
 			final boolean corner = frame.isCorner(pos);
 			boolean found = false;
 
-			if(corner) {
+			if (corner) {
 				found = requiredCorner.test(world, pos, state);
 
-				if(found) {
-					if(!cornerBlocksContributeToMinimumAmount) {
+				if (found) {
+					if (!cornerBlocksContributeToMinimumAmount) {
 						continue;
 					}
 				} else {
-					if(requiredCorner != RequiredCorner.SAME) {
+					if (requiredCorner != RequiredCorner.SAME) {
 						return false;
 					}
 				}
 			}
 
-			for(FrameBlock block : blocks) {
-				if(block.test(state)) {
-					if(!corner || cornerBlocksContributeToMinimumAmount) {
+			for (FrameBlock block : blocks) {
+				if (block.test(state)) {
+					if (!corner || cornerBlocksContributeToMinimumAmount) {
 						detectedBlocks.merge(block, 1, Integer::sum);
 					}
 
@@ -96,19 +96,19 @@ public final class FrameData {
 				}
 			}
 
-			if(!found) {
+			if (!found) {
 				return false;
 			}
 		}
 
-		for(FrameBlock block : blocks) {
-			if(block.minimumAmount == 0) {
+		for (FrameBlock block : blocks) {
+			if (block.minimumAmount == 0) {
 				continue;
 			}
 
 			final Integer detectedAmount = detectedBlocks.get(block);
 
-			if(detectedAmount == null || detectedAmount < block.minimumAmount) {
+			if (detectedAmount == null || detectedAmount < block.minimumAmount) {
 				return false;
 			}
 		}

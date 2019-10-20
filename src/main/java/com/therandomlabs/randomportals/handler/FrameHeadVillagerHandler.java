@@ -17,32 +17,32 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public final class FrameHeadVillagerHandler {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onCheckSpawn(EntityJoinWorldEvent event) {
-		if(event.getWorld().isRemote) {
+		if (event.getWorld().isRemote) {
 			return;
 		}
 
 		final double chance = RPOConfig.EndPortals.frameHeadVillagerSpawnChance;
 
-		if(chance == 0.0) {
+		if (chance == 0.0) {
 			return;
 		}
 
 		final Entity entity = event.getEntity();
 
-		if(entity.getClass() != EntityVillager.class) {
+		if (entity.getClass() != EntityVillager.class) {
 			return;
 		}
 
 		final EntityVillager villager = (EntityVillager) entity;
 		final NBTTagCompound data = villager.getEntityData();
 
-		if(data.getBoolean("FrameHeadChecked")) {
+		if (data.getBoolean("FrameHeadChecked")) {
 			return;
 		}
 
 		data.setBoolean("FrameHeadChecked", true);
 
-		if(chance == 1.0 || villager.getRNG().nextDouble() <= chance) {
+		if (chance == 1.0 || villager.getRNG().nextDouble() <= chance) {
 			villager.setItemStackToSlot(
 					EntityEquipmentSlot.HEAD,
 					new ItemStack(RPOBlocks.vertical_end_portal_frame)
@@ -52,25 +52,25 @@ public final class FrameHeadVillagerHandler {
 
 	@SubscribeEvent
 	public static void onEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
-		if(!RPOConfig.EndPortals.rightClickVillagersToConvertToFrameHeads) {
+		if (!RPOConfig.EndPortals.rightClickVillagersToConvertToFrameHeads) {
 			return;
 		}
 
 		final ItemStack stack = event.getItemStack();
 
-		if(stack.getItem() != ItemBlock.getItemFromBlock(RPOBlocks.vertical_end_portal_frame)) {
+		if (stack.getItem() != ItemBlock.getItemFromBlock(RPOBlocks.vertical_end_portal_frame)) {
 			return;
 		}
 
 		final Entity entity = event.getTarget();
 
-		if(entity.getClass() != EntityVillager.class) {
+		if (entity.getClass() != EntityVillager.class) {
 			return;
 		}
 
 		final EntityVillager villager = (EntityVillager) entity;
 
-		if(!villager.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty()) {
+		if (!villager.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty()) {
 			return;
 		}
 
@@ -79,7 +79,7 @@ public final class FrameHeadVillagerHandler {
 				new ItemStack(RPOBlocks.vertical_end_portal_frame)
 		);
 
-		if(!event.getEntityPlayer().capabilities.isCreativeMode) {
+		if (!event.getEntityPlayer().capabilities.isCreativeMode) {
 			stack.shrink(1);
 		}
 

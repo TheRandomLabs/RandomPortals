@@ -16,8 +16,10 @@ public class PortalsTrigger extends RPOCriterionTrigger<AbstractCriterionInstanc
 	}
 
 	@Override
-	public AbstractCriterionInstance deserializeInstance(JsonObject object,
-			JsonDeserializationContext context) {
+	public AbstractCriterionInstance deserializeInstance(
+			JsonObject object,
+			JsonDeserializationContext context
+	) {
 		return new AbstractCriterionInstance(ID);
 	}
 

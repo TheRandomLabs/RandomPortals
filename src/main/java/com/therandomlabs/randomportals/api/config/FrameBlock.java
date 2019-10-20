@@ -54,12 +54,12 @@ public final class FrameBlock {
 	}
 
 	public Block getBlock() {
-		if(!blockRetrieved && !registryName.startsWith("ore:")) {
+		if (!blockRetrieved && !registryName.startsWith("ore:")) {
 			block = BLOCK_REGISTRY.getValue(new ResourceLocation(registryName));
 
-			if(block == Blocks.AIR) {
+			if (block == Blocks.AIR) {
 				block = null;
-			} else if(block != null) {
+			} else if (block != null) {
 				registryName = block.getRegistryName().toString();
 			}
 
@@ -77,11 +77,11 @@ public final class FrameBlock {
 	public IBlockState getActualState() {
 		final FrameBlock block = getActualBlock();
 
-		if(block == null) {
+		if (block == null) {
 			return null;
 		}
 
-		if(block.meta == OreDictionary.WILDCARD_VALUE) {
+		if (block.meta == OreDictionary.WILDCARD_VALUE) {
 			return block.getBlock().getDefaultState();
 		}
 
@@ -93,7 +93,7 @@ public final class FrameBlock {
 	}
 
 	public void ensureCorrect() {
-		if(minimumAmount < 0) {
+		if (minimumAmount < 0) {
 			minimumAmount = 0;
 		}
 	}
@@ -102,9 +102,10 @@ public final class FrameBlock {
 		final Block block = state.getBlock();
 		final int meta = block.getMetaFromState(state);
 
-		for(FrameBlock frameBlock : getBlocks()) {
-			if(frameBlock.getBlock() == block && (frameBlock.meta == OreDictionary.WILDCARD_VALUE ||
-					frameBlock.meta == meta)) {
+		for (FrameBlock frameBlock : getBlocks()) {
+			if (frameBlock.getBlock() == block &&
+					(frameBlock.meta == OreDictionary.WILDCARD_VALUE ||
+							frameBlock.meta == meta)) {
 				return true;
 			}
 		}
@@ -113,12 +114,12 @@ public final class FrameBlock {
 	}
 
 	private FrameBlock[] getBlocks() {
-		if(blocks != null) {
+		if (blocks != null) {
 			return blocks;
 		}
 
-		if(!registryName.startsWith("ore:")) {
-			if(getBlock() == null) {
+		if (!registryName.startsWith("ore:")) {
+			if (getBlock() == null) {
 				blocks = new FrameBlock[0];
 				return blocks;
 			}
@@ -131,17 +132,17 @@ public final class FrameBlock {
 
 		final List<ItemStack> ores = OreDictionary.getOres(registryName.substring(4));
 
-		if(ores.isEmpty()) {
+		if (ores.isEmpty()) {
 			blocks = new FrameBlock[0];
 			return blocks;
 		}
 
 		final List<FrameBlock> blocks = new ArrayList<>(ores.size());
 
-		for(ItemStack ore : ores) {
+		for (ItemStack ore : ores) {
 			final Item item = ore.getItem();
 
-			if(item instanceof ItemBlock) {
+			if (item instanceof ItemBlock) {
 				blocks.add(new FrameBlock(((ItemBlock) item).getBlock(), ore.getMetadata()));
 			}
 		}

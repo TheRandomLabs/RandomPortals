@@ -24,7 +24,7 @@ public class BlockRPOFire extends BlockFire {
 
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if(PORTAL_ACTIVATOR.
+		if (PORTAL_ACTIVATOR.
 				setPlayer(NetherPortalActivationHandler.getPotentialFireActivator(pos)).
 				activate(world, pos, null) != null) {
 			return;
@@ -32,7 +32,7 @@ public class BlockRPOFire extends BlockFire {
 
 		final BlockPos down = pos.down();
 
-		if(!world.getBlockState(down).isSideSolid(world, down, EnumFacing.UP) &&
+		if (!world.getBlockState(down).isSideSolid(world, down, EnumFacing.UP) &&
 				!canNeighborCatchFire(world, pos)) {
 			world.setBlockToAir(pos);
 		} else {
@@ -41,8 +41,8 @@ public class BlockRPOFire extends BlockFire {
 	}
 
 	private boolean canNeighborCatchFire(World world, BlockPos pos) {
-		for(EnumFacing facing : EnumFacing.values()) {
-			if(canCatchFire(world, pos.offset(facing), facing.getOpposite())) {
+		for (EnumFacing facing : EnumFacing.values()) {
+			if (canCatchFire(world, pos.offset(facing), facing.getOpposite())) {
 				return true;
 			}
 		}

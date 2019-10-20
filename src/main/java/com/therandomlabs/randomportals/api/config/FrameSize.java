@@ -12,7 +12,7 @@ public final class FrameSize {
 	public int maxHeight;
 
 	public FrameSize() {
-		if(RandomPatches.IS_DEOBFUSCATED) {
+		if (RandomPatches.IS_DEOBFUSCATED) {
 			minWidth = 3;
 			maxWidth = Integer.MAX_VALUE;
 			minHeight = 3;
@@ -33,19 +33,19 @@ public final class FrameSize {
 	}
 
 	public void ensureCorrect() {
-		if(minWidth < 3) {
+		if (minWidth < 3) {
 			minWidth = 3;
 		}
 
-		if(minHeight < 3) {
+		if (minHeight < 3) {
 			minHeight = 3;
 		}
 
-		if(maxWidth < minWidth) {
+		if (maxWidth < minWidth) {
 			maxWidth = minWidth;
 		}
 
-		if(maxHeight < minHeight) {
+		if (maxHeight < minHeight) {
 			maxHeight = minHeight;
 		}
 	}

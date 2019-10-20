@@ -31,13 +31,13 @@ public final class ActivationData {
 	public void ensureCorrect() {
 		final List<RegistryNameAndMeta> checkedItems = new ArrayList<>();
 
-		for(int i = 0; i < activators.size(); i++) {
+		for (int i = 0; i < activators.size(); i++) {
 			final PortalActivator activator = activators.get(i);
 			final RegistryNameAndMeta registryNameAndMeta = new RegistryNameAndMeta(
 					activator.registryName, activator.meta
 			);
 
-			if(!activator.isValid() || checkedItems.contains(registryNameAndMeta)) {
+			if (!activator.isValid() || checkedItems.contains(registryNameAndMeta)) {
 				activators.remove(i--);
 				continue;
 			}
@@ -49,21 +49,21 @@ public final class ActivationData {
 	}
 
 	public SoundEvent[] getActivationSoundEvents() {
-		if(activationSoundEvents != null) {
+		if (activationSoundEvents != null) {
 			return activationSoundEvents;
 		}
 
 		final List<String> sounds = new ArrayList<>(activationSounds.length);
 		final List<SoundEvent> soundEvents = new ArrayList<>(activationSounds.length);
 
-		for(String activationSound : activationSounds) {
+		for (String activationSound : activationSounds) {
 			final SoundEvent soundEvent =
 					SoundEvent.REGISTRY.getObject(new ResourceLocation(activationSound));
 
-			if(soundEvent != null) {
+			if (soundEvent != null) {
 				final String registryName = soundEvent.getRegistryName().toString();
 
-				if(!sounds.contains(registryName)) {
+				if (!sounds.contains(registryName)) {
 					sounds.add(registryName);
 					soundEvents.add(soundEvent);
 				}
@@ -77,8 +77,8 @@ public final class ActivationData {
 	}
 
 	public boolean test(ItemStack stack) {
-		for(PortalActivator activator : activators) {
-			if(activator.test(stack)) {
+		for (PortalActivator activator : activators) {
+			if (activator.test(stack)) {
 				return true;
 			}
 		}

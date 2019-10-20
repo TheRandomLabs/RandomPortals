@@ -57,11 +57,13 @@ public final class VerticalInwardsEndPortalDetector extends SidedFrameDetector {
 		);
 	}
 
-	private boolean test(FrameType type, IBlockState state, Block block, EnumFacing facingX,
-			EnumFacing facingY) {
+	private boolean test(
+			FrameType type, IBlockState state, Block block, EnumFacing facingX,
+			EnumFacing facingY
+	) {
 		final boolean result = state.getBlock() == block && state.getValue(EYE);
 
-		if(facingX == null) {
+		if (facingX == null) {
 			return result;
 		}
 

@@ -34,8 +34,10 @@ public class BlockUpsideDownEndPortal extends BlockLateralEndPortal {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
-			EnumFacing side) {
+	public boolean shouldSideBeRendered(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			EnumFacing side
+	) {
 		return side == EnumFacing.UP || side == EnumFacing.DOWN;
 	}
 
@@ -45,8 +47,10 @@ public class BlockUpsideDownEndPortal extends BlockLateralEndPortal {
 	}
 
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos,
-			Entity entity) {
+	public boolean canEntityDestroy(
+			IBlockState state, IBlockAccess world, BlockPos pos,
+			Entity entity
+	) {
 		return false;
 	}
 }

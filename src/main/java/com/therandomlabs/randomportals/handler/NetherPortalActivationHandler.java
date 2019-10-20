@@ -48,18 +48,18 @@ public final class NetherPortalActivationHandler {
 		final EntityPlayer player = event.getEntityPlayer();
 		final EnumFacing face = event.getFace();
 
-		if(face == null) {
+		if (face == null) {
 			//Apparently this happens
 			return;
 		}
 
 		final BlockPos portalPos = pos.offset(face);
 
-		if(stack.getItem() == Items.FLINT_AND_STEEL) {
+		if (stack.getItem() == Items.FLINT_AND_STEEL) {
 			potentialFirePositions.put(portalPos, player);
 		}
 
-		if(!PortalTypes.getValidActivators().test(stack) ||
+		if (!PortalTypes.getValidActivators().test(stack) ||
 				!PortalTypes.getValidBlocks().test(world, pos, world.getBlockState(pos)) ||
 				!player.canPlayerEdit(pos, face, stack)) {
 			return;
@@ -67,29 +67,29 @@ public final class NetherPortalActivationHandler {
 
 		final NetherPortal portal = PORTAL_ACTIVATOR.activate(world, portalPos, stack);
 
-		if(portal == null) {
+		if (portal == null) {
 			return;
 		}
 
 		event.setCanceled(true);
 		event.setCancellationResult(EnumActionResult.SUCCESS);
 
-		if(world.isRemote) {
+		if (world.isRemote) {
 			return;
 		}
 
 		final ActivationData activation = portal.getType().activation;
 		final ActivationData.ConsumeBehavior behavior = activation.activatorConsumeBehavior;
 
-		if(!player.capabilities.isCreativeMode) {
-			if(behavior == ActivationData.ConsumeBehavior.CONSUME) {
+		if (!player.capabilities.isCreativeMode) {
+			if (behavior == ActivationData.ConsumeBehavior.CONSUME) {
 				stack.shrink(1);
-			} else if(behavior == ActivationData.ConsumeBehavior.DAMAGE) {
+			} else if (behavior == ActivationData.ConsumeBehavior.DAMAGE) {
 				stack.damageItem(1, player);
 			}
 		}
 
-		if(activation.spawnFireBeforeActivating) {
+		if (activation.spawnFireBeforeActivating) {
 			world.setBlockState(portalPos, Blocks.FIRE.getDefaultState(), 2);
 			return;
 		}
@@ -99,20 +99,20 @@ public final class NetherPortalActivationHandler {
 		final DelayedActivation delayedActivation =
 				delayedActivations.remove(delayedActivations.size() - 1);
 
-		for(BlockPos portalPosition : delayedActivation.portalPositions) {
+		for (BlockPos portalPosition : delayedActivation.portalPositions) {
 			world.setBlockState(portalPosition, delayedActivation.portalState, 2);
 		}
 	}
 
 	@SubscribeEvent
 	public static void onWorldTick(TickEvent.WorldTickEvent event) {
-		if(event.phase == TickEvent.Phase.END) {
+		if (event.phase == TickEvent.Phase.END) {
 			return;
 		}
 
-		for(DelayedActivation delayedActivation : delayedActivations) {
-			if(delayedActivation.world == event.world) {
-				for(BlockPos portalPosition : delayedActivation.portalPositions) {
+		for (DelayedActivation delayedActivation : delayedActivations) {
+			if (delayedActivation.world == event.world) {
+				for (BlockPos portalPosition : delayedActivation.portalPositions) {
 					event.world.setBlockState(portalPosition, delayedActivation.portalState, 2);
 				}
 			}
@@ -121,7 +121,7 @@ public final class NetherPortalActivationHandler {
 
 	@SubscribeEvent
 	public static void onServerTick(TickEvent.ServerTickEvent event) {
-		if(event.phase == TickEvent.Phase.END) {
+		if (event.phase == TickEvent.Phase.END) {
 			potentialFirePositions.clear();
 			delayedActivations.clear();
 		}
@@ -131,14 +131,16 @@ public final class NetherPortalActivationHandler {
 		return potentialFirePositions.get(pos);
 	}
 
-	public static void queueDelayedActivation(World world, List<BlockPos> portalPositions,
-			IBlockState portalState) {
+	public static void queueDelayedActivation(
+			World world, List<BlockPos> portalPositions,
+			IBlockState portalState
+	) {
 		delayedActivations.add(new DelayedActivation(world, portalPositions, portalState));
 	}
 
 	public static boolean isDelayedActivationQueued(World world, BlockPos pos) {
-		for(DelayedActivation delayedActivation : delayedActivations) {
-			if(delayedActivation.world == world &&
+		for (DelayedActivation delayedActivation : delayedActivations) {
+			if (delayedActivation.world == world &&
 					delayedActivation.portalPositions.contains(pos)) {
 				return true;
 			}

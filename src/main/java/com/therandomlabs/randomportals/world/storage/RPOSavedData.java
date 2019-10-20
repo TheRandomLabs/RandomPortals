@@ -71,12 +71,12 @@ public class RPOSavedData extends WorldSavedData {
 		generatedNetherPortalFrames.clear();
 		endPortals.clear();
 
-		for(NBTBase tag : nbt.getTagList(NETHER_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
+		for (NBTBase tag : nbt.getTagList(NETHER_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
 			final NBTTagCompound compound = (NBTTagCompound) tag;
 
 			final Frame frame = readFrame(world, compound.getCompoundTag(FRAME_KEY));
 
-			if(frame == null) {
+			if (frame == null) {
 				continue;
 			}
 
@@ -95,11 +95,11 @@ public class RPOSavedData extends WorldSavedData {
 
 		final NBTTagCompound compound = nbt.getCompoundTag(GENERATED_NETHER_PORTAL_FRAMES_KEY);
 
-		for(String typeID : compound.getKeySet()) {
+		for (String typeID : compound.getKeySet()) {
 			final NBTTagList list = compound.getTagList(typeID, Constants.NBT.TAG_COMPOUND);
 			final Set<BlockPos> positions = new HashSet<>(list.tagCount());
 
-			for(NBTBase tag : list) {
+			for (NBTBase tag : list) {
 				positions.add(NBTUtil.getPosFromTag((NBTTagCompound) tag));
 			}
 
@@ -114,7 +114,7 @@ public class RPOSavedData extends WorldSavedData {
 			);
 		}
 
-		for(NBTBase tag : nbt.getTagList(END_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
+		for (NBTBase tag : nbt.getTagList(END_PORTALS_KEY, Constants.NBT.TAG_COMPOUND)) {
 			final Frame frame = readFrame(world, (NBTTagCompound) tag);
 			endPortals.put(frame.getTopLeft(), frame);
 		}
@@ -124,7 +124,7 @@ public class RPOSavedData extends WorldSavedData {
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		final NBTTagList netherPortalList = new NBTTagList();
 
-		for(NetherPortal portal : netherPortals.values()) {
+		for (NetherPortal portal : netherPortals.values()) {
 			final NBTTagCompound compound = new NBTTagCompound();
 
 			final NBTTagCompound frame = writeFrame(new NBTTagCompound(), portal.getFrame());
@@ -143,10 +143,10 @@ public class RPOSavedData extends WorldSavedData {
 
 		final NBTTagCompound generatedPortalFramesTag = new NBTTagCompound();
 
-		for(Map.Entry<String, Set<BlockPos>> entry : generatedNetherPortalFrames.entrySet()) {
+		for (Map.Entry<String, Set<BlockPos>> entry : generatedNetherPortalFrames.entrySet()) {
 			final NBTTagList positionList = new NBTTagList();
 
-			for(BlockPos pos : entry.getValue()) {
+			for (BlockPos pos : entry.getValue()) {
 				positionList.appendTag(NBTUtil.createPosTag(pos));
 			}
 
@@ -161,7 +161,7 @@ public class RPOSavedData extends WorldSavedData {
 
 		final NBTTagList endPortalList = new NBTTagList();
 
-		for(Frame frame : endPortals.values()) {
+		for (Frame frame : endPortals.values()) {
 			endPortalList.appendTag(writeFrame(new NBTTagCompound(), frame));
 		}
 
@@ -197,7 +197,7 @@ public class RPOSavedData extends WorldSavedData {
 
 		netherPortals.put(frame.getTopLeft(), portal);
 
-		if(!userCreated) {
+		if (!userCreated) {
 			generatedNetherPortalFrames.merge(
 					portal.getType().toString(),
 					new HashSet<>(frame.getFrameBlockPositions()),
@@ -237,8 +237,8 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	public PortalType getGeneratedNetherPortalType(BlockPos framePos) {
-		for(Map.Entry<String, Set<BlockPos>> entry : generatedNetherPortalFrames.entrySet()) {
-			if(entry.getValue().contains(framePos)) {
+		for (Map.Entry<String, Set<BlockPos>> entry : generatedNetherPortalFrames.entrySet()) {
+			if (entry.getValue().contains(framePos)) {
 				return PortalTypes.getSpecific(entry.getKey());
 			}
 		}
@@ -249,7 +249,7 @@ public class RPOSavedData extends WorldSavedData {
 	public void removeGeneratedNetherPortalFramePos(String typeID, BlockPos framePos) {
 		final Set<BlockPos> positions = generatedNetherPortalFrames.get(typeID);
 
-		if(positions != null) {
+		if (positions != null) {
 			markDirty();
 		}
 	}
@@ -289,10 +289,10 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	private NetherPortal getNetherPortal(Predicate<Frame> predicate, BlockPos pos) {
-		for(NetherPortal portal : netherPortals.values()) {
+		for (NetherPortal portal : netherPortals.values()) {
 			final Frame frame = portal.getFrame();
 
-			if(predicate.test(frame)) {
+			if (predicate.test(frame)) {
 				return portal;
 			}
 		}
@@ -301,10 +301,10 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	private NetherPortal removeNetherPortal(Predicate<Frame> predicate) {
-		for(Map.Entry<BlockPos, NetherPortal> entry : netherPortals.entrySet()) {
+		for (Map.Entry<BlockPos, NetherPortal> entry : netherPortals.entrySet()) {
 			final NetherPortal portal = entry.getValue();
 
-			if(predicate.test(portal.getFrame())) {
+			if (predicate.test(portal.getFrame())) {
 				netherPortals.remove(entry.getKey());
 				markDirty();
 				MinecraftForge.EVENT_BUS.post(new NetherPortalEvent.Remove(portal));
@@ -316,8 +316,8 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	private Frame getEndPortal(Predicate<Frame> predicate, BlockPos pos) {
-		for(Frame frame : endPortals.values()) {
-			if(predicate.test(frame)) {
+		for (Frame frame : endPortals.values()) {
+			if (predicate.test(frame)) {
 				return frame;
 			}
 		}
@@ -326,10 +326,10 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	private Frame removeEndPortal(Predicate<Frame> predicate) {
-		for(Map.Entry<BlockPos, Frame> entry : endPortals.entrySet()) {
+		for (Map.Entry<BlockPos, Frame> entry : endPortals.entrySet()) {
 			final Frame frame = entry.getValue();
 
-			if(predicate.test(frame)) {
+			if (predicate.test(frame)) {
 				endPortals.remove(entry.getKey());
 				markDirty();
 				MinecraftForge.EVENT_BUS.post(new EndPortalEvent.Remove(frame));
@@ -353,7 +353,7 @@ public class RPOSavedData extends WorldSavedData {
 	}
 
 	public static NBTTagCompound writeFrame(NBTTagCompound compound, Frame frame) {
-		if(frame == null) {
+		if (frame == null) {
 			return compound;
 		}
 
@@ -371,7 +371,7 @@ public class RPOSavedData extends WorldSavedData {
 		final MapStorage storage = world.getPerWorldStorage();
 		RPOSavedData instance = (RPOSavedData) storage.getOrLoadData(RPOSavedData.class, ID);
 
-		if(instance == null) {
+		if (instance == null) {
 			instance = new RPOSavedData();
 			storage.setData(ID, instance);
 		}
