@@ -3,6 +3,7 @@ package com.therandomlabs.randomportals;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+
 import com.therandomlabs.randomlib.TRLUtils;
 import com.therandomlabs.randomlib.config.ConfigManager;
 import com.therandomlabs.randomportals.advancements.RPOCriteriaTriggers;
@@ -26,6 +27,14 @@ public class CommonProxy {
 
 	public void init() {
 		RPOConfig.reload();
+
+		if (RandomPortals.INSPIRATIONS_INSTALLED) {
+			try {
+				handleInspirations();
+			} catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException ex) {
+				RandomPortals.LOGGER.error("Failed to fix Inspirations compatibility", ex);
+			}
+		}
 
 		if (RandomPortals.MOVINGWORLD_INSTALLED) {
 			try {
@@ -57,6 +66,13 @@ public class CommonProxy {
 		}
 
 		RPOCriteriaTriggers.register();
+	}
+
+	private void handleInspirations()
+			throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+		final Class<?> config = Class.forName("knightminer.inspirations.common.Config");
+		final Field customPortalColor = config.getDeclaredField("customPortalColor");
+		customPortalColor.set(null, false);
 	}
 
 	private void handleMovingWorld() throws ClassNotFoundException, NoSuchFieldException,
