@@ -22,12 +22,6 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class CommonProxy {
 	public void preInit() {
-		ConfigManager.register(RPOConfig.class);
-	}
-
-	public void init() {
-		RPOConfig.reload();
-
 		if (RandomPortals.INSPIRATIONS_INSTALLED) {
 			try {
 				handleInspirations();
@@ -35,6 +29,12 @@ public class CommonProxy {
 				RandomPortals.LOGGER.error("Failed to fix Inspirations compatibility", ex);
 			}
 		}
+
+		ConfigManager.register(RPOConfig.class);
+	}
+
+	public void init() {
+		RPOConfig.reload();
 
 		if (RandomPortals.MOVINGWORLD_INSTALLED) {
 			try {
