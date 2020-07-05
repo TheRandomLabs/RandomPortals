@@ -127,6 +127,8 @@
 		//Whether this portal is a one-way. If true, the corresponding portal generated in the
 		//destination dimension cannot be entered, only exited.
 		"oneWay": false,
+		//Whether the generated portal should always return to the dimension of the sending portal.
+		"ensureReturnToSameDimension": true,
 		//Whether to generate a portal in the destination dimension if a valid portal is not found.
 		"generatePortalIfNotFound": true,
 		//Valid values:

@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.8.2.0": "Added destination.ensureReturnToSameDimension.",
 		"1.12.2-1.8.1.3": "RandomPortals now automatically disables Inspirations' custom portal color feature.",
 		"1.12.2-1.8.1.2": "Attempted to fix compatibility with Topography.",
 		"1.12.2-1.8.1.1": "Portals are now localized as just \"Portal\" rather than \"Nether Portal\".\nFixed a BlockState error.",
@@ -44,7 +45,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.8.1.3",
-		"1.12.2-recommended": "1.12.2-1.8.1.3"
+		"1.12.2-latest": "1.12.2-1.8.2.0",
+		"1.12.2-recommended": "1.12.2-1.8.2.0"
 	}
 }
