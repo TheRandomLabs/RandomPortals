@@ -47,6 +47,7 @@ public class NetherPortalActivator {
 	private boolean activatedByFire;
 	private boolean activationDelayed;
 	private FunctionType functionType;
+	private int destination = NetherPortal.NO_FIXED_DESTINATION;
 	private EntityPlayer player;
 
 	public PortalType getForcedPortalType() {
@@ -116,6 +117,15 @@ public class NetherPortalActivator {
 
 	public NetherPortalActivator setFunctionType(FunctionType type) {
 		functionType = type;
+		return this;
+	}
+
+	public int getDestination() {
+		return destination;
+	}
+
+	public NetherPortalActivator setDestination(int id) {
+		destination = id;
 		return this;
 	}
 
@@ -308,7 +318,7 @@ public class NetherPortalActivator {
 		}
 
 		if (forcePortalType != null) {
-			return new NetherPortal(frame, null, forcePortalType, functionType);
+			return new NetherPortal(frame, null, forcePortalType, functionType, destination);
 		}
 
 		final List<PortalType> types;
@@ -336,7 +346,7 @@ public class NetherPortalActivator {
 			if ((!activatedByFire || type.activation.canBeActivatedByFire) && type.test(frame) &&
 					(forcePortalType != null || activator == null ||
 							type.testActivator(activator))) {
-				return new NetherPortal(frame, null, type, functionType);
+				return new NetherPortal(frame, null, type, functionType, destination);
 			}
 		}
 

@@ -41,6 +41,8 @@ public class RPOSavedData extends WorldSavedData {
 	public static final String WIDTH_KEY = "Width";
 	public static final String HEIGHT_KEY = "Height";
 
+	public static final String DESTINATION_KEY = "Destination";
+
 	public static final String GENERATED_NETHER_PORTAL_FRAMES_KEY = "GeneratedNetherPortalFrames";
 
 	public static final String END_PORTALS_KEY = "EndPortals";
@@ -88,8 +90,11 @@ public class RPOSavedData extends WorldSavedData {
 			final FunctionType functionType =
 					FUNCTION_TYPES[compound.getInteger(FUNCTION_TYPE_KEY)];
 
+			final int destination = compound.hasKey(DESTINATION_KEY) ?
+					compound.getInteger(DESTINATION_KEY) : NetherPortal.NO_FIXED_DESTINATION;
+
 			netherPortals.put(frame.getTopLeft(), new NetherPortal(
-					frame, receivingFrame, type, functionType
+					frame, receivingFrame, type, functionType, destination
 			));
 		}
 
@@ -135,6 +140,10 @@ public class RPOSavedData extends WorldSavedData {
 			compound.setTag(RECEIVING_FRAME_KEY, receivingFrame);
 			compound.setString(PORTAL_TYPE_KEY, portal.getType().toString());
 			compound.setInteger(FUNCTION_TYPE_KEY, portal.getFunctionType().ordinal());
+
+			if (portal.getDestination() != NetherPortal.NO_FIXED_DESTINATION) {
+				compound.setInteger(DESTINATION_KEY, portal.getDestination());
+			}
 
 			netherPortalList.appendTag(compound);
 		}

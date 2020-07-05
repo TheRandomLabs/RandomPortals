@@ -2,6 +2,7 @@ package com.therandomlabs.randomportals.world;
 
 import java.lang.reflect.Field;
 import java.util.List;
+
 import com.therandomlabs.randomlib.TRLUtils;
 import com.therandomlabs.randomportals.RandomPortals;
 import com.therandomlabs.randomportals.api.config.DestinationData;
@@ -472,7 +473,9 @@ public class RPOTeleporter extends Teleporter {
 			}
 
 			final NetherPortal portal = new NetherPortal(
-					newFrame, receivingFrame, portalType, oneWay ? FunctionType.ONE_WAY : null
+					newFrame, receivingFrame, portalType, oneWay ? FunctionType.ONE_WAY : null,
+					portalType.destination.ensureReturnToSameDimension ?
+							sendingDimensionID : NetherPortal.NO_FIXED_DESTINATION
 			);
 
 			RPOSavedData.get(world).addNetherPortal(portal, false);
@@ -506,6 +509,8 @@ public class RPOTeleporter extends Teleporter {
 				forcePortalType(portalType).
 				setUserCreated(false).
 				setFunctionType(oneWay ? FunctionType.ONE_WAY : null).
+				setDestination(portalType.destination.ensureReturnToSameDimension ?
+						sendingDimensionID : NetherPortal.NO_FIXED_DESTINATION).
 				activate(world, activationPos, null);
 
 		if (!initial) {

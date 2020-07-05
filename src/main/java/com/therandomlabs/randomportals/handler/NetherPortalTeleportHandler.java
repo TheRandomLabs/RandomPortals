@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Nullable;
+
 import com.therandomlabs.randomportals.api.config.PortalType;
 import com.therandomlabs.randomportals.api.config.PortalTypes;
 import com.therandomlabs.randomportals.api.event.NetherPortalEvent;
@@ -170,6 +172,11 @@ public final class NetherPortalTeleportHandler {
 		}
 
 		teleportData.put(reference, data);
-		entity.changeDimension(type.getDestinationDimensionID(dimensionID));
+
+		if (data.getPortal().getDestination() == NetherPortal.NO_FIXED_DESTINATION) {
+			entity.changeDimension(type.getDestinationDimensionID(dimensionID));
+		} else {
+			entity.changeDimension(data.getPortal().getDestination());
+		}
 	}
 }

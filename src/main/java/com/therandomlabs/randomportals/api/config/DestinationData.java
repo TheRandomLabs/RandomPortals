@@ -32,6 +32,8 @@ public final class DestinationData {
 	public boolean teleportToPortal = true;
 	public boolean oneWay;
 
+	public boolean ensureReturnToSameDimension;
+
 	public boolean generatePortalIfNotFound = true;
 	public PortalGenerationBehavior portalGenerationBehavior = PortalGenerationBehavior.CLONE;
 
