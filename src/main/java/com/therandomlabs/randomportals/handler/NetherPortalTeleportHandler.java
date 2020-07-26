@@ -173,10 +173,12 @@ public final class NetherPortalTeleportHandler {
 
 		teleportData.put(reference, data);
 
-		if (data.getPortal().getDestination() == NetherPortal.NO_FIXED_DESTINATION) {
+		final NetherPortal portal = data.getPortal();
+
+		if (portal == null || portal.getDestination() == NetherPortal.NO_FIXED_DESTINATION) {
 			entity.changeDimension(type.getDestinationDimensionID(dimensionID));
 		} else {
-			entity.changeDimension(data.getPortal().getDestination());
+			entity.changeDimension(portal.getDestination());
 		}
 	}
 }
