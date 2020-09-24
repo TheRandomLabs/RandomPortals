@@ -1,6 +1,8 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.8.2.3": "Potentially fixed ContentTweaker compatibility.",
+		"1.12.2-1.8.2.2": "Added initialLocation.useTopSolidY.",
 		"1.12.2-1.8.2.1": "Fixed a NullPointerException.",
 		"1.12.2-1.8.2.0": "Added destination.ensureReturnToSameDimension.",
 		"1.12.2-1.8.1.3": "RandomPortals now automatically disables Inspirations' custom portal color feature.",
@@ -46,7 +48,7 @@
 		"1.12.2-0.1.0.0": "Initial alpha release."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-1.8.2.1",
-		"1.12.2-recommended": "1.12.2-1.8.2.1"
+		"1.12.2-latest": "1.12.2-1.8.2.3",
+		"1.12.2-recommended": "1.12.2-1.8.2.3"
 	}
 }

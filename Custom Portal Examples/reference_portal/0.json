@@ -112,7 +112,10 @@
 		"initialLocation": {
 			"x": 0,
 			"y": 0,
-			"z": 0
+			"z": 0,
+			//If this is true, the above Y coordinate will be ignored, and the top solid block will
+			//be used instead.
+			"useTopSolidY": true
 		},
 		//What the entity's X and Z coordinates should be multiplied by.
 		//If the destination dimension does not have the ID specified by dimensionID,
