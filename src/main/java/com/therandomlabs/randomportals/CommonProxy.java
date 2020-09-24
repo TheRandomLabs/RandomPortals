@@ -58,14 +58,15 @@ public class CommonProxy {
 
 		EndPortalFrames.registerSizes();
 		FrameSizes.reload();
+		RPOCriteriaTriggers.register();
+	}
 
+	public void postInit() {
 		try {
 			PortalTypes.reload();
 		} catch (IOException ex) {
 			TRLUtils.crashReport("Error while reloading Nether portal types", ex);
 		}
-
-		RPOCriteriaTriggers.register();
 	}
 
 	private void handleInspirations()

@@ -13,6 +13,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderState;
+import net.minecraftforge.fml.relauncher.FMLCorePlugin;
 
 public final class FrameData {
 	public FrameType type = FrameType.LATERAL_OR_VERTICAL;
@@ -32,6 +37,11 @@ public final class FrameData {
 		}
 
 		size.ensureCorrect();
+
+		//ContentTweaker block support.
+		if (!Loader.instance().hasReachedState(LoaderState.POSTINITIALIZATION)) {
+			return;
+		}
 
 		final List<RegistryNameAndMeta> checkedBlocks = new ArrayList<>();
 

@@ -150,15 +150,8 @@ public class RPOTeleporter extends Teleporter {
 				DestinationData.LocationDetectionBehavior.FORCE_INITIAL &&
 				dimensionID == portalType.destination.dimensionID;
 
-		if (forceInitial) {
-			final NetherPortal initialPortal = savedData.getNetherPortalByFrame(
-					portalType.destination.initialLocation.toBlockPos()
-			);
-
-			if (initialPortal != null) {
-				receivingFrame = initialPortal.getFrame();
-			}
-		} else if (RPOConfig.NetherPortals.persistentReceivingPortals && sendingPortal != null) {
+		if ((forceInitial || RPOConfig.NetherPortals.persistentReceivingPortals) &&
+				sendingPortal != null) {
 			receivingFrame = sendingPortal.getReceivingFrame();
 		}
 
@@ -245,7 +238,7 @@ public class RPOTeleporter extends Teleporter {
 			zOffset = 0.0;
 			forwards = EnumFacing.NORTH;
 		} else {
-			if (sendingPortal != null && !forceInitial) {
+			if (sendingPortal != null) {
 				sendingPortal.setReceivingFrame(frame);
 
 				if (receivingPortal == null) {
@@ -443,7 +436,7 @@ public class RPOTeleporter extends Teleporter {
 		BlockPos topLeft;
 
 		if (initial) {
-			topLeft = portalType.destination.initialLocation.toBlockPos();
+			topLeft = portalType.destination.initialLocation.toBlockPos(world);
 
 			//initialLocation is the bottom left if the frame is vertical
 			if (type != FrameType.LATERAL) {
@@ -477,6 +470,7 @@ public class RPOTeleporter extends Teleporter {
 					portalType.destination.ensureReturnToSameDimension ?
 							sendingDimensionID : NetherPortal.NO_FIXED_DESTINATION
 			);
+			data.getPortal().setReceivingFrame(newFrame);
 
 			RPOSavedData.get(world).addNetherPortal(portal, false);
 
@@ -513,9 +507,8 @@ public class RPOTeleporter extends Teleporter {
 						sendingDimensionID : NetherPortal.NO_FIXED_DESTINATION).
 				activate(world, activationPos, null);
 
-		if (!initial) {
-			portal.setReceivingFrame(receivingFrame);
-		}
+		portal.setReceivingFrame(receivingFrame);
+		data.getPortal().setReceivingFrame(newFrame);
 
 		return true;
 	}

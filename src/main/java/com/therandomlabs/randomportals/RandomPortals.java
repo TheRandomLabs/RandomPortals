@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +57,11 @@ public final class RandomPortals {
 	@Mod.EventHandler
 	public static void init(FMLInitializationEvent event) {
 		proxy.init();
+	}
+
+	@Mod.EventHandler
+	public static void postInit(FMLPostInitializationEvent event) {
+		proxy.postInit();
 	}
 
 	@Mod.EventHandler
