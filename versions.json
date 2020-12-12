@@ -1,6 +1,7 @@
 {
 	"homepage": "https://minecraft.curseforge.com/projects/randomportals",
 	"1.12.2": {
+		"1.12.2-1.8.2.4": "Potentially fixed a NullPointerException.",
 		"1.12.2-1.8.2.3": "Potentially fixed ContentTweaker compatibility.",
 		"1.12.2-1.8.2.2": "Added initialLocation.useTopSolidY.",
 		"1.12.2-1.8.2.1": "Fixed a NullPointerException.",
