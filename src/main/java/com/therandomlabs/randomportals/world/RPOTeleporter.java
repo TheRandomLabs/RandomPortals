@@ -508,7 +508,10 @@ public class RPOTeleporter extends Teleporter {
 				activate(world, activationPos, null);
 
 		portal.setReceivingFrame(receivingFrame);
-		data.getPortal().setReceivingFrame(newFrame);
+
+		if (data.getPortal() != null) {
+			data.getPortal().setReceivingFrame(newFrame);
+		}
 
 		return true;
 	}
